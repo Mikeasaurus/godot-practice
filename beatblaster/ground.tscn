@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://bm7qgjkk7dev2"]
+
+[ext_resource type="Script" path="res://ground.gd" id="1_v02vq"]
+[ext_resource type="PackedScene" uid="uid://by1oghbi6p61o" path="res://big_boom.tscn" id="2_behk3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nfur4"]
+size = Vector2(1062, 73.5)
+
+[node name="Ground" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_v02vq")
+big_boom_scene = ExtResource("2_behk3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(484, 1168.75)
+shape = SubResource("RectangleShape2D_nfur4")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

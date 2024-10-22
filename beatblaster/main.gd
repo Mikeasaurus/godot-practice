@@ -1,13 +1,34 @@
 extends Node
 
+@export var invincible: bool
 @export var note_scene: PackedScene
+@export var meteor_scene: PackedScene
+var screen_width
+# State of the game.
+# 0 = Waiting (title screen)?
+# 1 = Playing
+# 2 = Game Over
+var game_state: int
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass
+	screen_width = get_viewport().size.x
+	start()
+
+func start() -> void:
+	game_state = 1
+	$Bright.color.a = 0.0
+	$Dark.color.a = 0.0
+	$EndMessage.disable()
+	$MeteorTimer.start()
+
+func stop() -> void:
+	$MeteorTimer.stop()
 
 func _input(event):
-	if event is InputEventMouseButton and event.pressed:
+	if game_state == 0 and event is InputEventMouseButton and event.pressed:
+		start()
+	if game_state == 1 and event is InputEventMouseButton and event.pressed:
 		#print ($Note.position, event.position)
 		# Spawn a new note.
 		var note = note_scene.instantiate()
@@ -23,4 +44,32 @@ func _input(event):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	pass
+	# Brightnening of sky during game over
+	if game_state == 2:
+		if $Bright.color.a < 1.0:
+			$Bright.color.a += 0.5 * delta
+		elif $Dark.color.a < 0.95:
+			$Dark.color.a += 0.5 * delta
+			if $Dark.color.a >= 0.95:
+				$EndMessage.set_value(0.040)
+		elif $Dark.color.a < 1.0:
+			$Dark.color.a += 0.5 * delta
+		elif $EndMessage.get_value() > 0.0:
+			$EndMessage.dec_value(0.05*delta)
+		elif $EndMessage.get_value() <= 0.0:
+			game_state = 0
+
+# Called when ready for another meteor to fall.
+func _on_meteor_timer_timeout() -> void:
+	var meteor = meteor_scene.instantiate()
+	# Put meteor in a random x location on the screen
+	meteor.position.x = round(randf()*screen_width)
+	meteor.position.y = -100
+	add_child(meteor)
+
+
+func _on_ground_gameover() -> void:
+	if invincible: return
+	print ("GAME OVER")
+	game_state = 2
+	stop()

@@ -1,17 +1,60 @@
-[gd_scene load_steps=4 format=3 uid="uid://dgp4315r85ut0"]
+[gd_scene load_steps=7 format=3 uid="uid://dgp4315r85ut0"]
 
 [ext_resource type="Texture2D" uid="uid://cxvwaprwwansr" path="res://band.png" id="1_ltden"]
 [ext_resource type="Script" path="res://main.gd" id="1_p7o6g"]
 [ext_resource type="PackedScene" uid="uid://ceqw036w7hyee" path="res://note.tscn" id="3_jgydo"]
+[ext_resource type="PackedScene" uid="uid://cf21ke6ukicec" path="res://meteor.tscn" id="4_fu6ey"]
+[ext_resource type="PackedScene" uid="uid://bm7qgjkk7dev2" path="res://ground.tscn" id="5_1l7i3"]
+[ext_resource type="Script" path="res://end_message.gd" id="5_u4d4m"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_p7o6g")
 note_scene = ExtResource("3_jgydo")
+meteor_scene = ExtResource("4_fu6ey")
 
 [node name="Band" type="Sprite2D" parent="."]
+z_index = 1
 position = Vector2(480, 810)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_ltden")
 
 [node name="NoteLaunch" type="Marker2D" parent="."]
 position = Vector2(434, 825)
+
+[node name="Sky" type="ColorRect" parent="."]
+offset_right = 960.0
+offset_bottom = 1080.0
+color = Color(0, 0.745098, 1, 1)
+
+[node name="Bright" type="ColorRect" parent="."]
+z_index = 2
+offset_right = 960.0
+offset_bottom = 1080.0
+color = Color(1, 1, 1, 0)
+
+[node name="Dark" type="ColorRect" parent="."]
+z_index = 3
+offset_right = 960.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 0)
+
+[node name="MeteorTimer" type="Timer" parent="."]
+
+[node name="EndMessage" type="Label" parent="."]
+z_index = 4
+offset_left = 221.0
+offset_top = 161.0
+offset_right = 270.0
+offset_bottom = 236.0
+scale = Vector2(10, 10)
+theme_override_colors/font_color = Color(0, 0, 1, 1)
+text = "Was It
+Worth
+It All?"
+horizontal_alignment = 1
+script = ExtResource("5_u4d4m")
+
+[node name="Ground" parent="." instance=ExtResource("5_1l7i3")]
+
+[connection signal="timeout" from="MeteorTimer" to="." method="_on_meteor_timer_timeout"]
+[connection signal="gameover" from="Ground" to="." method="_on_ground_gameover"]
