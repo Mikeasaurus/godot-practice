@@ -48,13 +48,33 @@ offset_right = 270.0
 offset_bottom = 236.0
 scale = Vector2(10, 10)
 theme_override_colors/font_color = Color(0, 0, 1, 1)
-text = "Was It
-Worth
-It All?"
 horizontal_alignment = 1
 script = ExtResource("5_u4d4m")
 
 [node name="Ground" parent="." instance=ExtResource("5_1l7i3")]
+
+[node name="Score" type="Label" parent="."]
+z_index = 4
+offset_left = 782.0
+offset_top = 24.0
+offset_right = 941.0
+offset_bottom = 107.0
+theme_override_font_sizes/font_size = 60
+text = "0"
+horizontal_alignment = 2
+
+[node name="SplashScreen" type="Label" parent="."]
+z_index = 4
+offset_left = 163.0
+offset_top = 168.0
+offset_right = 785.0
+offset_bottom = 725.0
+theme_override_font_sizes/font_size = 100
+text = "SCORE: XXX
+
+CLICK / TAP
+TO START"
+horizontal_alignment = 1
 
 [connection signal="timeout" from="MeteorTimer" to="." method="_on_meteor_timer_timeout"]
 [connection signal="gameover" from="Ground" to="." method="_on_ground_gameover"]

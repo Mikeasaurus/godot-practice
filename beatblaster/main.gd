@@ -4,6 +4,8 @@ extends Node
 @export var note_scene: PackedScene
 @export var meteor_scene: PackedScene
 var screen_width
+var score = 0
+
 # State of the game.
 # 0 = Waiting (title screen)?
 # 1 = Playing
@@ -15,19 +17,41 @@ func _ready() -> void:
 	screen_width = get_viewport().get_visible_rect().size.x
 	start()
 
+func update_score() -> void:
+	$SplashScreen.text = "SCORE: %d\n\nCLICK / TAP\nTO START"%score
+	$Score.text = str(score)
+
+func increase_score() -> void:
+	score = score + 10
+	update_score()
+
 func start() -> void:
+	game_state = 0
+	$Bright.color.a = 0.0
+	$Dark.color.a = 1.0
+	$EndMessage.disable()
+	$MeteorTimer.stop()
+	$Score.hide()
+	update_score()
+	$SplashScreen.show()
+
+func play() -> void:
 	game_state = 1
 	$Bright.color.a = 0.0
 	$Dark.color.a = 0.0
 	$EndMessage.disable()
 	$MeteorTimer.start()
+	score = 0
+	update_score()
+	$Score.show()
+	$SplashScreen.hide()
 
 func stop() -> void:
 	$MeteorTimer.stop()
 
 func _input(event):
 	if game_state == 0 and event is InputEventMouseButton and event.pressed:
-		start()
+		play()
 	if game_state == 1 and event is InputEventMouseButton and event.pressed:
 		#print ($Note.position, event.position)
 		# Spawn a new note.
@@ -48,15 +72,21 @@ func _process(delta: float) -> void:
 	if game_state == 2:
 		if $Bright.color.a < 1.0:
 			$Bright.color.a += 0.5 * delta
+			if $Bright.color.a >= 1.0:
+				$Score.hide()
+				update_score()
+				$SplashScreen.show()
 		elif $Dark.color.a < 0.95:
 			$Dark.color.a += 0.5 * delta
 			if $Dark.color.a >= 0.95:
 				$EndMessage.set_value(0.040)
 		elif $Dark.color.a < 1.0:
 			$Dark.color.a += 0.5 * delta
-		elif $EndMessage.get_value() > 0.0:
-			$EndMessage.dec_value(0.05*delta)
-		elif $EndMessage.get_value() <= 0.0:
+		#elif $EndMessage.get_value() > 0.0:
+		#	$EndMessage.dec_value(0.05*delta)
+		#elif $EndMessage.get_value() <= 0.0:
+		#	game_state = 0
+		else:
 			game_state = 0
 
 # Called when ready for another meteor to fall.
@@ -67,6 +97,7 @@ func _on_meteor_timer_timeout() -> void:
 	meteor.position.x = round(randf()*(screen_width-2*margin)) + margin
 	meteor.position.y = -100
 	add_child(meteor)
+	meteor.hit.connect(increase_score)
 
 
 func _on_ground_gameover() -> void:
