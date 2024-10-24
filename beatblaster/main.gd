@@ -12,7 +12,7 @@ var game_state: int
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	screen_width = get_viewport().size.x
+	screen_width = get_viewport().get_visible_rect().size.x
 	start()
 
 func start() -> void:
@@ -62,14 +62,14 @@ func _process(delta: float) -> void:
 # Called when ready for another meteor to fall.
 func _on_meteor_timer_timeout() -> void:
 	var meteor = meteor_scene.instantiate()
+	var margin = 50
 	# Put meteor in a random x location on the screen
-	meteor.position.x = round(randf()*screen_width)
+	meteor.position.x = round(randf()*(screen_width-2*margin)) + margin
 	meteor.position.y = -100
 	add_child(meteor)
 
 
 func _on_ground_gameover() -> void:
 	if invincible: return
-	print ("GAME OVER")
 	game_state = 2
 	stop()
