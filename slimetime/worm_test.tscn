@@ -1,0 +1,83 @@
+[gd_scene load_steps=3 format=3 uid="uid://ch3j30otfxv5c"]
+
+[ext_resource type="PackedScene" uid="uid://ss2xikvy6bt7" path="res://worm_segment.tscn" id="1_exnem"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_y6b5l"]
+size = Vector2(166, 36)
+
+[node name="WormTest" type="Node2D"]
+position = Vector2(3, -1)
+
+[node name="WormSegment1" parent="." instance=ExtResource("1_exnem")]
+position = Vector2(142, 234)
+
+[node name="WormSegment2" parent="." instance=ExtResource("1_exnem")]
+position = Vector2(179, 235)
+
+[node name="WormSegment3" parent="." instance=ExtResource("1_exnem")]
+position = Vector2(216, 233)
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(92, 275)
+rotation = 0.126973
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="Floor"]
+offset_right = 168.0
+offset_bottom = 40.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+position = Vector2(84, 21)
+shape = SubResource("RectangleShape2D_y6b5l")
+
+[node name="Spring1a" type="DampedSpringJoint2D" parent="."]
+position = Vector2(163, 221)
+rotation = -1.44567
+node_a = NodePath("../WormSegment1")
+node_b = NodePath("../WormSegment2")
+
+[node name="Spring1b" type="DampedSpringJoint2D" parent="."]
+position = Vector2(167, 254)
+rotation = -1.5708
+node_a = NodePath("../WormSegment1")
+node_b = NodePath("../WormSegment2")
+
+[node name="Spring1c" type="DampedSpringJoint2D" parent="."]
+position = Vector2(163, 237)
+rotation = -0.812241
+node_a = NodePath("../WormSegment1")
+node_b = NodePath("../WormSegment2")
+
+[node name="Spring1d" type="DampedSpringJoint2D" parent="."]
+position = Vector2(162, 238)
+rotation = -2.2875
+node_a = NodePath("../WormSegment1")
+node_b = NodePath("../WormSegment2")
+
+[node name="Core1" type="RigidBody2D" parent="."]
+position = Vector2(178, 234)
+
+[node name="Core2" type="RigidBody2D" parent="."]
+position = Vector2(215, 233)
+
+[node name="Connector" type="GrooveJoint2D" parent="."]
+position = Vector2(175, 236)
+rotation = -1.57656
+node_a = NodePath("../Core1")
+node_b = NodePath("../Core2")
+
+[node name="Pin1" type="PinJoint2D" parent="."]
+position = Vector2(177, 235)
+node_a = NodePath("../WormSegment2")
+node_b = NodePath("../Core1")
+angular_limit_enabled = true
+angular_limit_lower = -0.174533
+angular_limit_upper = 0.174533
+
+[node name="Pin2" type="PinJoint2D" parent="."]
+position = Vector2(217, 235)
+node_a = NodePath("../WormSegment3")
+node_b = NodePath("../Core2")
+angular_limit_enabled = true
+angular_limit_lower = -0.174533
+angular_limit_upper = 0.174533
