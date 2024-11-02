@@ -29,31 +29,3 @@ offset_bottom = 40.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
 position = Vector2(84, 21)
 shape = SubResource("RectangleShape2D_y6b5l")
-
-[node name="Connector1" type="RigidBody2D" parent="."]
-position = Vector2(150, 228)
-
-[node name="Pin1a" type="PinJoint2D" parent="."]
-position = Vector2(131, 229)
-node_a = NodePath("../Connector1")
-node_b = NodePath("../WormSegment1")
-angular_limit_enabled = true
-angular_limit_lower = -0.349066
-angular_limit_upper = 0.349066
-
-[node name="Pin1b" type="PinJoint2D" parent="."]
-position = Vector2(168, 229)
-node_a = NodePath("../Connector1")
-node_b = NodePath("../WormSegment2")
-angular_limit_enabled = true
-angular_limit_lower = -0.349066
-angular_limit_upper = 0.349066
-
-[node name="Connector2" type="RigidBody2D" parent="."]
-position = Vector2(191, 232)
-
-[node name="Pin2a" type="PinJoint2D" parent="."]
-node_a = NodePath("../Connector2")
-
-[node name="Pin2b" type="PinJoint2D" parent="."]
-node_a = NodePath("../Connector2")

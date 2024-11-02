@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://ss2xikvy6bt7"]
+[gd_scene load_steps=7 format=3 uid="uid://ss2xikvy6bt7"]
 
 [ext_resource type="Script" path="res://worm_segment.gd" id="1_i22me"]
 [ext_resource type="Texture2D" uid="uid://dca0wcvf7auln" path="res://worm/segment-walk1.png" id="1_yvgym"]
@@ -28,11 +28,10 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_alg25"]
 radius = 39.0128
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_f1jk2"]
-size = Vector2(65, 26)
-
 [node name="WormSegment" type="RigidBody2D"]
 collision_layer = 0
+contact_monitor = true
+max_contacts_reported = 1
 script = ExtResource("1_i22me")
 metadata/_edit_group_ = true
 
@@ -44,13 +43,3 @@ frame_progress = 0.813933
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-4, -3)
 shape = SubResource("CircleShape2D_alg25")
-
-[node name="StickyFeet" type="Area2D" parent="."]
-collision_layer = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StickyFeet"]
-position = Vector2(-1.5, 43)
-shape = SubResource("RectangleShape2D_f1jk2")
-debug_color = Color(0.615686, 0.215686, 0, 0.419608)
-
-[connection signal="body_entered" from="StickyFeet" to="." method="_on_sticky_feet_body_entered"]
