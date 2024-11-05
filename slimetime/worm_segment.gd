@@ -8,6 +8,9 @@ class_name WormSegment
 # Keep memory of sticky feet force, even if momentarily detached.
 var sticky_feet_force: Vector2 = Vector2.ZERO
 
+# Attraction point.  Either for gravity or for sticking to a surface.
+var gravity_point: Vector2 = Vector2.ZERO
+
 # Direction that the segment will try to point towards (for standing on a surface)
 var stand_angle: float = NAN
 # Optional connections to other segments.
@@ -17,7 +20,7 @@ var segment_spacing: float = 30.0
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#$AnimatedSprite2D.play()
-	pass
+	gravity_point = position + Vector2(0,100)
 
 func set_front_segment (segment: WormSegment) -> void:
 	front_segment = segment
@@ -27,7 +30,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	pass
 	if state.get_contact_count() > 0:
 		stand_angle = state.get_contact_local_normal(0).angle() + PI/2
-		gravity_scale = 0.0
+		#gravity_scale = 0.0
 		$GravityTimer.stop()
 	else:
 		stand_angle = NAN
@@ -38,7 +41,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 func _process(delta: float) -> void:
 	var f: Vector2 = Vector2.ZERO
 	# Apply a torque to align the body segment with a surface.
-	if is_finite(stand_angle):
+	if false and is_finite(stand_angle):
 		var angle_diff: float = stand_angle - rotation
 		if angle_diff < -PI: angle_diff += 2*PI
 		if angle_diff > PI: angle_diff -= 2*PI
@@ -50,14 +53,6 @@ func _process(delta: float) -> void:
 		#apply_torque(50*computed_inertia*angle_diff)
 		#apply_torque_impulse(computed_inertia*angle_diff)
 		angular_velocity = angle_diff
-	# Apply a force to stick the feet to a surface.
-	if is_finite(stand_angle):
-		# Why does force have to be 100 times stronger than gravity to avoid slipping?
-		sticky_feet_force = walking_speed*Vector2.from_angle(stand_angle+PI/2)
-		#sticky_feet_force = 100*Vector2.from_angle(stand_angle)
-	#if front_segment == null: print (position, sticky_feet_force*mass)
-	#apply_central_force(sticky_feet_force*mass)  
-	f += sticky_feet_force*mass
 	# Apply a force to bring the segment to the correct distance to the front and back neighbours.
 	# TODO: revisit this for when the worm is turning around.
 	if front_segment != null:
@@ -71,12 +66,15 @@ func _process(delta: float) -> void:
 	# Check for user-driven movement, if this is the front (leader) segment.
 	if front_segment == null:
 		if Input.is_action_pressed("move_right") and is_finite(stand_angle):
-			#linear_velocity = walking_speed * Vector2.from_angle(stand_angle)
-			apply_force(walking_speed * Vector2.from_angle(stand_angle), Vector2.from_angle(stand_angle-PI/2)*50)
+			#linear_velocity = 30 * Vector2.from_angle(stand_angle + PI/2)
+			#apply_force(walking_speed * Vector2.from_angle(stand_angle), Vector2.from_angle(stand_angle-PI/2)*50)
 			#f += walking_speed * Vector2.from_angle(stand_angle)
-			pass
-	apply_central_force(f)
+			gravity_point = position + Vector2(100,100)
+		elif is_nan(stand_angle):
+			gravity_point = position + Vector2(0,100)
+	apply_central_force((gravity_point-position).normalized()*100)
 
 func _on_gravity_timer_timeout() -> void:
-	gravity_scale = 1.0
-	sticky_feet_force = Vector2.ZERO
+	pass
+	#gravity_scale = 1.0
+	#sticky_feet_force = Vector2.ZERO
