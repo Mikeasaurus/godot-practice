@@ -43,3 +43,8 @@ frame_progress = 0.813933
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-4, -3)
 shape = SubResource("CircleShape2D_alg25")
+
+[node name="GravityTimer" type="Timer" parent="."]
+wait_time = 10.0
+
+[connection signal="timeout" from="GravityTimer" to="." method="_on_gravity_timer_timeout"]
