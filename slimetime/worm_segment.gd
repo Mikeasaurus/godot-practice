@@ -20,7 +20,8 @@ var segment_spacing: float = 30.0
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#$AnimatedSprite2D.play()
-	gravity_point = position + Vector2(0,100)
+	print (position, $CollisionShape2D.position, $GravityPoint.position)
+	gravity_point = Vector2(0,100)
 
 func set_front_segment (segment: WormSegment) -> void:
 	front_segment = segment
@@ -69,10 +70,18 @@ func _process(delta: float) -> void:
 			#linear_velocity = 30 * Vector2.from_angle(stand_angle + PI/2)
 			#apply_force(walking_speed * Vector2.from_angle(stand_angle), Vector2.from_angle(stand_angle-PI/2)*50)
 			#f += walking_speed * Vector2.from_angle(stand_angle)
-			gravity_point = position + Vector2(100,100)
-		elif is_nan(stand_angle):
-			gravity_point = position + Vector2(0,100)
-	apply_central_force((gravity_point-position).normalized()*100)
+			#gravity_point = position + Vector2(100,100)
+			#f = Vector2.from_angle(stand_angle-PI/2) * 10
+			gravity_point = Vector2(100,100)
+		elif is_finite(stand_angle):
+			gravity_point = Vector2(0,100)
+			#f = Vector2.from_angle(stand_angle-PI/2) * 10
+		else:
+			#f = Vector2(0,1) * 10
+			gravity_point = Vector2(0,100)
+	#TODO
+	apply_central_force(gravity_point.normalized()*10)
+	$GravityPoint.position = gravity_point
 
 func _on_gravity_timer_timeout() -> void:
 	pass
