@@ -21,7 +21,7 @@ var segment_spacing: float = 30.0
 func _ready() -> void:
 	#$AnimatedSprite2D.play()
 	print (position, $CollisionShape2D.position, $GravityPoint.position)
-	gravity_point = Vector2(0,100)
+	gravity_point = global_position + Vector2(0,100)
 
 func set_front_segment (segment: WormSegment) -> void:
 	front_segment = segment
@@ -32,6 +32,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if state.get_contact_count() > 0:
 		stand_angle = state.get_contact_local_normal(0).angle() + PI/2
 		#gravity_scale = 0.0
+		gravity_point = global_position - state.get_contact_local_normal(0)*50
 		$GravityTimer.stop()
 	else:
 		stand_angle = NAN
@@ -41,6 +42,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	var f: Vector2 = Vector2.ZERO
+	var gp: Vector2 = gravity_point
 	# Apply a torque to align the body segment with a surface.
 	if false and is_finite(stand_angle):
 		var angle_diff: float = stand_angle - rotation
@@ -72,16 +74,19 @@ func _process(delta: float) -> void:
 			#f += walking_speed * Vector2.from_angle(stand_angle)
 			#gravity_point = position + Vector2(100,100)
 			#f = Vector2.from_angle(stand_angle-PI/2) * 10
-			gravity_point = Vector2(100,100)
+			gp += (gravity_point - global_position).rotated(-PI/2).normalized() * 50
+			pass
 		elif is_finite(stand_angle):
-			gravity_point = Vector2(0,100)
+			#gravity_point = Vector2(0,100)
 			#f = Vector2.from_angle(stand_angle-PI/2) * 10
+			pass
 		else:
 			#f = Vector2(0,1) * 10
-			gravity_point = Vector2(0,100)
+			#gravity_point = Vector2(0,100)
+			pass
 	#TODO
-	apply_central_force(gravity_point.normalized()*10)
-	$GravityPoint.position = gravity_point
+	apply_central_force((gp-global_position).normalized()*200)
+	$GravityPoint.global_position = gp
 
 func _on_gravity_timer_timeout() -> void:
 	pass
