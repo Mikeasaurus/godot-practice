@@ -44,7 +44,7 @@ func _process(delta: float) -> void:
 	var f: Vector2 = Vector2.ZERO
 	var gp: Vector2 = gravity_point
 	# Apply a torque to align the body segment with a surface.
-	if false and is_finite(stand_angle):
+	if is_finite(stand_angle):
 		var angle_diff: float = stand_angle - rotation
 		if angle_diff < -PI: angle_diff += 2*PI
 		if angle_diff > PI: angle_diff -= 2*PI
@@ -55,7 +55,8 @@ func _process(delta: float) -> void:
 		#print (computed_inertia)
 		#apply_torque(50*computed_inertia*angle_diff)
 		#apply_torque_impulse(computed_inertia*angle_diff)
-		angular_velocity = angle_diff
+		#angular_velocity = angle_diff
+		$AnimatedSprite2D.global_rotation = stand_angle
 	# Apply a force to bring the segment to the correct distance to the front and back neighbours.
 	# TODO: revisit this for when the worm is turning around.
 	if front_segment != null:
@@ -65,7 +66,16 @@ func _process(delta: float) -> void:
 			#var f: float = (distance - segment_spacing) * mass * -10
 			#apply_central_force(f*to_other.normalized())
 			#set_deferred("position",position-(distance-segment_spacing)*to_other.normalized())
-			linear_velocity = (distance - segment_spacing) * to_other.normalized()
+			linear_velocity = (distance - segment_spacing) * to_other.normalized() * 10
+			#$AnimatedSprite2D.play()
+		else:
+			#$AnimatedSprite2D.pause()
+			pass
+	# Check if moving, need to animate legs?
+	if linear_velocity.length() > 10:
+		$AnimatedSprite2D.play()
+	else:
+		$AnimatedSprite2D.pause()
 	# Check for user-driven movement, if this is the front (leader) segment.
 	if front_segment == null:
 		if Input.is_action_pressed("move_right") and is_finite(stand_angle):
@@ -76,7 +86,9 @@ func _process(delta: float) -> void:
 			#f = Vector2.from_angle(stand_angle-PI/2) * 10
 			gp += (gravity_point - global_position).rotated(-PI/2).normalized() * 50
 			pass
+			#$AnimatedSprite2D.play()
 		elif is_finite(stand_angle):
+			#$AnimatedSprite2D.pause()
 			#gravity_point = Vector2(0,100)
 			#f = Vector2.from_angle(stand_angle-PI/2) * 10
 			pass
