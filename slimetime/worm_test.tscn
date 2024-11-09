@@ -12,7 +12,7 @@ radius = 57.3149
 position = Vector2(3, -1)
 
 [node name="Floor" type="StaticBody2D" parent="."]
-position = Vector2(508, 158)
+position = Vector2(96.9999, 309)
 rotation = 0.126973
 metadata/_edit_group_ = true
 
@@ -27,7 +27,7 @@ shape = SubResource("RectangleShape2D_y6b5l")
 [node name="Worm" parent="." instance=ExtResource("1_vcy4j")]
 
 [node name="Round" type="StaticBody2D" parent="."]
-position = Vector2(252, 120)
+position = Vector2(334, 180)
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Round"]
