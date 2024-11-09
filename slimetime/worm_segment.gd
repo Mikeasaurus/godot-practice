@@ -56,6 +56,9 @@ func _process(delta: float) -> void:
 	if front_segment == null:
 		if Input.is_action_pressed("move_right") and is_finite(stand_angle):
 			gp += (gravity_point - global_position).rotated(-PI/2).normalized() * 50
+		# If on a surface, but no key pressed, hit the brakes on movement.
+		elif is_finite(stand_angle) and linear_velocity.length() > 10:
+			gp -= linear_velocity.normalized()*100
 	# Apply the force to keep stuck to a surface / move in a direction.
 	apply_central_force((gp-global_position).normalized()*200)
 	# Visual aid for centre of force, for debugging.
