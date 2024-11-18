@@ -1,10 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://ss2xikvy6bt7"]
+[gd_scene load_steps=11 format=3 uid="uid://ss2xikvy6bt7"]
 
 [ext_resource type="Script" path="res://worm_segment.gd" id="1_i22me"]
 [ext_resource type="Texture2D" uid="uid://dca0wcvf7auln" path="res://worm/segment-walk1.png" id="1_yvgym"]
 [ext_resource type="Texture2D" uid="uid://fsoeijujxmy5" path="res://worm/segment-walk2.png" id="2_opyea"]
 [ext_resource type="Texture2D" uid="uid://bobv50cj7vfr6" path="res://worm/segment-walk3.png" id="3_rtdus"]
+[ext_resource type="Texture2D" uid="uid://bfuivwhhj5fjg" path="res://worm/segment-outline.png" id="5_gd7kj"]
+[ext_resource type="Texture2D" uid="uid://csxipffvdith0" path="res://worm/segment-top.png" id="6_f5u7s"]
 [ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://hit.png" id="6_ntq0u"]
+[ext_resource type="Texture2D" uid="uid://b0rc5xm2pb8pk" path="res://worm/segment-body.png" id="6_rmkjy"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_okwhj"]
 animations = [{
@@ -41,6 +44,18 @@ metadata/_edit_group_ = true
 sprite_frames = SubResource("SpriteFrames_okwhj")
 frame = 3
 frame_progress = 0.813933
+
+[node name="Outline" type="Sprite2D" parent="AnimatedSprite2D"]
+z_index = -3
+texture = ExtResource("5_gd7kj")
+
+[node name="Body" type="Sprite2D" parent="AnimatedSprite2D"]
+z_index = -2
+texture = ExtResource("6_rmkjy")
+
+[node name="Top" type="Sprite2D" parent="AnimatedSprite2D"]
+z_index = -1
+texture = ExtResource("6_f5u7s")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-4, -3)
