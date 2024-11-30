@@ -46,7 +46,7 @@ sprite_frames = SubResource("SpriteFrames_di2j6")
 offset = Vector2(27, -50)
 
 [node name="Outline" type="Sprite2D" parent="AnimatedSprite2D"]
-z_index = -2
+z_index = -3
 texture = ExtResource("5_vclal")
 offset = Vector2(27, -50)
 
