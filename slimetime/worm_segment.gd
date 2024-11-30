@@ -10,14 +10,14 @@ var stand_angle: float = NAN
 # When the last time that the segement was touching a surface.
 var last_stand: float = 0.0
 # Optional connections to other segments.
-var front_segment: WormSegment = null
+var front_segment: RigidBody2D = null
 var segment_spacing: float = 30.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	gravity_point = global_position + Vector2(0,100)
 
-func set_front_segment (segment: WormSegment) -> void:
+func set_front_segment (segment: RigidBody2D) -> void:
 	front_segment = segment
 
 # Get normal to any surface that's contacted.

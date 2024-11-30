@@ -25,6 +25,7 @@ position = Vector2(84, 21)
 shape = SubResource("RectangleShape2D_y6b5l")
 
 [node name="Worm" parent="." instance=ExtResource("1_vcy4j")]
+position = Vector2(-11, 25)
 
 [node name="Round" type="StaticBody2D" parent="."]
 position = Vector2(334, 180)

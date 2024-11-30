@@ -1,0 +1,68 @@
+[gd_scene load_steps=11 format=3 uid="uid://dd7mpa5anwn06"]
+
+[ext_resource type="Script" path="res://worm_front.gd" id="1_rw4nf"]
+[ext_resource type="Texture2D" uid="uid://xmouf5q1t8ww" path="res://worm/front-walk1.png" id="2_m32wx"]
+[ext_resource type="Texture2D" uid="uid://blojcrk05bmn0" path="res://worm/front-walk2.png" id="3_4unqo"]
+[ext_resource type="Texture2D" uid="uid://cy8ey6er2jslo" path="res://worm/front-walk3.png" id="4_ye44h"]
+[ext_resource type="Texture2D" uid="uid://xr53vj2ebvu" path="res://worm/front-outline.png" id="5_vclal"]
+[ext_resource type="Texture2D" uid="uid://bl12tabuh2g" path="res://worm/front-body.png" id="6_xwa5c"]
+[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://hit.png" id="7_0jjxr"]
+[ext_resource type="Texture2D" uid="uid://crr3r5rv3umqa" path="res://worm/front-top.png" id="7_prwf5"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_di2j6"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_m32wx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_4unqo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ye44h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_4unqo")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wfloj"]
+radius = 39.0128
+
+[node name="WormFront" type="RigidBody2D"]
+position = Vector2(29, -52)
+collision_layer = 0
+gravity_scale = 0.0
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_rw4nf")
+metadata/_edit_lock_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_di2j6")
+offset = Vector2(27, -50)
+
+[node name="Outline" type="Sprite2D" parent="AnimatedSprite2D"]
+z_index = -2
+texture = ExtResource("5_vclal")
+offset = Vector2(27, -50)
+
+[node name="Body" type="Sprite2D" parent="AnimatedSprite2D"]
+z_index = -2
+texture = ExtResource("6_xwa5c")
+offset = Vector2(27, -50)
+
+[node name="Top" type="Sprite2D" parent="AnimatedSprite2D"]
+z_index = -1
+texture = ExtResource("7_prwf5")
+offset = Vector2(27, -50)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_wfloj")
+
+[node name="GravityPoint" type="Sprite2D" parent="."]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("7_0jjxr")

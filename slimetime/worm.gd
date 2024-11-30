@@ -4,9 +4,8 @@ extends Node2D
 func _ready() -> void:
 	pass # Replace with function body.
 	$WormSegment1.set_front_segment($WormSegment2)
-	#$WormSegment2.set_back_segment($WormSegment1)
 	$WormSegment2.set_front_segment($WormSegment3)
-	#$WormSegment3.set_back_segment($WormSegment2)
+	$WormSegment3.set_front_segment($WormFront)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
