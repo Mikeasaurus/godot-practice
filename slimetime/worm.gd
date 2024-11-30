@@ -2,7 +2,7 @@ extends Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	$WormTail.set_front_segment($WormSegment1)
 	$WormSegment1.set_front_segment($WormSegment2)
 	$WormSegment2.set_front_segment($WormSegment3)
 	$WormSegment3.set_front_segment($WormFront)

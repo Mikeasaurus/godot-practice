@@ -1,0 +1,63 @@
+[gd_scene load_steps=11 format=3 uid="uid://c6aw5rjsklap6"]
+
+[ext_resource type="Script" path="res://worm_tail.gd" id="1_onfeh"]
+[ext_resource type="Texture2D" uid="uid://blls77duj641x" path="res://worm/tail-walk1.png" id="1_s7icc"]
+[ext_resource type="Texture2D" uid="uid://c4dsadwsrp0qd" path="res://worm/tail-walk2.png" id="2_vbqgt"]
+[ext_resource type="Texture2D" uid="uid://clepa24iv8d2a" path="res://worm/tail-walk3.png" id="3_nseqk"]
+[ext_resource type="Texture2D" uid="uid://daoi0drmdmmdn" path="res://worm/tail-outline.png" id="4_o4jfh"]
+[ext_resource type="Texture2D" uid="uid://d1aiefgpj6kgq" path="res://worm/tail-body.png" id="5_uoy1x"]
+[ext_resource type="Texture2D" uid="uid://tgpfeqvj6lv8" path="res://worm/tail-top.png" id="6_pw6xx"]
+[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://hit.png" id="7_hw7jy"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_o8qp8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_s7icc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_vbqgt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_nseqk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_vbqgt")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_rh2oh"]
+radius = 41.0
+
+[node name="WormTail" type="RigidBody2D"]
+collision_layer = 0
+gravity_scale = 0.0
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_onfeh")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-20, 5)
+sprite_frames = SubResource("SpriteFrames_o8qp8")
+
+[node name="Outline" type="Sprite2D" parent="AnimatedSprite2D"]
+z_index = -3
+texture = ExtResource("4_o4jfh")
+
+[node name="Body" type="Sprite2D" parent="AnimatedSprite2D"]
+z_index = -2
+texture = ExtResource("5_uoy1x")
+
+[node name="Top" type="Sprite2D" parent="AnimatedSprite2D"]
+z_index = -1
+texture = ExtResource("6_pw6xx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_rh2oh")
+
+[node name="GravityPoint" type="Sprite2D" parent="."]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("7_hw7jy")

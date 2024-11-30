@@ -1,11 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://bl2u1vwrkn7sx"]
+[gd_scene load_steps=5 format=3 uid="uid://bl2u1vwrkn7sx"]
 
 [ext_resource type="Script" path="res://worm.gd" id="1_isia4"]
 [ext_resource type="PackedScene" uid="uid://ss2xikvy6bt7" path="res://worm_segment.tscn" id="1_lbykk"]
 [ext_resource type="PackedScene" uid="uid://dd7mpa5anwn06" path="res://worm_front.tscn" id="3_8bjjj"]
+[ext_resource type="PackedScene" uid="uid://c6aw5rjsklap6" path="res://worm_tail.tscn" id="4_ypqm5"]
 
 [node name="Worm" type="Node2D"]
 script = ExtResource("1_isia4")
+
+[node name="WormTail" parent="." instance=ExtResource("4_ypqm5")]
+position = Vector2(112, 232)
 
 [node name="WormSegment1" parent="." instance=ExtResource("1_lbykk")]
 position = Vector2(142, 234)
