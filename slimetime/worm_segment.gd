@@ -13,6 +13,9 @@ var last_stand: float = 0.0
 var front_segment: RigidBody2D = null
 var segment_spacing: float = 30.0
 
+# Current direction of the segment.
+var current_direction: String = "right"
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	gravity_point = global_position + Vector2(0,100)
@@ -20,12 +23,49 @@ func _ready() -> void:
 func set_front_segment (segment: RigidBody2D) -> void:
 	front_segment = segment
 
+# Helper method - flip the segment in the opposite direction.
+# Maybe there's a better way to do this?
+# can't find a way to do this to all child nodes in one shot, need to
+# do each one individually?
+func flip_segment():
+	# Get width of the segment, and current offset.
+	var w = $AnimatedSprite2D/Outline.texture.get_width()
+	# Flip the components.
+	$AnimatedSprite2D.flip_h = not $AnimatedSprite2D.flip_h
+	$AnimatedSprite2D/Outline.flip_h = not $AnimatedSprite2D/Outline.flip_h
+	$AnimatedSprite2D/Body.flip_h = not $AnimatedSprite2D/Body.flip_h
+	$AnimatedSprite2D/Top.flip_h = not $AnimatedSprite2D/Top.flip_h
+	# Change sign of horizontal offset.
+	$AnimatedSprite2D.offset.x *= -1
+	$AnimatedSprite2D/Outline.offset.x *= -1
+	$AnimatedSprite2D/Body.offset.x *= -1
+	$AnimatedSprite2D/Top.offset.x *= -1
+	# Update current direction (so other segments can compare against it)
+	if current_direction == "left":
+		current_direction = "right"
+	else:
+		current_direction = "left"
+
+# Helper method - get the normalized direction that the segment is facing.
+# Based on stand_angle value (orientation that the segment *should* have).
+# May be different from current rotation value, if it the segment is in the
+# process of adjusting to a new surface normal.
+func get_facing_direction():
+	var angle: float = $AnimatedSprite2D.global_rotation
+	if is_finite(stand_angle):
+		angle = stand_angle
+	var facing: Vector2 = Vector2.from_angle(angle)
+	# If segment is horizontally flipped, then flip sign of direction.
+	if current_direction == "left":
+		facing *= -1
+	return facing
+
 # Get normal to any surface that's contacted.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	pass
 	if state.get_contact_count() > 0:
 		stand_angle = state.get_contact_local_normal(0).angle() + PI/2
-		gravity_point = global_position - state.get_contact_local_normal(0)*50
+		gravity_point = global_position - state.get_contact_local_normal(0)*100
 		last_stand = Time.get_ticks_msec()
 	elif Time.get_ticks_msec() - last_stand > 100:
 		stand_angle = NAN
@@ -47,10 +87,13 @@ func _process(delta: float) -> void:
 		$AnimatedSprite2D.global_rotation = target_angle
 	else:
 		$AnimatedSprite2D.global_rotation += 10.0 * delta * sign(angle_diff)
-	# Apply a force to bring the segment to the correct distance to the front and back neighbours.
-	# TODO: revisit this for when the worm is turning around.
+	# The following actions are contingent on have a segment in front.
 	if front_segment != null:
-		var to_other: Vector2 = front_segment.position - position
+		var to_other: Vector2 = front_segment.global_position - global_position
+		# Flip direction if segment ahead has turned around and moved past this one.
+		if to_other.dot(get_facing_direction()) < 0:
+			flip_segment()
+		# Apply a force to bring the segment to the correct distance to the front neighbour.
 		var distance: float = to_other.length()
 		if distance > segment_spacing:
 			linear_velocity = (distance - segment_spacing) * to_other.normalized() * 10
@@ -62,7 +105,20 @@ func _process(delta: float) -> void:
 	# Check for user-driven movement, if this is the front (leader) segment.
 	if front_segment == null:
 		if Input.is_action_pressed("move_right") and is_finite(stand_angle):
+			# Lead the gravity point in the direction of travel.
+			# Motion will be from an effect of this force.
 			gp += (gravity_point - global_position).rotated(-PI/2).normalized() * 50
+			# Check if the sprites need to be flipped around.
+			# Check if the sprites need to be flipped around.
+			if current_direction == "left":
+				flip_segment()
+		elif Input.is_action_pressed("move_left") and is_finite(stand_angle):
+			# Lead the gravity point in the direction of travel.
+			# Motion will be from an effect of this force.
+			gp -= (gravity_point - global_position).rotated(-PI/2).normalized() * 50
+			# Check if the sprites need to be flipped around.
+			if current_direction == "right":
+				flip_segment()
 		# If on a surface, but no key pressed, hit the brakes on movement.
 		elif is_finite(stand_angle) and linear_velocity.length() > 10:
 			gp -= linear_velocity.normalized()*100
