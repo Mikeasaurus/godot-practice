@@ -77,8 +77,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		stand_angle = v.angle() + PI/2
 		gravity_point = global_position - state.get_contact_local_normal(0)*100
 		last_stand = Time.get_ticks_msec()
-	elif Time.get_ticks_msec() - last_stand > 100:
-		stand_angle = NAN
+	# Disabled this code, because it was causing the head to "nod" forward too
+	# much when going over a hill.
+	#elif Time.get_ticks_msec() - last_stand > 100:
+	#	stand_angle = NAN
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
