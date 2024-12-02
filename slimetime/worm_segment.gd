@@ -27,7 +27,7 @@ func set_front_segment (segment: RigidBody2D) -> void:
 # Maybe there's a better way to do this?
 # can't find a way to do this to all child nodes in one shot, need to
 # do each one individually?
-func flip_segment():
+func flip_segment() -> void:
 	# Get width of the segment, and current offset.
 	var w = $AnimatedSprite2D/Outline.texture.get_width()
 	# Flip the components.
@@ -46,6 +46,11 @@ func flip_segment():
 	else:
 		current_direction = "left"
 
+# Helper method: return true if the segement is flipped (turned around in other
+# direction)
+func is_flipped() -> bool:
+	return current_direction == "left"
+
 # Helper method - get the normalized direction that the segment is facing.
 # Based on stand_angle value (orientation that the segment *should* have).
 # May be different from current rotation value, if it the segment is in the
@@ -56,7 +61,7 @@ func get_facing_direction():
 		angle = stand_angle
 	var facing: Vector2 = Vector2.from_angle(angle)
 	# If segment is horizontally flipped, then flip sign of direction.
-	if current_direction == "left":
+	if is_flipped():
 		facing *= -1
 	return facing
 
@@ -74,12 +79,19 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 func _process(delta: float) -> void:
 	var gp: Vector2 = gravity_point
 	# Apply a torque to align the body segment with a surface.
-	# If not on a surface, align with front segment.
+	# If not on a surface, point it toward segment in front.
 	var target_angle: float = $AnimatedSprite2D.global_rotation
 	if is_finite(stand_angle):
 		target_angle = stand_angle
 	elif front_segment != null:
-		target_angle = front_segment.get_node("AnimatedSprite2D").global_rotation
+		# Old code that used same angle as front segment.
+		# Caused weird shear force effect.  Keeping here for reference of how
+		# to access a child of another object.
+		#target_angle = front_segment.get_node("AnimatedSprite2D").global_rotation
+		var target_vector: Vector2 = front_segment.global_position - global_position
+		# If segment is flipped, then flip sign of vector.
+		if is_flipped(): target_vector *= -1
+		target_angle = target_vector.angle()
 	var angle_diff: float = target_angle - $AnimatedSprite2D.global_rotation
 	while angle_diff < -PI: angle_diff += 2*PI
 	while angle_diff > PI: angle_diff -= 2*PI
