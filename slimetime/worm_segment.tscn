@@ -36,7 +36,7 @@ radius = 39.0128
 collision_layer = 0
 gravity_scale = 0.0
 contact_monitor = true
-max_contacts_reported = 1
+max_contacts_reported = 2
 script = ExtResource("1_i22me")
 metadata/_edit_group_ = true
 

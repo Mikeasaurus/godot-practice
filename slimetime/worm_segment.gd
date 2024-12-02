@@ -67,9 +67,14 @@ func get_facing_direction():
 
 # Get normal to any surface that's contacted.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	pass
-	if state.get_contact_count() > 0:
-		stand_angle = state.get_contact_local_normal(0).angle() + PI/2
+	var n = state.get_contact_count()
+	if n > 0:
+		# Sum up all contact normals.
+		# Should make it less jittery when transitioning from one surface to another?
+		var v: Vector2 = Vector2.ZERO
+		for i in range(n):
+			v  += state.get_contact_local_normal(i)
+		stand_angle = v.angle() + PI/2
 		gravity_point = global_position - state.get_contact_local_normal(0)*100
 		last_stand = Time.get_ticks_msec()
 	elif Time.get_ticks_msec() - last_stand > 100:
@@ -88,6 +93,7 @@ func _process(delta: float) -> void:
 		# Caused weird shear force effect.  Keeping here for reference of how
 		# to access a child of another object.
 		#target_angle = front_segment.get_node("AnimatedSprite2D").global_rotation
+		# New code that points toward segment in front.
 		var target_vector: Vector2 = front_segment.global_position - global_position
 		# If segment is flipped, then flip sign of vector.
 		if is_flipped(): target_vector *= -1
