@@ -88,6 +88,8 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		last_stand = Time.get_ticks_msec()
 		on_surface = true
 	elif Time.get_ticks_msec() - last_stand > 100:
+		#TODO: orient with gravity points of neighbouring segments?
+		gravity_point = global_position + Vector2(0,100)
 		on_surface = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
