@@ -32,7 +32,7 @@ func set_back_segment (segment: RigidBody2D) -> void:
 # Maybe there's a better way to do this?
 # can't find a way to do this to all child nodes in one shot, need to
 # do each one individually?
-func flip_segment() -> void:
+func flip_segment(adjust_zorder=true) -> void:
 	# Get width of the segment, and current offset.
 	var w = $AnimatedSprite2D/Outline.texture.get_width()
 	# Flip the components.
@@ -50,6 +50,19 @@ func flip_segment() -> void:
 		current_direction = "right"
 	else:
 		current_direction = "left"
+	# Put all layers ahead, so outline is visible while turning around.
+	# This will have to be re-adjusted back down when all segments have high z-index.
+	if adjust_zorder:
+		if back_segment == null:
+			z_index = front_segment.z_index
+		elif back_segment != null:
+			if back_segment.current_direction != current_direction:
+				z_index = back_segment.z_index + 5
+			# If turned around back and forth quickly, and re-aligned with segment
+			# behind, then restore old z order.
+			else:
+				z_index = back_segment.z_index
+		print (self, z_index)
 
 # Helper method: return true if the segement is flipped (turned around in other
 # direction)
@@ -109,7 +122,7 @@ func _process(delta: float) -> void:
 		# This happens sometimes if second segment gets ahead of head... don't know why.
 		# But easy enough to fix I guess.
 		if abs(get_orientation()-front_segment.get_orientation()) > PI/2:
-			flip_segment()
+			flip_segment(false)
 			set_orientation(get_orientation()+PI)
 	
 	# Adjust the rotation of the segment so it's aligned w.r.t. to segment
@@ -141,8 +154,6 @@ func _process(delta: float) -> void:
 				alignment_vector = front_segment.global_position - global_position
 				if is_flipped():
 					alignment_vector *= -1
-	#if is_flipped():
-	#	alignment_vector *= -1
 	# Instantaneous adjustment to the new alignment.
 	set_orientation(alignment_vector.angle())
 	# Remember this orientation (hold it for cases where not enough information to
@@ -155,6 +166,10 @@ func _process(delta: float) -> void:
 		var distance: float = to_other.length()
 		if distance > segment_spacing:
 			linear_velocity = (distance - segment_spacing) * to_other.normalized() * 10
+			# Adjust z-order
+			# (fail safe for when it doesn't work otherwise)
+			if current_direction == front_segment.current_direction:
+				z_index = front_segment.z_index
 
 	# Check if moving, need to animate legs?
 	if linear_velocity.length() > 10:

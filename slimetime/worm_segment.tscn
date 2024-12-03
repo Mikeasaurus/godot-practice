@@ -62,5 +62,6 @@ position = Vector2(-4, -3)
 shape = SubResource("CircleShape2D_alg25")
 
 [node name="GravityPoint" type="Sprite2D" parent="."]
+visible = false
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("6_ntq0u")
