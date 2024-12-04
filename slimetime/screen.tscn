@@ -29,4 +29,5 @@ tile_map_data = PackedByteArray("AAAAAAUAAAACAAAAAAABAAUAAAACAAAAAAACAAUAAAACAAA
 tile_set = SubResource("TileSet_6vxb5")
 
 [node name="Worm" parent="." instance=ExtResource("2_34v46")]
+z_index = 1
 position = Vector2(8, 316)

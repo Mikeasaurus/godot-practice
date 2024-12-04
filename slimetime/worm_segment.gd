@@ -62,7 +62,6 @@ func flip_segment(adjust_zorder=true) -> void:
 			# behind, then restore old z order.
 			else:
 				z_index = back_segment.z_index
-		print (self, z_index)
 
 # Helper method: return true if the segement is flipped (turned around in other
 # direction)

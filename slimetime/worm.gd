@@ -18,7 +18,6 @@ func _process(delta: float) -> void:
 	# Adjust z-order of worm segments if they all exceed a certain value
 	var minz: int = segments[0].z_index
 	if minz > 0:
-		print ("Reduce zorder by", minz)
 		for segment in segments:
 			segment.z_index -= minz
 	
