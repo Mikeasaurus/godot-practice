@@ -8,6 +8,8 @@ radius = 22.0
 
 [node name="Slime" type="RigidBody2D"]
 collision_layer = 0
+contact_monitor = true
+max_contacts_reported = 1
 script = ExtResource("1_2jvy3")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
