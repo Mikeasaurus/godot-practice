@@ -120,7 +120,9 @@ func _process(delta: float) -> void:
 		# then re-adjust.
 		# This happens sometimes if second segment gets ahead of head... don't know why.
 		# But easy enough to fix I guess.
-		if abs(get_orientation()-front_segment.get_orientation()) > PI/2:
+		var v1 = Vector2.from_angle(get_orientation())
+		var v2 = Vector2.from_angle(front_segment.get_orientation())
+		if v1.dot(v2) < 0:
 			flip_segment(false)
 			set_orientation(get_orientation()+PI)
 	
