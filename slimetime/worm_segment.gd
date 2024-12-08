@@ -4,7 +4,7 @@ class_name WormSegment
 
 # Attraction point.  Either for gravity or for sticking to a surface.
 var gravity_point: Vector2 = Vector2.ZERO
-# Indicates if currently standing on a surface (do determine if user can control
+# Indicates if currently standing on a surface (to determine if user can control
 # movement)
 var on_surface: bool = false
 # Keep track of the orientation angle, to stop it from rolling with the collision circle.
@@ -17,12 +17,17 @@ var back_segment: RigidBody2D = null
 var segment_spacing: float = 30.0
 
 # Current direction of the segment.
+# Relative to the direction of its feet.
 var current_direction: String = "right"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# Set gravity, so segment will start falling onto the surface below
+	# if it's placed above the ground.
 	gravity_point = global_position + Vector2(0,100)
 
+# Helper methods to associate this segment with neighbouring segments.
+# Called by a higher-level scene which will manage the overall worm.
 func set_front_segment (segment: RigidBody2D) -> void:
 	front_segment = segment
 func set_back_segment (segment: RigidBody2D) -> void:
@@ -77,6 +82,9 @@ func set_orientation(angle: float) -> void:
 	if angle < 0: angle += 2*PI
 	if angle >= 2*PI: angle -= 2*PI
 	$AnimatedSprite2D.global_rotation = angle
+	# Save this orientation for cases where it should be held fixed
+	# (when no other context for determining the best orientation)
+	orientation = angle
 
 # Helper method - get the normalized direction that the segment is facing.
 func get_facing_direction():
@@ -86,6 +94,11 @@ func get_facing_direction():
 	if is_flipped():
 		facing *= -1
 	return facing
+# Helper method - get downward direction relative from the sprite.
+func get_downward_direction():
+	var angle: float = get_orientation() - PI/2
+	var downward: Vector2 = Vector2.from_angle(angle)
+	return downward
 
 # Get normal to any surface that's contacted.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
@@ -98,10 +111,14 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			v  += state.get_contact_local_normal(i)
 		gravity_point = global_position - v.normalized()*100
 		last_stand = Time.get_ticks_msec()
+		if on_surface == false:
+			print (self, "now on surface")
 		on_surface = true
 	elif Time.get_ticks_msec() - last_stand > 100:
 		#TODO: orient with gravity points of neighbouring segments?
 		gravity_point = global_position + Vector2(0,100)
+		if on_surface == true:
+			print (self, "has been off a surface for a while")
 		on_surface = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -127,7 +144,7 @@ func _process(delta: float) -> void:
 			set_orientation(get_orientation()+PI)
 	
 	# Adjust the rotation of the segment so it's aligned w.r.t. to segment
-	# in front and behind.
+	# in front and/or behind.
 	var alignment_vector: Vector2 = Vector2.from_angle(orientation)
 	# Case 1: this is the front segment (check if no segments ahead).
 	if front_segment == null and back_segment != null:
@@ -157,28 +174,56 @@ func _process(delta: float) -> void:
 					alignment_vector *= -1
 	# Instantaneous adjustment to the new alignment.
 	set_orientation(alignment_vector.angle())
-	# Remember this orientation (hold it for cases where not enough information to
-	# determmine orientation in the future).
-	orientation = alignment_vector.angle()
 	
-	# Apply a force to bring the segment to the correct distance to the front neighbour.
-	if front_segment != null:
-		var to_other: Vector2 = front_segment.global_position - global_position
-		var distance: float = to_other.length()
-		if distance > segment_spacing:
-			linear_velocity = (distance - segment_spacing) * to_other.normalized() * 10
-			# Adjust z-order
-			# (fail safe for when it doesn't work otherwise)
-			if current_direction == front_segment.current_direction:
-				z_index = front_segment.z_index
-
 	# Check if moving, need to animate legs?
 	if linear_velocity.length() > 10:
 		$AnimatedSprite2D.play()
 	else:
 		$AnimatedSprite2D.pause()
-	# Check for user-driven movement, if this is the front (leader) segment.
+		
+	# The following code controls force of movement for the segments.
+	
+	# This variable defines a force point of attraction for the segment.
+	# Could be force of gravity, or a force sticking the segment to a surface.
+	# Initialized with current attraction point, can be updated to include
+	# other forces further below.
 	var gp: Vector2 = gravity_point
+
+	# Bring the segment to the correct distance to the front neighbour.
+	if front_segment != null:
+		var to_other: Vector2 = front_segment.global_position - global_position
+		var distance: float = to_other.length()
+		if distance > segment_spacing:
+			# Close the gap.
+			# Instantaneous.  I had too many problems with other approaches:
+			# - Using a force was too springy.
+			# - Setting a linear velocity mostly worked, but doing so negated any
+			#   other forces (gravity) from being applied.
+			var dx: Vector2 = to_other.normalized() * (distance - segment_spacing)
+			global_position += dx
+			# If segment in front is not attached to ground, then adjust the
+			# linear velocity of this one to match the speed at which the above
+			# adjustment would have been made.
+			# This should give it some "momentum" for when the worm is jumping in
+			# mid-air.
+			# Don't do this if the segment in front is touching the ground,
+			# because doing so messses with gravity.
+			if not front_segment.on_surface:
+				pass #linear_velocity = dx / delta
+			# Adjust z-order
+			# (fail safe for when it doesn't work otherwise)
+			if current_direction == front_segment.current_direction:
+				z_index = front_segment.z_index
+
+	# If disattached from a surface, but neighbouring segment(s) are attached,
+	# then apply an attachment force to this segment.
+	if not on_surface:
+		if (back_segment != null and back_segment.on_surface) or (front_segment != null and front_segment.on_surface):
+			pass #TODO
+			#print ("re-attach", self)
+			#gravity_point = global_position + get_downward_direction() * 100
+
+	# Generate a force of motion in response to user input (front segment only)
 	if front_segment == null:
 		if Input.is_action_pressed("move_right") and on_surface:
 			# Lead the gravity point in the direction of travel.
@@ -198,7 +243,14 @@ func _process(delta: float) -> void:
 		# If on a surface, but no key pressed, hit the brakes on movement.
 		elif on_surface and linear_velocity.length() > 10:
 			gp -= linear_velocity.normalized()*100
-	# Apply the force to keep stuck to a surface / move in a direction.
+	# Apply the force and linear velocity.
 	apply_central_force((gp-global_position).normalized()*200)
+	# Only adjust linear velocity in direction orthogonal to gravity / surface attraction.
+	#var g: Vector2 = (gp-global_position).normalized()
+	#lv -= lv.dot(g) * g
+	#if front_segment != null:
+#	#	print (linear_velocity, g)
+	#	set_deferred("linear_velocity", linear_velocity)
+	#	#linear_velocity = linear_velocity.dot(g) * g #+ lv
 	# Visual aid for centre of force, for debugging.
 	$GravityPoint.global_position = gp
