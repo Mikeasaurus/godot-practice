@@ -111,14 +111,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			v  += state.get_contact_local_normal(i)
 		gravity_point = global_position - v.normalized()*100
 		last_stand = Time.get_ticks_msec()
-		if on_surface == false:
-			print (self, "now on surface")
 		on_surface = true
 	elif Time.get_ticks_msec() - last_stand > 100:
 		#TODO: orient with gravity points of neighbouring segments?
 		gravity_point = global_position + Vector2(0,100)
-		if on_surface == true:
-			print (self, "has been off a surface for a while")
 		on_surface = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -193,7 +189,7 @@ func _process(delta: float) -> void:
 	if front_segment != null:
 		var to_other: Vector2 = front_segment.global_position - global_position
 		var distance: float = to_other.length()
-		if distance > segment_spacing:
+		if distance > segment_spacing * 1.05:
 			# Close the gap.
 			# Instantaneous.  I had too many problems with other approaches:
 			# - Using a force was too springy.
@@ -201,27 +197,28 @@ func _process(delta: float) -> void:
 			#   other forces (gravity) from being applied.
 			var dx: Vector2 = to_other.normalized() * (distance - segment_spacing)
 			global_position += dx
-			# If segment in front is not attached to ground, then adjust the
-			# linear velocity of this one to match the speed at which the above
-			# adjustment would have been made.
-			# This should give it some "momentum" for when the worm is jumping in
-			# mid-air.
-			# Don't do this if the segment in front is touching the ground,
-			# because doing so messses with gravity.
-			if not front_segment.on_surface:
-				pass #linear_velocity = dx / delta
+			# Set linear velocity to give it its own momentum.
+			# Average it with current velocity to dampen any sudden jumps
+			# (e.g. at start when segments need to self-adjust to right spacing)
+			#TODO: use proper function to add impulse?
+			linear_velocity = 0.9 * linear_velocity + 0.1 * dx / delta
 			# Adjust z-order
 			# (fail safe for when it doesn't work otherwise)
 			if current_direction == front_segment.current_direction:
 				z_index = front_segment.z_index
 
+		# If close enough to front segment, and on a surface, then turn off any further velocity
+		# in that particular direction.
+		if distance <= segment_spacing * 0.9:
+			var dx: Vector2 = to_other.normalized()
+			if linear_velocity.dot(dx) > 10:
+				linear_velocity -= linear_velocity.dot(dx) * dx
+
 	# If disattached from a surface, but neighbouring segment(s) are attached,
 	# then apply an attachment force to this segment.
-	if not on_surface:
-		if (back_segment != null and back_segment.on_surface) or (front_segment != null and front_segment.on_surface):
-			pass #TODO
-			#print ("re-attach", self)
-			#gravity_point = global_position + get_downward_direction() * 100
+	if not on_surface and front_segment != null and front_segment.on_surface:
+		#print ("re-attach", self)
+		gp = front_segment.gravity_point - front_segment.global_position + global_position
 
 	# Generate a force of motion in response to user input (front segment only)
 	if front_segment == null:
@@ -243,14 +240,9 @@ func _process(delta: float) -> void:
 		# If on a surface, but no key pressed, hit the brakes on movement.
 		elif on_surface and linear_velocity.length() > 10:
 			gp -= linear_velocity.normalized()*100
-	# Apply the force and linear velocity.
-	apply_central_force((gp-global_position).normalized()*200)
-	# Only adjust linear velocity in direction orthogonal to gravity / surface attraction.
-	#var g: Vector2 = (gp-global_position).normalized()
-	#lv -= lv.dot(g) * g
-	#if front_segment != null:
-#	#	print (linear_velocity, g)
-	#	set_deferred("linear_velocity", linear_velocity)
-	#	#linear_velocity = linear_velocity.dot(g) * g #+ lv
+	# Apply the force.
+	if true or front_segment == null:
+		apply_central_force((gp-global_position).normalized()*200)
+
 	# Visual aid for centre of force, for debugging.
 	$GravityPoint.global_position = gp
