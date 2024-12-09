@@ -176,9 +176,23 @@ func _process(delta: float) -> void:
 		$AnimatedSprite2D.play()
 	else:
 		$AnimatedSprite2D.pause()
-		
-	# The following code controls force of movement for the segments.
-	
+
+# Helper method - Set the velocity along the given direction.
+# Velocity in orthogonal direction is left untouched.
+func set_velocity_in_direction (direction: Vector2, vel: float) -> void:
+	# Normalized direction of effect
+	var v: Vector2 = direction.normalized()
+	# Target linear velocity
+	var lv: Vector2 = linear_velocity
+	# Strip out current velocity along that direction.
+	lv -= lv.dot(v) * v
+	# Add in desired velocity
+	lv += vel * v
+	# Adjust the velocity through an impulse.
+	apply_central_impulse(lv-linear_velocity)
+
+# The following code controls force of movement for the segments.
+func _physics_process(delta: float) -> void:
 	# This variable defines a force point of attraction for the segment.
 	# Could be force of gravity, or a force sticking the segment to a surface.
 	# Initialized with current attraction point, can be updated to include
@@ -195,24 +209,16 @@ func _process(delta: float) -> void:
 			# - Using a force was too springy.
 			# - Setting a linear velocity mostly worked, but doing so negated any
 			#   other forces (gravity) from being applied.
-			var dx: Vector2 = to_other.normalized() * (distance - segment_spacing)
-			global_position += dx
-			# Set linear velocity to give it its own momentum.
-			# Average it with current velocity to dampen any sudden jumps
-			# (e.g. at start when segments need to self-adjust to right spacing)
-			#TODO: use proper function to add impulse?
-			linear_velocity = 0.9 * linear_velocity + 0.1 * dx / delta
+			set_velocity_in_direction(to_other, (distance-segment_spacing)/delta*0.5)
 			# Adjust z-order
 			# (fail safe for when it doesn't work otherwise)
 			if current_direction == front_segment.current_direction:
 				z_index = front_segment.z_index
 
-		# If close enough to front segment, and on a surface, then turn off any further velocity
+		# If close enough to front segment, then turn off any further velocity
 		# in that particular direction.
 		if distance <= segment_spacing * 0.9:
-			var dx: Vector2 = to_other.normalized()
-			if linear_velocity.dot(dx) > 10:
-				linear_velocity -= linear_velocity.dot(dx) * dx
+			set_velocity_in_direction(to_other, 0.0)
 
 	# If disattached from a surface, but neighbouring segment(s) are attached,
 	# then apply an attachment force to this segment.
