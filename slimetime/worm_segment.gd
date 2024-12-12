@@ -96,7 +96,7 @@ func get_facing_direction():
 	return facing
 # Helper method - get downward direction relative from the sprite.
 func get_downward_direction():
-	var angle: float = get_orientation() - PI/2
+	var angle: float = get_orientation() + PI/2
 	var downward: Vector2 = Vector2.from_angle(angle)
 	return downward
 
@@ -201,7 +201,12 @@ func _physics_process(delta: float) -> void:
 
 	# Bring the segment to the correct distance to the front neighbour.
 	if front_segment != null:
-		var to_other: Vector2 = front_segment.global_position - global_position
+		# Figure out where this segment would be w.r.t. the front one, at the end of this
+		# time step.
+		var v2: Vector2 = front_segment.global_position + front_segment.linear_velocity*delta
+		var v1: Vector2 = global_position + linear_velocity*delta
+		# Calculate the distance, and apply a correction if distance would be too large.
+		var to_other: Vector2 = v2 - v1
 		var distance: float = to_other.length()
 		if distance > segment_spacing * 1.05:
 			# Close the gap.
@@ -246,6 +251,9 @@ func _physics_process(delta: float) -> void:
 		# If on a surface, but no key pressed, hit the brakes on movement.
 		elif on_surface and linear_velocity.length() > 10:
 			gp -= linear_velocity.normalized()*100
+		if Input.is_action_just_pressed("jump") and on_surface:
+			# Apply impulse to launch the segment in the air.
+			apply_central_impulse(-get_downward_direction() * 200)
 	# Apply the force.
 	if true or front_segment == null:
 		apply_central_force((gp-global_position).normalized()*200)
