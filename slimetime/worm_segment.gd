@@ -251,9 +251,9 @@ func _physics_process(delta: float) -> void:
 		# If on a surface, but no key pressed, hit the brakes on movement.
 		elif on_surface and linear_velocity.length() > 10:
 			gp -= linear_velocity.normalized()*100
-		if Input.is_action_just_pressed("jump") and on_surface:
-			# Apply impulse to launch the segment in the air.
-			apply_central_impulse(-get_downward_direction() * 200)
+	if Input.is_action_just_pressed("jump") and on_surface:
+		# Apply impulse to launch the segment in the air.
+		apply_central_impulse((get_facing_direction()-get_downward_direction()) * 200)
 	# Apply the force.
 	if true or front_segment == null:
 		apply_central_force((gp-global_position).normalized()*200)
