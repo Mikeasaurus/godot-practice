@@ -144,12 +144,18 @@ func _process(delta: float) -> void:
 	var alignment_vector: Vector2 = Vector2.from_angle(orientation)
 	# Case 1: this is the front segment (check if no segments ahead).
 	if front_segment == null and back_segment != null:
-		if get_facing_direction().dot(global_position - back_segment.global_position) > 0:
-			# Only if far enough distance.
-			if (global_position - back_segment.global_position).length() > segment_spacing * 0.9:
+		# Use back segment to define alignment, if far enough distance.
+		#TODO: still use alignment regardless of which way facing?
+		if get_facing_direction().dot(global_position - back_segment.global_position) > 0 and \
+			(global_position - back_segment.global_position).length() > segment_spacing * 0.9:
 				alignment_vector = global_position - back_segment.global_position
 				if is_flipped():
 					alignment_vector *= -1
+		# Check if "upside down" on the ground.
+		# Can happen if just contacted with an opposite-facing surface.
+		if on_surface and (gravity_point-global_position).dot(get_downward_direction()) < 0:
+			flip_segment(false)
+			alignment_vector *= -1
 	# Case 2: this is an inner segment.
 	if front_segment != null and back_segment != null:
 		# Only if this segment is actually in-between the other segments.
