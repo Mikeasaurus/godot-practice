@@ -23,7 +23,7 @@ func _ready() -> void:
 	# if it's placed above the ground.
 	gravity_direction = Vector2(0,100)
 	# Set the direction that the segment is facing toward.
-	facing_direction = Vector2.from_angle(get_orientation()+PI/2)
+	facing_direction = Vector2.from_angle(get_orientation())
 
 # Helper methods to associate this segment with neighbouring segments.
 # Called by a higher-level scene which will manage the overall worm.
@@ -56,9 +56,12 @@ func is_flipped() -> bool:
 func update_sprite() -> void:
 	var orientation: Vector2 = facing_direction
 	# Check if need to flip the segment around.
-	var need_flip: bool = gravity_direction.cross(facing_direction) < 0
+	# Y direction is flipped (positive downward), so sign check for cross
+	# product is flipped as well.
+	var need_flip: bool = gravity_direction.cross(facing_direction) > 0
 	if need_flip != is_flipped():
 		flip_segment()
+	if is_flipped():
 		orientation *= -1
 	$AnimatedSprite2D.global_rotation = orientation.angle()
 
@@ -83,7 +86,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		var v: Vector2 = Vector2.ZERO
 		for i in range(n):
 			v  += state.get_contact_local_normal(i)
-		gravity_direction = v.normalized()*100
+		gravity_direction = -v.normalized()*100
 		last_stand = Time.get_ticks_msec()
 		on_surface = true
 	elif Time.get_ticks_msec() - last_stand > 100:
@@ -201,8 +204,7 @@ func _physics_process(delta: float) -> void:
 		# Apply impulse to launch the segment in the air.
 		apply_central_impulse((facing_direction-get_downward_direction()) * 200)
 	# Apply the force.
-	if true or front_segment == null:
-		apply_central_force(gd.normalized()*200)
+	apply_central_force(gd.normalized()*200)
 
 	# Visual aid for centre of force, for debugging.
 	$GravityPoint.global_position = global_position + gd
