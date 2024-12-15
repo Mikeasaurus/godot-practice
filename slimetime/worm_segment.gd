@@ -119,43 +119,27 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	# Check if need to flip direction of the segment.
-	# Follow the orientation of the segment in front, if it has moved past this one.
-	# Note: very front segment is not flipped here, it's determine from change in
-	# direction from user controls.
-	if front_segment != null:
-		var to_other: Vector2 = front_segment.global_position - global_position
-		# Flip direction if segment ahead has turned around and moved past this one.
-		if to_other.dot(get_facing_direction()) < 0:
-			if current_direction != front_segment.current_direction:
-				flip_segment()
-		# Fail safe: if in a weird state where we are upside down w.r.t. the segment in front,
-		# then re-adjust.
-		# This happens sometimes if second segment gets ahead of head... don't know why.
-		# But easy enough to fix I guess.
-		var v1 = Vector2.from_angle(get_orientation())
-		var v2 = Vector2.from_angle(front_segment.get_orientation())
-		if v1.dot(v2) < 0:
-			flip_segment(false)
-			set_orientation(get_orientation()+PI)
-	
+
+	# Modify rotation / flip of the segment
+
+	# Alignment of the segment (which direction it's looking towards).
+	var alignment_vector: Vector2 = Vector2.from_angle(orientation)
+
 	# Adjust the rotation of the segment so it's aligned w.r.t. to segment
 	# in front and/or behind.
-	var alignment_vector: Vector2 = Vector2.from_angle(orientation)
+
 	# Case 1: this is the front segment (check if no segments ahead).
 	if front_segment == null and back_segment != null:
 		# Use back segment to define alignment, if far enough distance.
-		#TODO: still use alignment regardless of which way facing?
-		if get_facing_direction().dot(global_position - back_segment.global_position) > 0 and \
-			(global_position - back_segment.global_position).length() > segment_spacing * 0.9:
-				alignment_vector = global_position - back_segment.global_position
-				if is_flipped():
-					alignment_vector *= -1
-		# Check if "upside down" on the ground.
-		# Can happen if just contacted with an opposite-facing surface.
-		if on_surface and (gravity_point-global_position).dot(get_downward_direction()) < 0:
-			flip_segment(false)
-			alignment_vector *= -1
+		var v: Vector2 = global_position - back_segment.global_position
+		if v.length() > segment_spacing * 0.9:
+			alignment_vector = v
+			# Check if this alignment would make the worm upside down w.r.t.
+			# other segments, and flip accordingly.
+			
+			#TODO
+			if is_flipped():
+				alignment_vector *= -1
 	# Case 2: this is an inner segment.
 	if front_segment != null and back_segment != null:
 		# Only if this segment is actually in-between the other segments.
@@ -168,14 +152,62 @@ func _process(delta: float) -> void:
 					alignment_vector *= -1
 	# Case 3: this is the tail segment (check if no segments behind).
 	if back_segment == null and front_segment != null:
-		if get_facing_direction().dot(front_segment.global_position - global_position) > 0:
-			# Only if far enough distance.
-			if (front_segment.global_position - global_position).length() > segment_spacing * 0.9:
-				alignment_vector = front_segment.global_position - global_position
-				if is_flipped():
-					alignment_vector *= -1
+		if (front_segment.global_position - global_position).length() > segment_spacing * 0.9:
+			alignment_vector = front_segment.global_position - global_position
+			if is_flipped():
+				alignment_vector *= -1
+
 	# Instantaneous adjustment to the new alignment.
 	set_orientation(alignment_vector.angle())
+
+	# Whether the segment needs to be flipped to face other direction.
+	var do_flip: bool = false
+	# If flipping, does the zorder need to be adjusted to display entirely in front of other segments?
+	var adjust_zorder: bool = true
+
+	# Check if "upside down" on the ground.
+	# Can happen if just contacted with an opposite-facing surface.
+	if front_segment == null and on_surface and (gravity_point-global_position).dot(get_downward_direction()) < 0:
+		pass
+		#print ("UPSIDE DOWN")
+		#do_flip = true; adjust_zorder = false
+		#alignment_vector *= -1
+
+	#TODO - manage flipping of front segment from keyboard controls.
+	if front_segment == null:
+		if Input.is_action_pressed("move_right") and on_surface:
+			# Check if the sprites need to be flipped around.
+			if current_direction == "left":
+				do_flip = true; adjust_zorder = true
+		elif Input.is_action_pressed("move_left") and on_surface:
+			# Check if the sprites need to be flipped around.
+			if current_direction == "right":
+				do_flip = true; adjust_zorder = true
+
+	# Check if need to flip direction of the segment.
+	# Follow the orientation of the segment in front, if it has moved past this one.
+	# Note: very front segment is not flipped here, it's determine from change in
+	# direction from user controls.
+	if front_segment != null:
+		var to_other: Vector2 = front_segment.global_position - global_position
+		# Flip direction if segment ahead has turned around and moved past this one.
+		if to_other.dot(get_facing_direction()) < 0:
+			if current_direction != front_segment.current_direction:
+				do_flip = true
+		# Fail safe: if in a weird state where we are upside down w.r.t. the segment in front,
+		# then re-adjust.
+		# This happens sometimes if second segment gets ahead of head... don't know why.
+		# But easy enough to fix I guess.
+		var v1 = Vector2.from_angle(get_orientation())
+		var v2 = Vector2.from_angle(front_segment.get_orientation())
+		if v1.dot(v2) < 0:
+			do_flip = true
+			adjust_zorder = false
+			alignment_vector *= -1
+	
+	set_orientation(alignment_vector.angle())
+	if do_flip:
+		flip_segment(adjust_zorder)
 	
 	# Check if moving, need to animate legs?
 	if linear_velocity.length() > 10:
@@ -243,17 +275,10 @@ func _physics_process(delta: float) -> void:
 			# Lead the gravity point in the direction of travel.
 			# Motion will be from an effect of this force.
 			gp += (gravity_point - global_position).rotated(-PI/2).normalized() * 50
-			# Check if the sprites need to be flipped around.
-			# Check if the sprites need to be flipped around.
-			if current_direction == "left":
-				flip_segment()
 		elif Input.is_action_pressed("move_left") and on_surface:
 			# Lead the gravity point in the direction of travel.
 			# Motion will be from an effect of this force.
 			gp -= (gravity_point - global_position).rotated(-PI/2).normalized() * 50
-			# Check if the sprites need to be flipped around.
-			if current_direction == "right":
-				flip_segment()
 		# If on a surface, but no key pressed, hit the brakes on movement.
 		elif on_surface and linear_velocity.length() > 10:
 			gp -= linear_velocity.normalized()*100
