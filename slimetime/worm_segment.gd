@@ -107,7 +107,10 @@ func _process(delta: float) -> void:
 		# Use back segment to define alignment, if far enough distance.
 		var v: Vector2 = global_position - back_segment.global_position
 		if v.length() > segment_spacing * 0.9:
-			facing_direction = v.normalized()
+			if v.dot(facing_direction) > 0:
+				facing_direction = v.normalized()
+			else:
+				facing_direction = -v.normalized()
 	# Case 2: this is an inner segment.
 	if front_segment != null and back_segment != null:
 		# Only if this segment is actually in-between the other segments.
@@ -189,17 +192,21 @@ func _physics_process(delta: float) -> void:
 
 	# Generate a force of motion in response to user input (front segment only)
 	if front_segment == null:
-		if Input.is_action_pressed("move_right") and on_surface:
-			# Lead the gravity point in the direction of travel.
-			# Motion will be from an effect of this force.
-			gd += gravity_direction.rotated(-PI/2).normalized() * 50
-		elif Input.is_action_pressed("move_left") and on_surface:
-			# Lead the gravity point in the direction of travel.
-			# Motion will be from an effect of this force.
-			gd -= gravity_direction.rotated(-PI/2).normalized() * 50
-		# If on a surface, but no key pressed, hit the brakes on movement.
-		elif on_surface and linear_velocity.length() > 10:
-			gd -= linear_velocity.normalized()*100
+		# Determine direction to move in, based on direction specified by user.
+		var move_direction: Vector2 = Vector2.ZERO
+		if Input.is_action_pressed("move_right"):
+			move_direction += Vector2(1,0)
+		if Input.is_action_pressed("move_left"):
+			move_direction += Vector2(-1,0)
+		if Input.is_action_pressed("move_down"):
+			move_direction += Vector2(0,1)
+		if Input.is_action_pressed("move_up"):
+			move_direction += Vector2(0,-1)
+		# If going in opposite direction to before, need to invert direction that we're facing.
+		if move_direction.dot(facing_direction) < 0:
+			facing_direction *= -1
+		if on_surface and move_direction != Vector2.ZERO:
+			gd += facing_direction * 50
 	if Input.is_action_just_pressed("jump") and on_surface:
 		# Apply impulse to launch the segment in the air.
 		apply_central_impulse((facing_direction-get_downward_direction()) * 200)
