@@ -14,7 +14,8 @@ func _ready() -> void:
 		pair (segments[i],segments[i+1])
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+# NOTE: Disabled - z-order seems to be stable now, no need for adjustment.
+func __process(delta: float) -> void:
 	# Adjust z-order of worm segments if they all exceed a certain value
 	var minz: int = segments[0].z_index
 	if minz > 0:
