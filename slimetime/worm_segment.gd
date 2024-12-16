@@ -125,11 +125,20 @@ func _process(delta: float) -> void:
 			facing_direction = (front_segment.global_position - global_position).normalized()
 
 	# Adjust z-order if facing opposite direction from segement behind.
+	# I.e., moving in opposite direction, visually in front of other segments.
 	if back_segment != null:
 		if facing_direction.dot(back_segment.facing_direction) < 0:
 			z_index = back_segment.z_index + 5
 		else:
 			z_index = back_segment.z_index
+	# Flip and adjust z-order if being passed by front segment from other direction.
+	if front_segment != null:
+		var v: Vector2 = front_segment.global_position - global_position
+		if v.dot(facing_direction) < 0:
+			facing_direction *= -1
+			# Update z-order unless front is turned around, then let it stay in front.
+			if front_segment.facing_direction.dot(v) > 0 and back_segment != null:
+				z_index = front_segment.z_index
 
 	# Apply new orientation
 	update_sprite()
