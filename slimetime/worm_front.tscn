@@ -65,6 +65,10 @@ offset = Vector2(27, -50)
 [node name="SlimeSource" type="Marker2D" parent="AnimatedSprite2D"]
 position = Vector2(38, -65)
 
+[node name="Camera2D" type="Camera2D" parent="AnimatedSprite2D"]
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_wfloj")
 
