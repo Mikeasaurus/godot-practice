@@ -7,8 +7,12 @@ var gravity_direction: Vector2
 # Indicates if currently standing on a surface (to determine if user can control
 # movement)
 var on_surface: bool = false
+
 # Direction that the segment is pointing towards
 var facing_direction: Vector2
+# Direction that the segment's feet are in.
+# Only general direction needed.  facing_direction will determine exact angle.
+var feet_direction: Vector2
 
 # When the last time that the segement was touching a surface.
 var last_stand: float = 0.0
@@ -23,7 +27,9 @@ func _ready() -> void:
 	# if it's placed above the ground.
 	gravity_direction = Vector2(0,100)
 	# Set the direction that the segment is facing toward.
-	facing_direction = Vector2.from_angle(get_orientation())
+	facing_direction = Vector2(1,0)
+	# Set the feet direction.
+	feet_direction = gravity_direction.normalized()
 
 # Helper methods to associate this segment with neighbouring segments.
 # Called by a higher-level scene which will manage the overall worm.
@@ -52,32 +58,25 @@ func flip_segment() -> void:
 func is_flipped() -> bool:
 	return $AnimatedSprite2D.flip_h
 
-# Helper method - update sprite based on current facing direction and gravity point.
+# Helper method - update sprite based on current facing direction and feet direction.
 func update_sprite() -> void:
 	var orientation: Vector2 = facing_direction
 	# Check if need to flip the segment around.
 	# Y direction is flipped (positive downward), so sign check for cross
 	# product is flipped as well.
-	# Only consider flipping if on a surface, otherwise keep currect direction.
-	if on_surface:
-		var need_flip: bool = gravity_direction.cross(facing_direction) > 0
-		if need_flip != is_flipped():
-			flip_segment()
+	var need_flip: bool = feet_direction.cross(facing_direction) > 0
+	if need_flip != is_flipped():
+		flip_segment()
 	if is_flipped():
 		orientation *= -1
 	$AnimatedSprite2D.global_rotation = orientation.angle()
+	# Update feet direction.
+	var v: Vector2 = orientation.rotated(PI/2)
+	if v.dot(feet_direction) > 0:
+		feet_direction = v
+	else:
+		feet_direction = -v
 
-# Helper method - get current rotation of sprite.
-# (not segment rotation, which is affected by rolling collision circle).
-func get_orientation() -> float:
-	return $AnimatedSprite2D.global_rotation
-# Helper method - set orientation of sprite.
-
-# Helper method - get downward direction relative from the sprite.
-func get_downward_direction():
-	var angle: float = get_orientation() + PI/2
-	var downward: Vector2 = Vector2.from_angle(angle)
-	return downward
 
 # Get normal to any surface that's contacted.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
@@ -88,7 +87,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		var v: Vector2 = Vector2.ZERO
 		for i in range(n):
 			v  += state.get_contact_local_normal(i)
-		gravity_direction = -v.normalized()*100
+		# Stand upright on surface.
+		feet_direction = -v.normalized()
+		# Apply force to stay on surface.
+		gravity_direction = feet_direction*100
 		last_stand = Time.get_ticks_msec()
 		on_surface = true
 	elif Time.get_ticks_msec() - last_stand > 100:
@@ -224,7 +226,7 @@ func _physics_process(delta: float) -> void:
 				gd += facing_direction * 50
 	if Input.is_action_just_pressed("jump") and on_surface:
 		# Apply impulse to launch the segment in the air.
-		apply_central_impulse((facing_direction-get_downward_direction()) * 200)
+		apply_central_impulse((facing_direction-feet_direction) * 200)
 	# Apply the force.
 	apply_central_force(gd.normalized()*200)
 
