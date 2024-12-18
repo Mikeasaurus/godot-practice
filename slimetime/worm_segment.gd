@@ -16,6 +16,9 @@ var feet_direction: Vector2
 
 # When the last time that the segement was touching a surface.
 var last_stand: float = 0.0
+# When a jump was started.
+# Timer for doing something in mid-air, like changing direction.
+var jump_start: float = 0.0
 # Optional connections to other segments.
 var front_segment: RigidBody2D = null
 var back_segment: RigidBody2D = null
@@ -88,11 +91,13 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		for i in range(n):
 			v  += state.get_contact_local_normal(i)
 		# Stand upright on surface.
-		feet_direction = -v.normalized()
-		# Apply force to stay on surface.
-		gravity_direction = feet_direction*100
-		last_stand = Time.get_ticks_msec()
-		on_surface = true
+		# Only if not in the process of starting a jump.
+		if Time.get_ticks_msec() > jump_start + 100:
+			feet_direction = -v.normalized()
+			# Apply force to stay on surface.
+			gravity_direction = feet_direction*100
+			last_stand = Time.get_ticks_msec()
+			on_surface = true
 	elif Time.get_ticks_msec() - last_stand > 100:
 		#TODO: orient with gravity points of neighbouring segments?
 		gravity_direction = Vector2(0,100)
@@ -227,6 +232,13 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and on_surface:
 		# Apply impulse to launch the segment in the air.
 		apply_central_impulse((facing_direction-feet_direction) * 200)
+		# Remember when jump was started.
+		# Can allow for a delta of time in which worm won't try to re-stick to
+		# as surface, so can do things like re-orient it for a landing.
+		jump_start = Time.get_ticks_msec()
+		# Turn worm around if on a steep surface (wall jumping).
+		if abs(facing_direction.x) <= 0.2:
+			feet_direction *= -1
 	# Apply the force.
 	apply_central_force(gd.normalized()*200)
 
