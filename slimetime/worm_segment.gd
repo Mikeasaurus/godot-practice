@@ -58,9 +58,11 @@ func update_sprite() -> void:
 	# Check if need to flip the segment around.
 	# Y direction is flipped (positive downward), so sign check for cross
 	# product is flipped as well.
-	var need_flip: bool = gravity_direction.cross(facing_direction) > 0
-	if need_flip != is_flipped():
-		flip_segment()
+	# Only consider flipping if on a surface, otherwise keep currect direction.
+	if on_surface:
+		var need_flip: bool = gravity_direction.cross(facing_direction) > 0
+		if need_flip != is_flipped():
+			flip_segment()
 	if is_flipped():
 		orientation *= -1
 	$AnimatedSprite2D.global_rotation = orientation.angle()
@@ -211,11 +213,15 @@ func _physics_process(delta: float) -> void:
 			move_direction += Vector2(0,1)
 		if Input.is_action_pressed("move_up"):
 			move_direction += Vector2(0,-1)
-		# If going in opposite direction to before, need to invert direction that we're facing.
-		if move_direction.dot(facing_direction) < 0:
-			facing_direction *= -1
-		if on_surface and move_direction != Vector2.ZERO:
-			gd += facing_direction * 50
+		# Check if there's any user-driven movement, and if it's not orthogonal
+		# to surface.
+		if move_direction != Vector2.ZERO:
+			var cos: float = move_direction.normalized().dot(facing_direction)
+			if abs(cos) >= 0.5 and on_surface:
+				# If going in opposite direction to before, need to invert direction that we're facing.
+				if move_direction.dot(facing_direction) < 0:
+					facing_direction *= -1
+				gd += facing_direction * 50
 	if Input.is_action_just_pressed("jump") and on_surface:
 		# Apply impulse to launch the segment in the air.
 		apply_central_impulse((facing_direction-get_downward_direction()) * 200)
