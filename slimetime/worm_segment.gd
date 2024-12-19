@@ -94,6 +94,11 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		# Only if not in the process of starting a jump.
 		if Time.get_ticks_msec() > jump_start + 100:
 			feet_direction = -v.normalized()
+			# Update facing direction based on feet direction.
+			if feet_direction.cross(facing_direction) < 0:
+				facing_direction = feet_direction.rotated(-PI/2)
+			else:
+				facing_direction = feet_direction.rotated(PI/2)
 			# Apply force to stay on surface.
 			gravity_direction = feet_direction*100
 			last_stand = Time.get_ticks_msec()
@@ -120,6 +125,8 @@ func _process(delta: float) -> void:
 				facing_direction = v.normalized()
 			else:
 				facing_direction = -v.normalized()
+		# Otherwise, will be aligned to ground based (handled in _integrate_forces)
+
 	# Case 2: this is an inner segment.
 	if front_segment != null and back_segment != null:
 		# Only if this segment is actually in-between the other segments.
