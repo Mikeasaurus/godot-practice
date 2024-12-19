@@ -28,7 +28,7 @@ var segment_spacing: float = 30.0
 func _ready() -> void:
 	# Set gravity, so segment will start falling onto the surface below
 	# if it's placed above the ground.
-	gravity_direction = Vector2(0,100)
+	gravity_direction = Vector2(0,Globals.gravity)
 	# Set the direction that the segment is facing toward.
 	facing_direction = Vector2(1,0)
 	# Set the feet direction.
@@ -100,12 +100,12 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			else:
 				facing_direction = feet_direction.rotated(PI/2)
 			# Apply force to stay on surface.
-			gravity_direction = feet_direction*100
+			gravity_direction = feet_direction*Globals.gravity
 			last_stand = Time.get_ticks_msec()
 			on_surface = true
 	elif Time.get_ticks_msec() - last_stand > 100:
 		#TODO: orient with gravity points of neighbouring segments?
-		gravity_direction = Vector2(0,100)
+		gravity_direction = Vector2(0,Globals.gravity)
 		on_surface = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -235,7 +235,7 @@ func _physics_process(delta: float) -> void:
 				# If going in opposite direction to before, need to invert direction that we're facing.
 				if move_direction.dot(facing_direction) < 0:
 					facing_direction *= -1
-				gd += facing_direction * 50
+				gd += facing_direction * Globals.gravity
 	if Input.is_action_just_pressed("jump") and on_surface:
 		# Apply impulse to launch the segment in the air.
 		apply_central_impulse((facing_direction-feet_direction) * 200)
@@ -247,7 +247,7 @@ func _physics_process(delta: float) -> void:
 		if abs(facing_direction.x) <= 0.2:
 			feet_direction *= -1
 	# Apply the force.
-	apply_central_force(gd.normalized()*200)
+	apply_central_force(gd.normalized()*Globals.gravity)
 
 	# Visual aid for centre of force, for debugging.
 	$GravityPoint.global_position = global_position + gd
