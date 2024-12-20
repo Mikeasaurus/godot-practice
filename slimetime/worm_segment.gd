@@ -238,7 +238,7 @@ func _physics_process(delta: float) -> void:
 				gd += facing_direction * Globals.gravity
 	if Input.is_action_just_pressed("jump") and on_surface:
 		# Apply impulse to launch the segment in the air.
-		apply_central_impulse((facing_direction-feet_direction) * 200)
+		apply_central_impulse((facing_direction-feet_direction) * 300)
 		# Remember when jump was started.
 		# Can allow for a delta of time in which worm won't try to re-stick to
 		# as surface, so can do things like re-orient it for a landing.

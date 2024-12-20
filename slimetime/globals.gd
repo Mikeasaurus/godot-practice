@@ -3,7 +3,7 @@ extends Node
 # Global parameters
 
 # Strength of gravity
-var gravity: float = 200
+var gravity: float = 500
 
 
 # Called when the node enters the scene tree for the first time.
