@@ -140,6 +140,10 @@ func _process(delta: float) -> void:
 		if (front_segment.global_position - global_position).length() > segment_spacing * 0.9:
 			facing_direction = (front_segment.global_position - global_position).normalized()
 
+	# Adjust feet to be same direction as segment in front.
+	if front_segment != null:
+		feet_direction = front_segment.feet_direction
+
 	# Adjust z-order if facing opposite direction from segement behind.
 	# I.e., moving in opposite direction, visually in front of other segments.
 	if back_segment != null:
@@ -160,7 +164,7 @@ func _process(delta: float) -> void:
 	update_sprite()
 
 	# Check if moving, need to animate legs?
-	if linear_velocity.length() > 10:
+	if on_surface and linear_velocity.length() > 10:
 		$AnimatedSprite2D.play()
 	else:
 		$AnimatedSprite2D.pause()
@@ -208,6 +212,25 @@ func _physics_process(delta: float) -> void:
 		# in that particular direction.
 		if distance <= segment_spacing * 0.9:
 			set_velocity_in_direction(to_other, 0.0)
+
+	# Avoid moving in direction that would cause segments to jack-knife.
+	if front_segment != null and front_segment.front_segment != null:
+		var x1a: Vector2 = global_position
+		var x2a: Vector2 = front_segment.global_position
+		var x3a: Vector2 = front_segment.front_segment.global_position
+		var v1a: Vector2 = (x1a-x2a).normalized()
+		var v2a: Vector2 = (x3a-x2a).normalized()
+		var cosa: float = v2a.dot(v1a)
+		var x1b: Vector2 = global_position + linear_velocity*delta
+		var x2b: Vector2 = front_segment.global_position + front_segment.linear_velocity*delta
+		var x3b: Vector2 = front_segment.front_segment.global_position + front_segment.front_segment.linear_velocity*delta
+		var v1b: Vector2 = (x1b-x2b).normalized()
+		var v2b: Vector2 = (x3b-x2b).normalized()
+		var cosb: float = v2b.dot(v1b)
+		# Check if segments are at a steep angle, and getting steeper.
+		if cosa > 0 and cosb > cosa:
+			# Turn off motion in that direction.
+			set_velocity_in_direction(x3b-x1b,0)
 
 	# If disattached from a surface, but neighbouring segment(s) are attached,
 	# then apply an attachment force to this segment.
