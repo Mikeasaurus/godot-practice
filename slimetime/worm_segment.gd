@@ -9,9 +9,9 @@ var last_surface_reference: Vector2
 # Indicates if currently standing on a surface (to determine if user can control
 # movement)
 var on_surface: bool
-# Indicates if the feet should "stick" strongly to a surface, or if free to
-# move in any direction.
+# Indicates if the feet should "stick" strongly to a surface that it touches.
 var sticky_feet: bool
+
 
 # Direction that the segment is pointing towards
 var facing_direction: Vector2
@@ -103,7 +103,9 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			facing_direction = feet_direction.rotated(-PI/2)
 		else:
 			facing_direction = feet_direction.rotated(PI/2)
-		on_surface = true
+		# Only stick if segment in front is already stuck.
+		if front_segment == null or front_segment.on_surface:
+			on_surface = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -203,7 +205,12 @@ func _physics_process(delta: float) -> void:
 			# - Using a force was too springy.
 			# - Setting a linear velocity mostly worked, but doing so negated any
 			#   other forces (gravity) from being applied.
-			set_velocity_in_direction(to_other, (distance-segment_spacing)/delta*0.5)
+			var vel: float = (distance-segment_spacing)/delta*0.5
+			# If velocity if above some threshold, then may need to un-stick from a surface
+			# to allow the correction to take place.
+			if vel > 1000.0 and on_surface:
+				release_from_surface()
+			set_velocity_in_direction(to_other, vel)
 
 		# If close enough to front segment, then turn off any further velocity
 		# in that particular direction.
@@ -211,7 +218,7 @@ func _physics_process(delta: float) -> void:
 			set_velocity_in_direction(to_other, 0.0)
 
 	# Avoid moving in direction that would cause segments to jack-knife.
-	if front_segment != null and front_segment.front_segment != null:
+	if not on_surface and front_segment != null and front_segment.front_segment != null:
 		var x1a: Vector2 = global_position
 		var x2a: Vector2 = front_segment.global_position
 		var x3a: Vector2 = front_segment.front_segment.global_position
@@ -225,18 +232,17 @@ func _physics_process(delta: float) -> void:
 		var v2b: Vector2 = (x3b-x2b).normalized()
 		var cosb: float = v2b.dot(v1b)
 		# Check if segments are at a steep angle, and getting steeper.
-		if cosa > 0 and cosb > cosa:
+		if cosa > -0.5 and cosb > cosa:
 			# Turn off motion in that direction.
 			set_velocity_in_direction(x3b-x1b,0)
 
 	# If disattached from a surface, but neighbouring segment(s) are attached,
 	# then apply an attachment force to this segment.
 	if not on_surface and front_segment != null and front_segment.on_surface:
-		#print ("re-attach", self)
 		gd = front_segment.last_surface_normal
 
 	# Keep segments from drifting away from surface.
-	if sticky_feet and last_surface_reference != Vector2.ZERO:
+	if on_surface and last_surface_reference != Vector2.ZERO:
 		set_velocity_in_direction(global_position-last_surface_reference,0.0)
 
 	# Generate a force of motion in response to user input (front segment only)
