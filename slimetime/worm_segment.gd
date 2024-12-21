@@ -2,23 +2,23 @@ extends RigidBody2D
 
 class_name WormSegment
 
-# Attraction point.  Either for gravity or for sticking to a surface.
-var gravity_direction: Vector2
+# Remember contact direction of the last surface that was attached to.
+var last_surface_normal: Vector2
+# Remember a surface reference point (to help correct trajectory if starting to leave surface).
+var last_surface_reference: Vector2
 # Indicates if currently standing on a surface (to determine if user can control
 # movement)
-var on_surface: bool = false
+var on_surface: bool
+# Indicates if the feet should "stick" strongly to a surface, or if free to
+# move in any direction.
+var sticky_feet: bool
 
 # Direction that the segment is pointing towards
 var facing_direction: Vector2
 # Direction that the segment's feet are in.
-# Only general direction needed.  facing_direction will determine exact angle.
+# Only general direction of this is used.  facing_direction will determine exact angles.
 var feet_direction: Vector2
 
-# When the last time that the segement was touching a surface.
-var last_stand: float = 0.0
-# When a jump was started.
-# Timer for doing something in mid-air, like changing direction.
-var jump_start: float = 0.0
 # Optional connections to other segments.
 var front_segment: RigidBody2D = null
 var back_segment: RigidBody2D = null
@@ -28,11 +28,15 @@ var segment_spacing: float = 30.0
 func _ready() -> void:
 	# Set gravity, so segment will start falling onto the surface below
 	# if it's placed above the ground.
-	gravity_direction = Vector2(0,Globals.gravity)
+	last_surface_normal = Vector2(0,1)
+	last_surface_reference = Vector2.ZERO
 	# Set the direction that the segment is facing toward.
 	facing_direction = Vector2(1,0)
 	# Set the feet direction.
-	feet_direction = gravity_direction.normalized()
+	feet_direction = Vector2(0,1)
+	# Ready to land and stick to a surface.
+	on_surface = false
+	sticky_feet = true
 
 # Helper methods to associate this segment with neighbouring segments.
 # Called by a higher-level scene which will manage the overall worm.
@@ -80,9 +84,9 @@ func update_sprite() -> void:
 	else:
 		feet_direction = -v
 
-
-# Get normal to any surface that's contacted.
+# Get normal to any surface that's contacted, align direction vectors accordingly.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	if not sticky_feet: return
 	var n = state.get_contact_count()
 	if n > 0:
 		# Sum up all contact normals.
@@ -91,22 +95,15 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		for i in range(n):
 			v  += state.get_contact_local_normal(i)
 		# Stand upright on surface.
-		# Only if not in the process of starting a jump.
-		if Time.get_ticks_msec() > jump_start + 100:
-			feet_direction = -v.normalized()
-			# Update facing direction based on feet direction.
-			if feet_direction.cross(facing_direction) < 0:
-				facing_direction = feet_direction.rotated(-PI/2)
-			else:
-				facing_direction = feet_direction.rotated(PI/2)
-			# Apply force to stay on surface.
-			gravity_direction = feet_direction*Globals.gravity
-			last_stand = Time.get_ticks_msec()
-			on_surface = true
-	elif Time.get_ticks_msec() - last_stand > 100:
-		#TODO: orient with gravity points of neighbouring segments?
-		gravity_direction = Vector2(0,Globals.gravity)
-		on_surface = false
+		last_surface_normal = -v.normalized()
+		last_surface_reference = global_position + last_surface_normal * 50
+		feet_direction = last_surface_normal
+		# Update facing direction based on feet direction.
+		if feet_direction.cross(facing_direction) < 0:
+			facing_direction = feet_direction.rotated(-PI/2)
+		else:
+			facing_direction = feet_direction.rotated(PI/2)
+		on_surface = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -189,7 +186,7 @@ func _physics_process(delta: float) -> void:
 	# Could be force of gravity, or a force sticking the segment to a surface.
 	# Initialized with current attraction point, can be updated to include
 	# other forces further below.
-	var gd: Vector2 = gravity_direction
+	var gd: Vector2 = last_surface_normal
 
 	# Bring the segment to the correct distance to the front neighbour.
 	if front_segment != null:
@@ -236,7 +233,11 @@ func _physics_process(delta: float) -> void:
 	# then apply an attachment force to this segment.
 	if not on_surface and front_segment != null and front_segment.on_surface:
 		#print ("re-attach", self)
-		gd = front_segment.gravity_direction
+		gd = front_segment.last_surface_normal
+
+	# Keep segments from drifting away from surface.
+	if sticky_feet and last_surface_reference != Vector2.ZERO:
+		set_velocity_in_direction(global_position-last_surface_reference,0.0)
 
 	# Generate a force of motion in response to user input (front segment only)
 	if front_segment == null:
@@ -258,14 +259,11 @@ func _physics_process(delta: float) -> void:
 				# If going in opposite direction to before, need to invert direction that we're facing.
 				if move_direction.dot(facing_direction) < 0:
 					facing_direction *= -1
-				gd += facing_direction * Globals.gravity
+				gd += facing_direction
 	if Input.is_action_just_pressed("jump") and on_surface:
 		# Apply impulse to launch the segment in the air.
+		release_from_surface()
 		apply_central_impulse((facing_direction-feet_direction) * 300)
-		# Remember when jump was started.
-		# Can allow for a delta of time in which worm won't try to re-stick to
-		# as surface, so can do things like re-orient it for a landing.
-		jump_start = Time.get_ticks_msec()
 		# Turn worm around if on a steep surface (wall jumping).
 		if abs(facing_direction.x) <= 0.2:
 			feet_direction *= -1
@@ -274,3 +272,17 @@ func _physics_process(delta: float) -> void:
 
 	# Visual aid for centre of force, for debugging.
 	$GravityPoint.global_position = global_position + gd
+
+# Helper function - release segment from a surface so it has time for reacting to
+# impulses or other forces (such as to initiate a jump).
+func release_from_surface () -> void:
+	sticky_feet = false
+	on_surface = false
+	last_surface_reference = Vector2.ZERO
+	# Re-enable a gravitational force
+	last_surface_normal = Vector2(0,1)
+	$JumpTimer.start()
+# Callback function, called shortly after jump was initiated.
+# Re-enables "sticking" to surfaces, for when worm lands from the jump.
+func _on_jump_timer_timeout() -> void:
+	sticky_feet = true

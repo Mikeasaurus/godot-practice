@@ -65,3 +65,9 @@ shape = SubResource("CircleShape2D_alg25")
 visible = false
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("6_ntq0u")
+
+[node name="JumpTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[connection signal="timeout" from="JumpTimer" to="." method="_on_jump_timer_timeout"]
