@@ -1,0 +1,42 @@
+[gd_scene load_steps=7 format=3 uid="uid://lnqgkkyiw03c"]
+
+[ext_resource type="Script" path="res://beetle.gd" id="1_07pwg"]
+[ext_resource type="Texture2D" uid="uid://psliqeeiy8kv" path="res://beetle1.png" id="1_u2afi"]
+[ext_resource type="Texture2D" uid="uid://bkr42pw6odav" path="res://beetle2.png" id="2_bpdfk"]
+[ext_resource type="Texture2D" uid="uid://cc1wpweqrk0i2" path="res://beetle-slimed.png" id="4_w6v2j"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_7deo6"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_u2afi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_bpdfk")
+}],
+"loop": true,
+"name": &"default",
+"speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_w6v2j")
+}],
+"loop": true,
+"name": &"slimed",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_51bm2"]
+radius = 31.257
+
+[node name="Beetle" type="RigidBody2D"]
+collision_layer = 2
+gravity_scale = 0.0
+script = ExtResource("1_07pwg")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_7deo6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_51bm2")

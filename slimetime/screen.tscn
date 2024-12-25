@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=6 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
 [ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm.tscn" id="2_34v46"]
+[ext_resource type="PackedScene" uid="uid://lnqgkkyiw03c" path="res://beetle.tscn" id="3_uld1f"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
 texture = ExtResource("1_vx3mq")
@@ -56,3 +57,6 @@ tile_set = SubResource("TileSet_6vxb5")
 [node name="Worm" parent="." instance=ExtResource("2_34v46")]
 z_index = 5
 position = Vector2(8, 316)
+
+[node name="Beetle" parent="." instance=ExtResource("3_uld1f")]
+position = Vector2(560, 270)
