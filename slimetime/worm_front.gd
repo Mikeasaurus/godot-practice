@@ -1,5 +1,8 @@
 extends WormSegment
 
+# How fast slime shoots out.
+var slime_speed: float = 1000.0
+
 @export var slime_scene: PackedScene
 # Where the mouth is located on the sprite.
 var mouth_position: Vector2
@@ -17,23 +20,61 @@ func _ready() -> void:
 	mouth_position = $AnimatedSprite2D/SlimeSource.position
 	super()
 
+# Helper method - get optimal angle for targeting the given object.
+func _get_targeting_angle (pos: Vector2, obj) -> float:
+	# Start by aiming at where the object currently is.
+	var angle: float = (obj.global_position - pos).angle()
+	# Calculate time needed to get there.
+	var t: float = (obj.global_position - pos).length() / slime_speed
+	var dangle: float = 0.1
+	var dt: float = 0.1
+	# Iterative solver for optimal angle.
+	# Not able to get direct solution, because need to find the intersection between
+	# the parabolic curve of the slime, and the sinusoidal oscillation of the bug.
+	# Fortunately, the approach taken below seems to converge quickly for the tests done.
+	# I have the math written down on paper, if you want to see it.
+	# (ha ha, it's probably in the trash by the time you read this)
+	# (screw you, future Mike!)
+	for n in range(3):
+		# Calculate distance at predicted collision point.
+		var l: Vector2 = _get_collision_mismatch (pos, obj, angle, t)
+		# Get rate of change of collision distance if angle or expected collision time is perturbed.
+		var dldangle: Vector2 = (_get_collision_mismatch(pos,obj,angle+dangle,t) - _get_collision_mismatch(pos,obj,angle,t)) / dangle
+		var dldt: Vector2 = (_get_collision_mismatch(pos,obj,angle,t+dt) - _get_collision_mismatch(pos,obj,angle,t)) / dt
+		# Adjust angle / collision time.
+		var a: float = dldangle.x
+		var b: float = dldt.x
+		var c: float = dldangle.y
+		var d: float = dldt.y
+		var delta_angle: float = -1/(a*d-b*c) * (d*l.x - b*l.y)
+		var delta_t: float = -1/(a*d-b*c) * (-c*l.x + a*l.y)
+		angle += delta_angle
+		t += delta_t
+	return angle
+# Helper method - get distance between slime and object at the given point in time.
+func _get_collision_mismatch (x0: Vector2, obj, angle: float, t: float) -> Vector2:
+	return obj.predict_location(t) - _get_slime_location (x0, angle, t)
+# Helper method - estimate where a slime shot would be at time t after being fired
+# at the specified angle.
+func _get_slime_location (x0: Vector2, angle: float, t: float) -> Vector2:
+	return x0 + Vector2(slime_speed*t*cos(angle), slime_speed*t*sin(angle) + Globals.gravity/2 * t**2)
+
 func _input(event: InputEvent) -> void:
 	# Check if we need to shoot some slime.
 	if Input.is_action_just_pressed("shoot_slime"):
-		# How fast slime shoots out.
-		var slime_speed: float = 1000.0
 		# Where the slime originates from (based on position of worm's mouth).
-		var slime_start: Vector2 = mouth_position.rotated($AnimatedSprite2D.rotation)
+		var slime_start: Vector2 = mouth_position.rotated($AnimatedSprite2D.global_rotation)
 		# Get the direction to shoot the slime.
 		# Check if any targets in range.
 		# Otherwise, shoot straight ahead.
 		var slime_direction: Vector2 = facing_direction
 		if len(targets) > 0:
-			slime_direction = (targets[0].global_position - (global_position+slime_start)).normalized()
+			var angle: float = _get_targeting_angle(global_position+slime_start, targets[0])
+			slime_direction = Vector2.from_angle(angle)
 		var slime = slime_scene.instantiate()
-		slime.position = slime_start
-		slime.linear_velocity = slime_direction * slime_speed
 		add_child(slime)
+		slime.global_position = global_position + slime_start
+		slime.linear_velocity = slime_direction * slime_speed
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func __process(delta: float) -> void:
 	pass

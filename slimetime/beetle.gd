@@ -47,6 +47,15 @@ func _process(delta: float) -> void:
 		angle *= abs(linear_velocity.x)/20
 	$AnimatedSprite2D.global_rotation_degrees = angle
 
+# Predict where the bug will be at the given time offset.
+# Helps with slime targeting.
+func predict_location (t: float) -> Vector2:
+	var x0: Vector2 = global_position
+	var v0: Vector2 = linear_velocity
+	var xc: Vector2 = starting_position
+	var a: float = sqrt(springiness)
+	return 1/a * sin(a*t) * v0 + cos(a*t) * (x0-xc) + xc
+
 # Change state of the bug so it's in a dormant, slimed state.
 func get_slimed () -> void:
 	is_flying = false
