@@ -80,7 +80,9 @@ func __process(delta: float) -> void:
 	pass
 
 func _on_shooting_range_body_entered(body: Node2D) -> void:
-	targets.append(body)
+	# Only keep track of targetable objects.
+	if "predict_location" in body:
+		targets.append(body)
 
 func _on_shooting_range_body_exited(body: Node2D) -> void:
 	targets.erase(body)

@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://b675104byppv0"]
+
+[ext_resource type="Script" path="res://particle.gd" id="1_4omh5"]
+
+[sub_resource type="Gradient" id="Gradient_l43b0"]
+offsets = PackedFloat32Array(0.577922, 0.688312)
+colors = PackedColorArray(0.666667, 0.862745, 0.243137, 0.8, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ih1ay"]
+gradient = SubResource("Gradient_l43b0")
+width = 10
+height = 10
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_t0kn1"]
+radius = 4.12311
+
+[node name="Particle" type="RigidBody2D"]
+collision_layer = 0
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_4omh5")
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_ih1ay")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_t0kn1")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

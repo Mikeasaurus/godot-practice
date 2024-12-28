@@ -60,3 +60,8 @@ func predict_location (t: float) -> Vector2:
 func get_slimed () -> void:
 	is_flying = false
 	$AnimatedSprite2D.play("slimed")
+
+func _on_body_entered(body: Node) -> void:
+	if "get_collision_layer" in body:
+		if body.get_collision_layer() == 2 and is_flying:
+			get_slimed()

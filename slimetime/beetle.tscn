@@ -32,7 +32,10 @@ radius = 31.257
 
 [node name="Beetle" type="RigidBody2D"]
 collision_layer = 2
+collision_mask = 3
 gravity_scale = 0.0
+contact_monitor = true
+max_contacts_reported = 1
 script = ExtResource("1_07pwg")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -40,3 +43,5 @@ sprite_frames = SubResource("SpriteFrames_7deo6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_51bm2")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
