@@ -266,9 +266,17 @@ func _physics_process(delta: float) -> void:
 				if move_direction.dot(facing_direction) < 0:
 					facing_direction *= -1
 				gd += facing_direction
+		# If no user-driven movement, then hit the brakes on momentum so the worm
+		# doesn't keep gliding forward.
+		elif on_surface:
+			gd -= linear_velocity.normalized()
 	if Input.is_action_just_pressed("jump") and on_surface:
 		# Apply impulse to launch the segment in the air.
 		release_from_surface()
+		# Stop rotating the collision circles.
+		# Otherwise it sometimes makes the worm fly off in unexpected directions.
+		apply_torque_impulse(-angular_velocity)
+		# Apply jump force.
 		apply_central_impulse((facing_direction-feet_direction) * 300)
 		# Turn worm around if on a steep surface (wall jumping).
 		if abs(facing_direction.x) <= 0.2:

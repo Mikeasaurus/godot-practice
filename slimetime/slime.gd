@@ -23,6 +23,8 @@ func _create_splatter (pos: Vector2, direction: Vector2) -> void:
 		var speed: float = 100 + randf() * 200
 		p.position = pos
 		p.linear_velocity = direction.rotated(angle) * speed
+		# Have to do a deferred call for adding the particles, otherwise get the error message:
+		# ERROR: Can't change this state while flushing queries. Use call_deferred() or set_deferred() to change monitoring state instead.
 		call_deferred("add_sibling",p)
 
 # Get normal to any surface that's contacted, align direction vectors accordingly.
