@@ -3,6 +3,8 @@ extends WormSegment
 # How fast slime shoots out.
 var slime_speed: float = 1000.0
 
+signal ate_bug
+
 @export var slime_scene: PackedScene
 @export var crumb_scene: PackedScene
 # Where the mouth is located on the sprite.
@@ -115,3 +117,4 @@ func _on_eating_area_body_entered(body: Node2D) -> void:
 	if "eat" in body:
 		_chew_food()
 		body.eat()
+		ate_bug.emit()

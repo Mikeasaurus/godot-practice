@@ -1,5 +1,7 @@
 extends Node2D
 
+signal ate_bug
+
 # Helper method - pair segments together.
 func pair(seg1,seg2) -> void:
 	seg1.set_front_segment(seg2)
@@ -22,3 +24,6 @@ func __process(_delta: float) -> void:
 		for segment in segments:
 			segment.z_index -= minz
 	
+# Pass along signal when a bug is eaten.
+func _on_worm_front_ate_bug() -> void:
+	ate_bug.emit()
