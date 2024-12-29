@@ -4,11 +4,13 @@ extends WormSegment
 var slime_speed: float = 1000.0
 
 @export var slime_scene: PackedScene
+@export var crumb_scene: PackedScene
 # Where the mouth is located on the sprite.
 var mouth_position: Vector2
 # Flip mouth position whenever head flips direction.
 func flip_segment():
 	mouth_position.x *= -1
+	$AnimatedSprite2D/EatingArea/CollisionShape2D.position.x *= -1
 	super()
 
 # Keep track of all bugs within range.
@@ -68,9 +70,14 @@ func _input(event: InputEvent) -> void:
 		# Check if any targets in range.
 		# Otherwise, shoot straight ahead.
 		var slime_direction: Vector2 = facing_direction
-		if len(targets) > 0:
-			var angle: float = _get_targeting_angle(global_position+slime_start, targets[0])
-			slime_direction = Vector2.from_angle(angle)
+		# Find first viable target (that isn't already slimed).
+		for target in targets:
+			if not target.is_slimed:
+				var angle: float = _get_targeting_angle(global_position+slime_start, targets[0])
+				# Only if angle is good (e.g. not shooting from back of head)
+				if abs(angle-facing_direction.angle()) < PI/2:
+					slime_direction = Vector2.from_angle(angle)
+					break
 		var slime = slime_scene.instantiate()
 		add_child(slime)
 		slime.global_position = global_position + slime_start
@@ -79,6 +86,20 @@ func _input(event: InputEvent) -> void:
 func __process(delta: float) -> void:
 	pass
 
+# Helper function - spawn particles when chewing food.
+func _chew_food () -> void:
+	for i in range(5):
+		var c: Color = Color(1.0,1.0,0)
+		var p: Node2D = crumb_scene.instantiate()
+		var angle: float = (randf() - 0.5) * PI
+		var speed: float = 100 + randf() * 200
+		p.position = position + mouth_position.rotated($AnimatedSprite2D.global_rotation)
+		p.linear_velocity = facing_direction.rotated(angle) * speed
+		# Have to do a deferred call for adding the particles, otherwise get the error message:
+		# ERROR: Can't change this state while flushing queries. Use call_deferred() or set_deferred() to change monitoring state instead.
+		call_deferred("add_sibling",p)
+
+
 func _on_shooting_range_body_entered(body: Node2D) -> void:
 	# Only keep track of targetable objects.
 	if "predict_location" in body:
@@ -86,3 +107,9 @@ func _on_shooting_range_body_entered(body: Node2D) -> void:
 
 func _on_shooting_range_body_exited(body: Node2D) -> void:
 	targets.erase(body)
+
+
+func _on_eating_area_body_entered(body: Node2D) -> void:
+	if "eat" in body:
+		_chew_food()
+		body.eat()

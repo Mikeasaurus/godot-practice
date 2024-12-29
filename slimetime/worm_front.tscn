@@ -1,9 +1,10 @@
-[gd_scene load_steps=13 format=3 uid="uid://dd7mpa5anwn06"]
+[gd_scene load_steps=15 format=3 uid="uid://dd7mpa5anwn06"]
 
 [ext_resource type="Script" path="res://worm_front.gd" id="1_rw4nf"]
 [ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://slime.tscn" id="2_dv6bn"]
 [ext_resource type="Texture2D" uid="uid://xmouf5q1t8ww" path="res://worm/front-walk1.png" id="2_m32wx"]
 [ext_resource type="Texture2D" uid="uid://blojcrk05bmn0" path="res://worm/front-walk2.png" id="3_4unqo"]
+[ext_resource type="PackedScene" uid="uid://qs6dhqvybwnq" path="res://crumb.tscn" id="3_5oyt6"]
 [ext_resource type="Texture2D" uid="uid://cy8ey6er2jslo" path="res://worm/front-walk3.png" id="4_ye44h"]
 [ext_resource type="Texture2D" uid="uid://xr53vj2ebvu" path="res://worm/front-outline.png" id="5_vclal"]
 [ext_resource type="Texture2D" uid="uid://bl12tabuh2g" path="res://worm/front-body.png" id="6_xwa5c"]
@@ -30,6 +31,10 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7sexe"]
+radius = 26.0
+height = 130.0
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_wfloj"]
 radius = 39.0128
 
@@ -44,6 +49,7 @@ contact_monitor = true
 max_contacts_reported = 2
 script = ExtResource("1_rw4nf")
 slime_scene = ExtResource("2_dv6bn")
+crumb_scene = ExtResource("3_5oyt6")
 metadata/_edit_lock_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -72,6 +78,15 @@ position = Vector2(38, -65)
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 
+[node name="EatingArea" type="Area2D" parent="AnimatedSprite2D"]
+position = Vector2(1, -2)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite2D/EatingArea"]
+position = Vector2(25, -37)
+shape = SubResource("CapsuleShape2D_7sexe")
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_wfloj")
 
@@ -91,6 +106,7 @@ collision_mask = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ShootingRange"]
 shape = SubResource("CircleShape2D_83qpy")
 
+[connection signal="body_entered" from="AnimatedSprite2D/EatingArea" to="." method="_on_eating_area_body_entered"]
 [connection signal="timeout" from="JumpTimer" to="." method="_on_jump_timer_timeout"]
 [connection signal="body_entered" from="ShootingRange" to="." method="_on_shooting_range_body_entered"]
 [connection signal="body_exited" from="ShootingRange" to="." method="_on_shooting_range_body_exited"]
