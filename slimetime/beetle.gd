@@ -66,6 +66,10 @@ func eat () -> void:
 	queue_free()
 
 func _on_body_entered(body: Node) -> void:
+	# Check if getting slimed.
 	if "get_collision_layer" in body:
 		if body.get_collision_layer() == 2 and not is_slimed:
 			get_slimed()
+	# Otherwise, hitting something solid, so make a thud.
+	else:
+		$GroundSound.play()

@@ -82,12 +82,15 @@ func _input(_event: InputEvent) -> void:
 		add_child(slime)
 		slime.global_position = global_position + slime_start
 		slime.linear_velocity = slime_direction * slime_speed
+		# Play a sound when shooting slime.
+		$SpitSound.play()
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func __process(_delta: float) -> void:
 	pass
 
 # Helper function - spawn particles when chewing food.
 func _chew_food () -> void:
+	$EatSound.play()
 	for i in range(5):
 		var p: Node2D = crumb_scene.instantiate()
 		var angle: float = (randf() - 0.5) * PI

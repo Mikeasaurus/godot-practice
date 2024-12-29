@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://c3celykknp05n"]
+[gd_scene load_steps=6 format=3 uid="uid://c3celykknp05n"]
 
 [ext_resource type="Script" path="res://slime.gd" id="1_2jvy3"]
 [ext_resource type="Texture2D" uid="uid://calncc3kymvdr" path="res://slime.png" id="1_hb2nk"]
 [ext_resource type="PackedScene" uid="uid://b675104byppv0" path="res://particle.tscn" id="3_y2ch6"]
+[ext_resource type="AudioStream" uid="uid://c20jw10h4xbfj" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="4_hsgpw"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qembf"]
 radius = 22.0
@@ -24,5 +25,8 @@ shape = SubResource("CircleShape2D_qembf")
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 scale = Vector2(2.6, 2.6)
 
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[node name="SplatSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_hsgpw")
+
 [connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]
+[connection signal="finished" from="SplatSound" to="." method="_on_splat_sound_finished"]

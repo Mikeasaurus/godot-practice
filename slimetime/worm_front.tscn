@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dd7mpa5anwn06"]
+[gd_scene load_steps=19 format=3 uid="uid://dd7mpa5anwn06"]
 
 [ext_resource type="Script" path="res://worm_front.gd" id="1_rw4nf"]
 [ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://slime.tscn" id="2_dv6bn"]
@@ -10,6 +10,10 @@
 [ext_resource type="Texture2D" uid="uid://bl12tabuh2g" path="res://worm/front-body.png" id="6_xwa5c"]
 [ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://hit.png" id="7_0jjxr"]
 [ext_resource type="Texture2D" uid="uid://crr3r5rv3umqa" path="res://worm/front-top.png" id="7_prwf5"]
+[ext_resource type="AudioStream" uid="uid://bytvlsxnxc076" path="res://audio/349182__natty23__whoosh.wav" id="11_bkiy5"]
+[ext_resource type="AudioStream" uid="uid://4r8shsnsbali" path="res://audio/215162__otisjames__thud.wav" id="12_eqvkb"]
+[ext_resource type="AudioStream" uid="uid://bsyma0k5y5heh" path="res://audio/352402__noahpardo__npx-throat-gathering-spit-2.wav" id="13_8n3bq"]
+[ext_resource type="AudioStream" uid="uid://boua4s0jseys6" path="res://audio/20279__koops__apple_crunch_16.wav" id="14_0o6yv"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_di2j6"]
 animations = [{
@@ -105,6 +109,18 @@ collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ShootingRange"]
 shape = SubResource("CircleShape2D_83qpy")
+
+[node name="JumpSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("11_bkiy5")
+
+[node name="GroundSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_eqvkb")
+
+[node name="SpitSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("13_8n3bq")
+
+[node name="EatSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("14_0o6yv")
 
 [connection signal="body_entered" from="AnimatedSprite2D/EatingArea" to="." method="_on_eating_area_body_entered"]
 [connection signal="timeout" from="JumpTimer" to="." method="_on_jump_timer_timeout"]

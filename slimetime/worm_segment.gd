@@ -103,6 +103,9 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			facing_direction = feet_direction.rotated(PI/2)
 		# Only stick if segment in front is already stuck.
 		if front_segment == null or front_segment.on_surface:
+			# Play sound for landing on surface (if not already landed).
+			if front_segment == null and not on_surface:
+				$GroundSound.play()
 			on_surface = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -276,6 +279,9 @@ func _physics_process(delta: float) -> void:
 		apply_torque_impulse(-angular_velocity)
 		# Apply jump force.
 		apply_central_impulse((facing_direction-feet_direction) * 300)
+		# Apply jump sound.  Only do once (not for all segments.
+		if front_segment == null:
+			$JumpSound.play()
 		# Turn worm around if on a steep surface (wall jumping).
 		if abs(facing_direction.x) <= 0.2:
 			feet_direction *= -1

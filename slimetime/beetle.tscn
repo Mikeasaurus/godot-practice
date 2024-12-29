@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://lnqgkkyiw03c"]
+[gd_scene load_steps=8 format=3 uid="uid://lnqgkkyiw03c"]
 
 [ext_resource type="Script" path="res://beetle.gd" id="1_07pwg"]
 [ext_resource type="Texture2D" uid="uid://psliqeeiy8kv" path="res://beetle1.png" id="1_u2afi"]
 [ext_resource type="Texture2D" uid="uid://bkr42pw6odav" path="res://beetle2.png" id="2_bpdfk"]
 [ext_resource type="Texture2D" uid="uid://cc1wpweqrk0i2" path="res://beetle-slimed.png" id="4_w6v2j"]
+[ext_resource type="AudioStream" uid="uid://4r8shsnsbali" path="res://audio/215162__otisjames__thud.wav" id="5_sk5ud"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_7deo6"]
 animations = [{
@@ -43,5 +44,8 @@ sprite_frames = SubResource("SpriteFrames_7deo6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_51bm2")
+
+[node name="GroundSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_sk5ud")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

@@ -29,10 +29,15 @@ func _create_splatter (pos: Vector2, direction: Vector2) -> void:
 
 # Get normal to any surface that's contacted, align direction vectors accordingly.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	if state.get_contact_count() > 0:
+	# Only splat if a surface is hit, and only splat once.
+	if state.get_contact_count() > 0 and $Sprite2D.visible:
 		var n: Vector2 = state.get_contact_local_normal(0)
 		_create_splatter (position, n)
+		# Play a sound.
+		$SplatSound.play()
+		# Turn slime invisible until gets cleaned up.
+		$Sprite2D.visible = false
 
-func _on_body_entered(_body: Node) -> void:
+func _on_splat_sound_finished() -> void:
 	queue_free()
 	pass # Replace with function body.
