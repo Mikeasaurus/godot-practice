@@ -61,7 +61,7 @@ func _get_collision_mismatch (x0: Vector2, obj, angle: float, t: float) -> Vecto
 func _get_slime_location (x0: Vector2, angle: float, t: float) -> Vector2:
 	return x0 + Vector2(slime_speed*t*cos(angle), slime_speed*t*sin(angle) + Globals.gravity/2 * t**2)
 
-func _input(event: InputEvent) -> void:
+func _input(_event: InputEvent) -> void:
 	# Check if we need to shoot some slime.
 	if Input.is_action_just_pressed("shoot_slime"):
 		# Where the slime originates from (based on position of worm's mouth).
@@ -83,13 +83,12 @@ func _input(event: InputEvent) -> void:
 		slime.global_position = global_position + slime_start
 		slime.linear_velocity = slime_direction * slime_speed
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func __process(delta: float) -> void:
+func __process(_delta: float) -> void:
 	pass
 
 # Helper function - spawn particles when chewing food.
 func _chew_food () -> void:
 	for i in range(5):
-		var c: Color = Color(1.0,1.0,0)
 		var p: Node2D = crumb_scene.instantiate()
 		var angle: float = (randf() - 0.5) * PI
 		var speed: float = 100 + randf() * 200
