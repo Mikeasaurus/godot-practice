@@ -7,5 +7,5 @@ func __ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func __process(delta: float) -> void:
+func __process(_delta: float) -> void:
 	pass

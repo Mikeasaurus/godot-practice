@@ -50,8 +50,6 @@ func set_back_segment (segment: RigidBody2D) -> void:
 # can't find a way to do this to all child nodes in one shot, need to
 # do each one individually?
 func flip_segment() -> void:
-	# Get width of the segment, and current offset.
-	var w = $AnimatedSprite2D/Outline.texture.get_width()
 	# Flip the components.
 	$AnimatedSprite2D.flip_h = not $AnimatedSprite2D.flip_h
 	$AnimatedSprite2D/Outline.flip_h = not $AnimatedSprite2D/Outline.flip_h
@@ -108,7 +106,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			on_surface = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 
 	# Modify rotation / flip of the segment
 
@@ -260,8 +258,8 @@ func _physics_process(delta: float) -> void:
 		# Check if there's any user-driven movement, and if it's not orthogonal
 		# to surface.
 		if move_direction != Vector2.ZERO:
-			var cos: float = move_direction.normalized().dot(facing_direction)
-			if abs(cos) >= 0.5 and on_surface:
+			var cos_angle: float = move_direction.normalized().dot(facing_direction)
+			if abs(cos_angle) >= 0.5 and on_surface:
 				# If going in opposite direction to before, need to invert direction that we're facing.
 				if move_direction.dot(facing_direction) < 0:
 					facing_direction *= -1

@@ -19,7 +19,7 @@ func _ready() -> void:
 	is_slimed = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if is_slimed:
 		apply_central_force(Vector2(0,Globals.gravity))
 		return

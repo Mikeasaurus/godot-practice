@@ -8,7 +8,7 @@ func _ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	# Apply gravity force.
 	apply_central_force(Vector2(0,Globals.gravity))
 
@@ -33,6 +33,6 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		var n: Vector2 = state.get_contact_local_normal(0)
 		_create_splatter (position, n)
 
-func _on_body_entered(body: Node) -> void:
+func _on_body_entered(_body: Node) -> void:
 	queue_free()
 	pass # Replace with function body.

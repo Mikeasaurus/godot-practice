@@ -6,11 +6,11 @@ func _ready() -> void:
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	pass # Replace with function body.
 	
 # Remove particle if it touches something solid, or leaves the screen. 
-func _on_body_entered(body: Node2D) -> void:
+func _on_body_entered(_body: Node2D) -> void:
 	queue_free()
 func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
 	queue_free()
