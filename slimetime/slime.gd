@@ -37,6 +37,8 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		$SplatSound.play()
 		# Turn slime invisible until gets cleaned up.
 		$Sprite2D.visible = false
+		# Also stop it from colliding, so bugs don't get hit by stray, invisible slimes.
+		collision_layer = 0
 
 func _on_splat_sound_finished() -> void:
 	queue_free()
