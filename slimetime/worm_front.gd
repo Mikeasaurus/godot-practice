@@ -7,6 +7,7 @@ signal ate_bug
 
 @export var slime_scene: PackedScene
 @export var crumb_scene: PackedScene
+@export var worm_segment_scene: PackedScene
 # Where the mouth is located on the sprite.
 var mouth_position: Vector2
 # Flip mouth position whenever head flips direction.
@@ -86,6 +87,16 @@ func _input(_event: InputEvent) -> void:
 		slime.linear_velocity = slime_direction * slime_speed
 		# Play a sound when shooting slime.
 		$SpitSound.play()
+	# Debug action... grow the worm on command.
+	if Input.is_action_just_pressed("grow"):
+		# Add a new segment, just behind the front segment.
+		var segment: WormSegment = worm_segment_scene.instantiate()
+		add_sibling(segment)
+		segment.global_position = (back_segment.global_position + global_position) / 2
+		back_segment.set_front_segment(segment)
+		segment.set_back_segment(back_segment)
+		segment.set_front_segment(self)
+		set_back_segment(segment)
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func __process(_delta: float) -> void:
 	pass

@@ -1,10 +1,11 @@
-[gd_scene load_steps=19 format=3 uid="uid://dd7mpa5anwn06"]
+[gd_scene load_steps=20 format=3 uid="uid://dd7mpa5anwn06"]
 
 [ext_resource type="Script" path="res://worm_front.gd" id="1_rw4nf"]
 [ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://slime.tscn" id="2_dv6bn"]
 [ext_resource type="Texture2D" uid="uid://xmouf5q1t8ww" path="res://worm/front-walk1.png" id="2_m32wx"]
 [ext_resource type="Texture2D" uid="uid://blojcrk05bmn0" path="res://worm/front-walk2.png" id="3_4unqo"]
 [ext_resource type="PackedScene" uid="uid://qs6dhqvybwnq" path="res://crumb.tscn" id="3_5oyt6"]
+[ext_resource type="PackedScene" uid="uid://ss2xikvy6bt7" path="res://worm_segment.tscn" id="4_fsj4d"]
 [ext_resource type="Texture2D" uid="uid://cy8ey6er2jslo" path="res://worm/front-walk3.png" id="4_ye44h"]
 [ext_resource type="Texture2D" uid="uid://xr53vj2ebvu" path="res://worm/front-outline.png" id="5_vclal"]
 [ext_resource type="Texture2D" uid="uid://bl12tabuh2g" path="res://worm/front-body.png" id="6_xwa5c"]
@@ -54,6 +55,7 @@ max_contacts_reported = 2
 script = ExtResource("1_rw4nf")
 slime_scene = ExtResource("2_dv6bn")
 crumb_scene = ExtResource("3_5oyt6")
+worm_segment_scene = ExtResource("4_fsj4d")
 metadata/_edit_lock_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
