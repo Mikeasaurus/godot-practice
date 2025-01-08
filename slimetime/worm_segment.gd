@@ -2,6 +2,9 @@ extends RigidBody2D
 
 class_name WormSegment
 
+# Signal to indicate the segment has landed on a surface
+signal landed
+
 # Remember contact direction of the last surface that was attached to.
 var last_surface_normal: Vector2
 # Remember a surface reference point (to help correct trajectory if starting to leave surface).
@@ -18,11 +21,6 @@ var facing_direction: Vector2
 # Direction that the segment's feet are in.
 # Only general direction of this is used.  facing_direction will determine exact angles.
 var feet_direction: Vector2
-
-# Optional connections to other segments.
-var front_segment: RigidBody2D = null
-var back_segment: RigidBody2D = null
-var segment_spacing: float = 30.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -94,13 +92,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 			facing_direction = feet_direction.rotated(-PI/2)
 		else:
 			facing_direction = feet_direction.rotated(PI/2)
-		# Only stick if segment in front is already stuck.
-		if front_segment == null or front_segment.on_surface:
-			# Play sound for landing on surface (if not already landed).
-			if front_segment == null and not on_surface:
-				$GroundSound.play()
-			on_surface = true
-
+		if not on_surface:
+			landed.emit()  # For playing landing sound (handled in worm_front)
+		on_surface = true
+"""
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 
@@ -283,7 +278,7 @@ func _physics_process(delta: float) -> void:
 
 	# Visual aid for centre of force, for debugging.
 	$GravityPoint.global_position = global_position + gd
-
+"""
 # Helper function - release segment from a surface so it has time for reacting to
 # impulses or other forces (such as to initiate a jump).
 func release_from_surface () -> void:

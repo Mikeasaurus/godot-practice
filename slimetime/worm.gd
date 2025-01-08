@@ -4,6 +4,8 @@ signal ate_bug
 
 # Array to hold individual worm segments.
 var segments: Array[WormSegment] = []
+# How far apart the segments should be.
+var segment_spacing: float = 30.0
 
 @export var worm_segment_scene: PackedScene
 

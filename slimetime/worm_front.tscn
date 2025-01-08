@@ -122,6 +122,7 @@ stream = ExtResource("13_8n3bq")
 [node name="EatSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("14_0o6yv")
 
+[connection signal="landed" from="." to="." method="_on_landed"]
 [connection signal="body_entered" from="AnimatedSprite2D/EatingArea" to="." method="_on_eating_area_body_entered"]
 [connection signal="timeout" from="JumpTimer" to="." method="_on_jump_timer_timeout"]
 [connection signal="body_entered" from="ShootingRange" to="." method="_on_shooting_range_body_entered"]

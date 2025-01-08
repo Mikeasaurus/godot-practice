@@ -121,3 +121,6 @@ func _on_eating_area_body_entered(body: Node2D) -> void:
 		_chew_food()
 		body.eat()
 		ate_bug.emit()
+
+func _on_landed() -> void:
+	$GroundSound.play()
