@@ -39,11 +39,12 @@ func _process(_delta: float) -> void:
 	var segment: WormSegment
 	var front_segment: WormSegment
 	var back_segment: WormSegment
+	var v: Vector2
 
 	# Align front segment
 	segment = segments[-1]
 	back_segment = segments[-2]
-	var v: Vector2 = segment.global_position - back_segment.global_position
+	v = segment.global_position - back_segment.global_position
 	if v.length() > segment_spacing * 0.9:
 		if v.dot(segment.facing_direction) > 0:
 			segment.facing_direction = v.normalized()
@@ -74,6 +75,25 @@ func _process(_delta: float) -> void:
 		segments[i].feet_direction = segments[i+1].feet_direction
 
 	# Z-order adjust and flip code was here.
+	# Adjust z-order if facing opposite direction from segment behind.
+	# I.e., moving in opposite direction, visually in front of other segments.
+	for i in range(1,len(segments)):
+		segment = segments[i]
+		back_segment = segments[i-1]
+		if segment.facing_direction.dot(back_segment.facing_direction) < 0:
+			segment.z_index = back_segment.z_index + 5
+		else:
+			segment.z_index = back_segment.z_index
+	# Flip and adjust z-order if being passed by front segment from other direction.
+	for i in range(len(segments)-1):
+		segment = segments[i]
+		front_segment = segments[i+1]
+		v = front_segment.global_position - segment.global_position
+		if v.dot(segment.facing_direction) < 0:
+			segment.facing_direction *= -1
+			# Update z-order unless front is turned around, then let it stay in front.
+			if front_segment.facing_direction.dot(v) > 0 and back_segment != null:
+				segment.z_index = front_segment.z_index
 
 	# Update segment sprites.
 	for s in segments:
