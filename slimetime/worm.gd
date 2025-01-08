@@ -30,14 +30,166 @@ func _input(_event: InputEvent) -> void:
 		segments.insert(-2,segment)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-# NOTE: Disabled - z-order seems to be stable now, no need for adjustment.
-func __process(_delta: float) -> void:
-	# Adjust z-order of worm segments if they all exceed a certain value
-	var minz: int = segments[0].z_index
-	if minz > 0:
-		for segment in segments:
-			segment.z_index -= minz
+func _process(_delta: float) -> void:
+	# Modify rotation / flip of the segments
+
+	# Adjust the rotation of the segments so they're aligned w.r.t. to segment
+	# in front and/or behind.
+
+	var segment: WormSegment
+	var front_segment: WormSegment
+	var back_segment: WormSegment
+
+	# Align front segment
+	segment = segments[-1]
+	back_segment = segments[-2]
+	var v: Vector2 = segment.global_position - back_segment.global_position
+	if v.length() > segment_spacing * 0.9:
+		if v.dot(segment.facing_direction) > 0:
+			segment.facing_direction = v.normalized()
+		else:
+			segment.facing_direction = -v.normalized()
+	# Otherwise, will be aligned to ground based (handled in _integrate_forces)
+
+	# Align inner segments
+	for i in range(1,len(segments)-1):
+		segment = segments[i]
+		back_segment = segments[i-1]
+		front_segment = segments[i+1]
+		# Only if this segment is actually in-between the other segments.
+		# (not if in process of turning whole body around in a different direction).
+		if (segment.global_position-back_segment.global_position).dot(front_segment.global_position-segment.global_position) > 0:
+			# Only if far enough distance.
+			if (front_segment.global_position - back_segment.global_position).length() > segment_spacing * 0.9:
+				segment.facing_direction = (front_segment.global_position - back_segment.global_position).normalized()
+
+	# Align tail segment.
+	segment = segments[0]
+	front_segment = segments[1]
+	if (front_segment.global_position - segment.global_position).length() > segment_spacing * 0.9:
+		segment.facing_direction = (front_segment.global_position - segment.global_position).normalized()
+
+	# Adjust feet to be same direction as segment in front.
+	for i in range(len(segments)-1):
+		segments[i].feet_direction = segments[i+1].feet_direction
+
+	# Z-order adjust and flip code was here.
+
+	# Update segment sprites.
+	for s in segments:
+		s.update_sprite()
+
+# The following code controls force of movement for the segments.
+func _physics_process(delta: float) -> void:
+	# This variable defines a force point of attraction for the segments.
+	# Could be force of gravity, or a force sticking the segment to a surface.
+	# Initialized with current attraction points, can be updated to include
+	# other forces further below.
+	var gd: Array[Vector2]
+	for s in segments: gd.append(s.last_surface_normal)
+
+	# Bring the segment to the correct distance to the front neighbour.
+	for i in range(len(segments)-1):
+		var segment: WormSegment = segments[i]
+		var front_segment: WormSegment = segments[i+1]
+		# Figure out where this segment would be w.r.t. the front one, at the end of this
+		# time step.
+		var v2: Vector2 = front_segment.global_position + front_segment.linear_velocity*delta
+		var v1: Vector2 = segment.global_position + segment.linear_velocity*delta
+		# Calculate the distance, and apply a correction if distance would be too large.
+		var to_other: Vector2 = v2 - v1
+		var distance: float = to_other.length()
+		if distance > segment_spacing * 1.05:
+			# Close the gap.
+			# Instantaneous.  I had too many problems with other approaches:
+			# - Using a force was too springy.
+			# - Setting a linear velocity mostly worked, but doing so negated any
+			#   other forces (gravity) from being applied.
+			var vel: float = (distance-segment_spacing)/delta*0.5
+			# If velocity if above some threshold, then may need to un-stick from a surface
+			# to allow the correction to take place.
+			if vel > 1000.0 and segment.on_surface:
+				segment.release_from_surface()
+			segment.set_velocity_in_direction(to_other, vel)
+
+		# If close enough to front segment, then turn off any further velocity
+		# in that particular direction.
+		if distance <= segment_spacing * 0.9:
+			segment.set_velocity_in_direction(to_other, 0.0)
+
+	# Avoid moving in direction that would cause segments to jack-knife.
+	for i in range(len(segments)-2):
+		var s1: WormSegment = segments[i]
+		var s2: WormSegment = segments[i+1]
+		var s3: WormSegment = segments[i+2]
+		if s1.on_surface: continue
+		var x1a: Vector2 = s1.global_position
+		var x2a: Vector2 = s2.global_position
+		var x3a: Vector2 = s3.global_position
+		var v1a: Vector2 = (x1a-x2a).normalized()
+		var v2a: Vector2 = (x3a-x2a).normalized()
+		var cosa: float = v2a.dot(v1a)
+		var x1b: Vector2 = s1.global_position + s1.linear_velocity*delta
+		var x2b: Vector2 = s2.global_position + s2.linear_velocity*delta
+		var x3b: Vector2 = s3.global_position + s3.linear_velocity*delta
+		var v1b: Vector2 = (x1b-x2b).normalized()
+		var v2b: Vector2 = (x3b-x2b).normalized()
+		var cosb: float = v2b.dot(v1b)
+		# Check if segments are at a steep angle, and getting steeper.
+		if cosa > -0.5 and cosb > cosa:
+			# Turn off motion in that direction.
+			s1.set_velocity_in_direction(x3b-x1b,0)
+
+	# If disattached from a surface, but neighbouring segment(s) are attached,
+	# then apply an attachment force to this segment.
+	for i in range(len(segments)-1):
+		if (not segments[i].on_surface) and segments[i+1].on_surface:
+			gd[i] = segments[i+1].last_surface_normal
+
+	# Keep segments from drifting away from surface.
+	for s in segments:
+		if s.on_surface and s.last_surface_reference != Vector2.ZERO:
+			s.set_velocity_in_direction(s.global_position-s.last_surface_reference,0.0)
+
+	# Generate a force of motion in response to user input (front segment only)
+	# Determine direction to move in, based on direction specified by user.
+	var move_direction: Vector2 = Vector2.ZERO
+	if Input.is_action_pressed("move_right"):
+		move_direction += Vector2(1,0)
+	if Input.is_action_pressed("move_left"):
+		move_direction += Vector2(-1,0)
+	if Input.is_action_pressed("move_down"):
+		move_direction += Vector2(0,1)
+	if Input.is_action_pressed("move_up"):
+		move_direction += Vector2(0,-1)
+	# Movement only applies to front segment (other segments follow passively)
+	var head: WormSegment = segments[-1]
+	# Check if there's any user-driven movement, and if it's not orthogonal
+	# to surface.
+	if move_direction != Vector2.ZERO:
+		var cos_angle: float = move_direction.normalized().dot(head.facing_direction)
+		if abs(cos_angle) >= 0.5 and head.on_surface:
+			# If going in opposite direction to before, need to invert direction that we're facing.
+			if move_direction.dot(head.facing_direction) < 0:
+				head.facing_direction *= -1
+			gd[-1] += head.facing_direction
+	# If no user-driven movement, then hit the brakes on momentum so the worm
+	# doesn't keep gliding forward.
+	else:
+		for i in range(len(segments)):
+			if segments[i].on_surface:
+				gd[i] -= segments[i].linear_velocity.normalized()
+
+	# jump code goes here?
 	
+	# Apply the force.
+	for i in range(len(segments)):
+		segments[i].apply_central_force(gd[i].normalized()*Globals.gravity)
+		# Visual aid for centre of force, for debugging.
+		segments[i].get_node("GravityPoint").global_position = segments[i].global_position + gd[i]
+
+
+
 # Pass along signal when a bug is eaten.
 func _on_worm_front_ate_bug() -> void:
 	ate_bug.emit()

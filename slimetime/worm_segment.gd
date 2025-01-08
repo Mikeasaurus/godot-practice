@@ -95,43 +95,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		if not on_surface:
 			landed.emit()  # For playing landing sound (handled in worm_front)
 		on_surface = true
-"""
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 
-	# Modify rotation / flip of the segment
-
-	# Adjust the rotation of the segment so it's aligned w.r.t. to segment
-	# in front and/or behind.
-
-	# Case 1: this is the front segment (check if no segments ahead).
-	if front_segment == null and back_segment != null:
-		# Use back segment to define alignment, if far enough distance.
-		var v: Vector2 = global_position - back_segment.global_position
-		if v.length() > segment_spacing * 0.9:
-			if v.dot(facing_direction) > 0:
-				facing_direction = v.normalized()
-			else:
-				facing_direction = -v.normalized()
-		# Otherwise, will be aligned to ground based (handled in _integrate_forces)
-
-	# Case 2: this is an inner segment.
-	if front_segment != null and back_segment != null:
-		# Only if this segment is actually in-between the other segments.
-		# (not if in process of turning whole body around in a different direction).
-		if (global_position-back_segment.global_position).dot(front_segment.global_position-global_position) > 0:
-			# Only if far enough distance.
-			if (front_segment.global_position - back_segment.global_position).length() > segment_spacing * 0.9:
-				facing_direction = (front_segment.global_position - back_segment.global_position).normalized()
-	# Case 3: this is the tail segment (check if no segments behind).
-	if back_segment == null and front_segment != null:
-		if (front_segment.global_position - global_position).length() > segment_spacing * 0.9:
-			facing_direction = (front_segment.global_position - global_position).normalized()
-
-	# Adjust feet to be same direction as segment in front.
-	if front_segment != null:
-		feet_direction = front_segment.feet_direction
-
+	"""
 	# Adjust z-order if facing opposite direction from segement behind.
 	# I.e., moving in opposite direction, visually in front of other segments.
 	if back_segment != null:
@@ -150,13 +117,13 @@ func _process(_delta: float) -> void:
 
 	# Apply new orientation
 	update_sprite()
+	"""
 
 	# Check if moving, need to animate legs?
 	if on_surface and linear_velocity.length() > 10:
 		$AnimatedSprite2D.play()
 	else:
 		$AnimatedSprite2D.pause()
-
 # Helper method - Set the velocity along the given direction.
 # Velocity in orthogonal direction is left untouched.
 func set_velocity_in_direction (direction: Vector2, vel: float) -> void:
@@ -171,94 +138,11 @@ func set_velocity_in_direction (direction: Vector2, vel: float) -> void:
 	# Adjust the velocity through an impulse.
 	apply_central_impulse(lv-linear_velocity)
 
+"""
 # The following code controls force of movement for the segments.
 func _physics_process(delta: float) -> void:
-	# This variable defines a force point of attraction for the segment.
-	# Could be force of gravity, or a force sticking the segment to a surface.
-	# Initialized with current attraction point, can be updated to include
-	# other forces further below.
-	var gd: Vector2 = last_surface_normal
 
-	# Bring the segment to the correct distance to the front neighbour.
-	if front_segment != null:
-		# Figure out where this segment would be w.r.t. the front one, at the end of this
-		# time step.
-		var v2: Vector2 = front_segment.global_position + front_segment.linear_velocity*delta
-		var v1: Vector2 = global_position + linear_velocity*delta
-		# Calculate the distance, and apply a correction if distance would be too large.
-		var to_other: Vector2 = v2 - v1
-		var distance: float = to_other.length()
-		if distance > segment_spacing * 1.05:
-			# Close the gap.
-			# Instantaneous.  I had too many problems with other approaches:
-			# - Using a force was too springy.
-			# - Setting a linear velocity mostly worked, but doing so negated any
-			#   other forces (gravity) from being applied.
-			var vel: float = (distance-segment_spacing)/delta*0.5
-			# If velocity if above some threshold, then may need to un-stick from a surface
-			# to allow the correction to take place.
-			if vel > 1000.0 and on_surface:
-				release_from_surface()
-			set_velocity_in_direction(to_other, vel)
 
-		# If close enough to front segment, then turn off any further velocity
-		# in that particular direction.
-		if distance <= segment_spacing * 0.9:
-			set_velocity_in_direction(to_other, 0.0)
-
-	# Avoid moving in direction that would cause segments to jack-knife.
-	if not on_surface and front_segment != null and front_segment.front_segment != null:
-		var x1a: Vector2 = global_position
-		var x2a: Vector2 = front_segment.global_position
-		var x3a: Vector2 = front_segment.front_segment.global_position
-		var v1a: Vector2 = (x1a-x2a).normalized()
-		var v2a: Vector2 = (x3a-x2a).normalized()
-		var cosa: float = v2a.dot(v1a)
-		var x1b: Vector2 = global_position + linear_velocity*delta
-		var x2b: Vector2 = front_segment.global_position + front_segment.linear_velocity*delta
-		var x3b: Vector2 = front_segment.front_segment.global_position + front_segment.front_segment.linear_velocity*delta
-		var v1b: Vector2 = (x1b-x2b).normalized()
-		var v2b: Vector2 = (x3b-x2b).normalized()
-		var cosb: float = v2b.dot(v1b)
-		# Check if segments are at a steep angle, and getting steeper.
-		if cosa > -0.5 and cosb > cosa:
-			# Turn off motion in that direction.
-			set_velocity_in_direction(x3b-x1b,0)
-
-	# If disattached from a surface, but neighbouring segment(s) are attached,
-	# then apply an attachment force to this segment.
-	if not on_surface and front_segment != null and front_segment.on_surface:
-		gd = front_segment.last_surface_normal
-
-	# Keep segments from drifting away from surface.
-	if on_surface and last_surface_reference != Vector2.ZERO:
-		set_velocity_in_direction(global_position-last_surface_reference,0.0)
-
-	# Generate a force of motion in response to user input (front segment only)
-	if front_segment == null:
-		# Determine direction to move in, based on direction specified by user.
-		var move_direction: Vector2 = Vector2.ZERO
-		if Input.is_action_pressed("move_right"):
-			move_direction += Vector2(1,0)
-		if Input.is_action_pressed("move_left"):
-			move_direction += Vector2(-1,0)
-		if Input.is_action_pressed("move_down"):
-			move_direction += Vector2(0,1)
-		if Input.is_action_pressed("move_up"):
-			move_direction += Vector2(0,-1)
-		# Check if there's any user-driven movement, and if it's not orthogonal
-		# to surface.
-		if move_direction != Vector2.ZERO:
-			var cos_angle: float = move_direction.normalized().dot(facing_direction)
-			if abs(cos_angle) >= 0.5 and on_surface:
-				# If going in opposite direction to before, need to invert direction that we're facing.
-				if move_direction.dot(facing_direction) < 0:
-					facing_direction *= -1
-				gd += facing_direction
-		# If no user-driven movement, then hit the brakes on momentum so the worm
-		# doesn't keep gliding forward.
-		elif on_surface:
-			gd -= linear_velocity.normalized()
 	if Input.is_action_just_pressed("jump") and on_surface:
 		# Apply impulse to launch the segment in the air.
 		release_from_surface()
@@ -273,11 +157,6 @@ func _physics_process(delta: float) -> void:
 		# Turn worm around if on a steep surface (wall jumping).
 		if abs(facing_direction.x) <= 0.2:
 			feet_direction *= -1
-	# Apply the force.
-	apply_central_force(gd.normalized()*Globals.gravity)
-
-	# Visual aid for centre of force, for debugging.
-	$GravityPoint.global_position = global_position + gd
 """
 # Helper function - release segment from a surface so it has time for reacting to
 # impulses or other forces (such as to initiate a jump).
