@@ -76,7 +76,7 @@ func _input(_event: InputEvent) -> void:
 		# Find first viable target (that isn't already slimed).
 		for target in targets:
 			if not target.is_slimed:
-				var angle: float = _get_targeting_angle(global_position+slime_start, targets[0])
+				var angle: float = _get_targeting_angle(global_position+slime_start, target)
 				# Only if angle is good (e.g. not shooting from back of head)
 				if abs(angle-facing_direction.angle()) < PI/2:
 					slime_direction = Vector2.from_angle(angle)
