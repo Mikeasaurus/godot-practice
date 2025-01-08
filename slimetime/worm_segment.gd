@@ -38,13 +38,6 @@ func _ready() -> void:
 	on_surface = false
 	sticky_feet = true
 
-# Helper methods to associate this segment with neighbouring segments.
-# Called by a higher-level scene which will manage the overall worm.
-func set_front_segment (segment: RigidBody2D) -> void:
-	front_segment = segment
-func set_back_segment (segment: RigidBody2D) -> void:
-	back_segment = segment
-
 # Helper method - flip the segment in the opposite direction.
 # Maybe there's a better way to do this?
 # can't find a way to do this to all child nodes in one shot, need to
