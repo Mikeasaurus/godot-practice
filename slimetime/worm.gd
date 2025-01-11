@@ -27,7 +27,7 @@ func _input(_event: InputEvent) -> void:
 		var segment: WormSegment = worm_segment_scene.instantiate()
 		add_child(segment)
 		segment.global_position = (segments[-2].global_position + segments[-1].global_position) / 2
-		segments.insert(-2,segment)
+		segments.insert(len(segments)-1,segment)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
