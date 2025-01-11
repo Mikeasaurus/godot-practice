@@ -202,12 +202,10 @@ func _physics_process(delta: float) -> void:
 
 	# Do a jump
 	if Input.is_action_just_pressed("jump"):
-		# Apply jump sound.  Only once.
 		if segments[-1].on_surface:
+			# Apply jump sound.  Only once.
 			$JumpSound.play()
-		# Any segment on a surface gets an impulse force applied.
-		for s in segments:
-			if s.on_surface:
+			for s in segments:
 				# Apply impulse to launch the segment in the air.
 				s.release_from_surface()
 				# Stop rotating the collision circles.
