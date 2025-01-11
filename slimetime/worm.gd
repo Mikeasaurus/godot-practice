@@ -14,20 +14,20 @@ func _ready() -> void:
 	# Organize the segments into an ordered array.
 	# Note: When I tried to set this from within the declaration of "segments", the
 	# elements were all null.  Have to wait until runtime for these references to exist?
-	segments.append_array([$WormTail, $WormSegment1, $WormSegment2, $WormSegment3, $WormFront])
+	segments.append_array([$WormFront, $WormSegment3, $WormSegment2, $WormSegment1, $WormTail])
 
 func _input(_event: InputEvent) -> void:
 	# Check if we need to shoot some slime.
 	if Input.is_action_just_pressed("shoot_slime"):
 		# Tell head segment to shoot some slime.
-		segments[-1].shoot_slime()
+		segments[0].shoot_slime()
 	# Debug action... grow the worm on command.
 	if Input.is_action_just_pressed("grow"):
 		# Add a new segment, just behind the front segment.
 		var segment: WormSegment = worm_segment_scene.instantiate()
 		add_child(segment)
-		segment.global_position = (segments[-2].global_position + segments[-1].global_position) / 2
-		segments.insert(len(segments)-1,segment)
+		segment.global_position = (segments[0].global_position + segments[1].global_position) / 2
+		segments.insert(1,segment)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -42,8 +42,8 @@ func _process(_delta: float) -> void:
 	var v: Vector2
 
 	# Align front segment
-	segment = segments[-1]
-	back_segment = segments[-2]
+	segment = segments[0]
+	back_segment = segments[1]
 	v = segment.global_position - back_segment.global_position
 	if v.length() > segment_spacing * 0.9:
 		if v.dot(segment.facing_direction) > 0:
@@ -55,8 +55,8 @@ func _process(_delta: float) -> void:
 	# Align inner segments
 	for i in range(1,len(segments)-1):
 		segment = segments[i]
-		back_segment = segments[i-1]
-		front_segment = segments[i+1]
+		back_segment = segments[i+1]
+		front_segment = segments[i-1]
 		# Only if this segment is actually in-between the other segments.
 		# (not if in process of turning whole body around in a different direction).
 		if (segment.global_position-back_segment.global_position).dot(front_segment.global_position-segment.global_position) > 0:
@@ -65,29 +65,30 @@ func _process(_delta: float) -> void:
 				segment.facing_direction = (front_segment.global_position - back_segment.global_position).normalized()
 
 	# Align tail segment.
-	segment = segments[0]
-	front_segment = segments[1]
+	segment = segments[-1]
+	front_segment = segments[-2]
 	if (front_segment.global_position - segment.global_position).length() > segment_spacing * 0.9:
 		segment.facing_direction = (front_segment.global_position - segment.global_position).normalized()
 
 	# Adjust feet to be same direction as segment in front.
-	for i in range(len(segments)-1):
-		segments[i].feet_direction = segments[i+1].feet_direction
+	for i in range(1,len(segments)):
+		segments[i].feet_direction = segments[i-1].feet_direction
+		segments[i].update_sprite()
 
 	# Z-order adjust and flip code was here.
 	# Adjust z-order if facing opposite direction from segment behind.
 	# I.e., moving in opposite direction, visually in front of other segments.
-	for i in range(1,len(segments)):
+	for i in range(len(segments)-2,-1,-1):
 		segment = segments[i]
-		back_segment = segments[i-1]
+		back_segment = segments[i+1]
 		if segment.facing_direction.dot(back_segment.facing_direction) < 0:
 			segment.z_index = back_segment.z_index + 5
 		else:
 			segment.z_index = back_segment.z_index
 	# Flip and adjust z-order if being passed by front segment from other direction.
-	for i in range(len(segments)-1):
+	for i in range(1,len(segments)):
 		segment = segments[i]
-		front_segment = segments[i+1]
+		front_segment = segments[i-1]
 		v = front_segment.global_position - segment.global_position
 		if v.dot(segment.facing_direction) < 0:
 			segment.facing_direction *= -1
@@ -109,9 +110,9 @@ func _physics_process(delta: float) -> void:
 	for s in segments: gd.append(s.last_surface_normal)
 
 	# Bring the segment to the correct distance to the front neighbour.
-	for i in range(len(segments)-1):
+	for i in range(1,len(segments)):
 		var segment: WormSegment = segments[i]
-		var front_segment: WormSegment = segments[i+1]
+		var front_segment: WormSegment = segments[i-1]
 		# Figure out where this segment would be w.r.t. the front one, at the end of this
 		# time step.
 		var v2: Vector2 = front_segment.global_position + front_segment.linear_velocity*delta
@@ -138,10 +139,10 @@ func _physics_process(delta: float) -> void:
 			segment.set_velocity_in_direction(to_other, 0.0)
 
 	# Avoid moving in direction that would cause segments to jack-knife.
-	for i in range(len(segments)-2):
+	for i in range(2,len(segments)):
 		var s1: WormSegment = segments[i]
-		var s2: WormSegment = segments[i+1]
-		var s3: WormSegment = segments[i+2]
+		var s2: WormSegment = segments[i-1]
+		var s3: WormSegment = segments[i-2]
 		if s1.on_surface: continue
 		var x1a: Vector2 = s1.global_position
 		var x2a: Vector2 = s2.global_position
@@ -162,9 +163,9 @@ func _physics_process(delta: float) -> void:
 
 	# If disattached from a surface, but neighbouring segment(s) are attached,
 	# then apply an attachment force to this segment.
-	for i in range(len(segments)-1):
-		if (not segments[i].on_surface) and segments[i+1].on_surface:
-			gd[i] = segments[i+1].last_surface_normal
+	for i in range(1,len(segments)):
+		if (not segments[i].on_surface) and segments[i-1].on_surface:
+			gd[i] = segments[i-1].last_surface_normal
 
 	# Keep segments from drifting away from surface.
 	for s in segments:
@@ -183,7 +184,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_pressed("move_up"):
 		move_direction += Vector2(0,-1)
 	# Movement only applies to front segment (other segments follow passively)
-	var head: WormSegment = segments[-1]
+	var head: WormSegment = segments[0]
 	# Check if there's any user-driven movement, and if it's not orthogonal
 	# to surface.
 	if move_direction != Vector2.ZERO:
@@ -192,7 +193,7 @@ func _physics_process(delta: float) -> void:
 			# If going in opposite direction to before, need to invert direction that we're facing.
 			if move_direction.dot(head.facing_direction) < 0:
 				head.facing_direction *= -1
-			gd[-1] += head.facing_direction
+			gd[0] += head.facing_direction
 	# If no user-driven movement, then hit the brakes on momentum so the worm
 	# doesn't keep gliding forward.
 	else:
@@ -202,12 +203,12 @@ func _physics_process(delta: float) -> void:
 
 	# Do a jump
 	if Input.is_action_just_pressed("jump"):
-		if segments[-1].on_surface:
+		if segments[0].on_surface:
 			# Apply jump sound.  Only once.
 			$JumpSound.play()
 			# Define the direction of jump, based on front segment.
 			# All segments should be jumping in the same direction.
-			var jump_impulse: Vector2 = (segments[-1].facing_direction - segments[-1].feet_direction) * 300
+			var jump_impulse: Vector2 = (segments[0].facing_direction - segments[0].feet_direction) * 300
 			for s in segments:
 				# Apply impulse to launch the segment in the air.
 				s.release_from_surface()
