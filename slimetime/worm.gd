@@ -200,7 +200,24 @@ func _physics_process(delta: float) -> void:
 			if segments[i].on_surface:
 				gd[i] -= segments[i].linear_velocity.normalized()
 
-	# jump code goes here?
+	# Do a jump
+	if Input.is_action_just_pressed("jump"):
+		# Apply jump sound.  Only once.
+		if segments[-1].on_surface:
+			$JumpSound.play()
+		# Any segment on a surface gets an impulse force applied.
+		for s in segments:
+			if s.on_surface:
+				# Apply impulse to launch the segment in the air.
+				s.release_from_surface()
+				# Stop rotating the collision circles.
+				# Otherwise it sometimes makes the worm fly off in unexpected directions.
+				s.apply_torque_impulse(-s.angular_velocity)
+				# Apply jump force.
+				s.apply_central_impulse((s.facing_direction-s.feet_direction) * 300)
+				# Turn worm around if on a steep surface (wall jumping).
+				if abs(s.facing_direction.x) <= 0.2:
+					s.feet_direction *= -1
 	
 	# Apply the force.
 	for i in range(len(segments)):

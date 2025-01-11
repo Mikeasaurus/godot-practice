@@ -118,26 +118,6 @@ func set_velocity_in_direction (direction: Vector2, vel: float) -> void:
 	# Adjust the velocity through an impulse.
 	apply_central_impulse(lv-linear_velocity)
 
-"""
-# The following code controls force of movement for the segments.
-func _physics_process(delta: float) -> void:
-
-
-	if Input.is_action_just_pressed("jump") and on_surface:
-		# Apply impulse to launch the segment in the air.
-		release_from_surface()
-		# Stop rotating the collision circles.
-		# Otherwise it sometimes makes the worm fly off in unexpected directions.
-		apply_torque_impulse(-angular_velocity)
-		# Apply jump force.
-		apply_central_impulse((facing_direction-feet_direction) * 300)
-		# Apply jump sound.  Only do once (not for all segments.
-		if front_segment == null:
-			$JumpSound.play()
-		# Turn worm around if on a steep surface (wall jumping).
-		if abs(facing_direction.x) <= 0.2:
-			feet_direction *= -1
-"""
 # Helper function - release segment from a surface so it has time for reacting to
 # impulses or other forces (such as to initiate a jump).
 func release_from_surface () -> void:
