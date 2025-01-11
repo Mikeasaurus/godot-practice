@@ -5,6 +5,9 @@ extends Node
 # Strength of gravity
 var gravity: float = 500
 
+# How fast slime shoots out.
+var slime_speed: float = 1000.0
+
 # Current score
 var score: int = 0
 

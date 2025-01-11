@@ -1,13 +1,14 @@
 extends WormSegment
 
-# How fast slime shoots out.
-var slime_speed: float = 1000.0
-
 signal ate_bug
 
+# Use these PackedScenes to instansiate these effects at runtime.
+# Alternatively, could use "preload" on the scene files.
+# Don't know which is better in this case.  I'm just carrying over this idiom from
+# my first Godot tutorial practice.
 @export var slime_scene: PackedScene
 @export var crumb_scene: PackedScene
-@export var worm_segment_scene: PackedScene
+
 # Where the mouth is located on the sprite.
 var mouth_position: Vector2
 # Flip mouth position whenever head flips direction.
@@ -26,12 +27,13 @@ func _ready() -> void:
 	super()
 
 # Helper method - get optimal angle for targeting the given object.
+# Used for targeting bugs with slime.
 func _get_targeting_angle (pos: Vector2, obj) -> float:
 	# Start by aiming at where the object currently is.
 	var angle: float = (obj.global_position - pos).angle()
 	# Calculate time needed to get there.
-	var t: float = (obj.global_position - pos).length() / slime_speed
-	var dangle: float = 0.1
+	var t: float = (obj.global_position - pos).length() / Globals.slime_speed
+	var dangle: float = 0.1   # "delta angle", not "dangle" :)
 	var dt: float = 0.1
 	# Iterative solver for optimal angle.
 	# Not able to get direct solution, because need to find the intersection between
@@ -58,25 +60,24 @@ func _get_targeting_angle (pos: Vector2, obj) -> float:
 	return angle
 # Helper method - get distance between slime and object at the given point in time.
 func _get_collision_mismatch (x0: Vector2, obj, angle: float, t: float) -> Vector2:
-	return obj.predict_location(t) - _get_slime_location (x0, angle, t)
+	return obj.predict_location(t) - _predict_slime_location (x0, angle, t)
 # Helper method - estimate where a slime shot would be at time t after being fired
 # at the specified angle.
-func _get_slime_location (x0: Vector2, angle: float, t: float) -> Vector2:
-	return x0 + Vector2(slime_speed*t*cos(angle), slime_speed*t*sin(angle) + Globals.gravity/2 * t**2)
+func _predict_slime_location (x0: Vector2, angle: float, t: float) -> Vector2:
+	return x0 + Vector2(Globals.slime_speed*t*cos(angle), Globals.slime_speed*t*sin(angle) + Globals.gravity/2 * t**2)
 
-func _input(_event: InputEvent) -> void:
-	# Check if we need to shoot some slime.
-	if Input.is_action_just_pressed("shoot_slime"):
+
+func shoot_slime () -> void:
 		# Where the slime originates from (based on position of worm's mouth).
 		var slime_start: Vector2 = mouth_position.rotated($AnimatedSprite2D.global_rotation)
 		# Get the direction to shoot the slime.
 		# Check if any targets in range.
 		# Otherwise, shoot straight ahead.
 		var slime_direction: Vector2 = facing_direction
-		# Find first viable target (that isn't already slimed).
+		# Find first viable target (that isn't already sli       med).
 		for target in targets:
 			if not target.is_slimed:
-				var angle: float = _get_targeting_angle(global_position+slime_start, targets[0])
+				var angle: float = _get_targeting_angle(global_position+slime_start, target)
 				# Only if angle is good (e.g. not shooting from back of head)
 				if abs(angle-facing_direction.angle()) < PI/2:
 					slime_direction = Vector2.from_angle(angle)
@@ -84,19 +85,10 @@ func _input(_event: InputEvent) -> void:
 		var slime = slime_scene.instantiate()
 		add_child(slime)
 		slime.global_position = global_position + slime_start
-		slime.linear_velocity = slime_direction * slime_speed
+		slime.linear_velocity = slime_direction * Globals.slime_speed
 		# Play a sound when shooting slime.
 		$SpitSound.play()
-	# Debug action... grow the worm on command.
-	if Input.is_action_just_pressed("grow"):
-		# Add a new segment, just behind the front segment.
-		var segment: WormSegment = worm_segment_scene.instantiate()
-		add_sibling(segment)
-		segment.global_position = (back_segment.global_position + global_position) / 2
-		back_segment.set_front_segment(segment)
-		segment.set_back_segment(back_segment)
-		segment.set_front_segment(self)
-		set_back_segment(segment)
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func __process(_delta: float) -> void:
 	pass
@@ -129,3 +121,6 @@ func _on_eating_area_body_entered(body: Node2D) -> void:
 		_chew_food()
 		body.eat()
 		ate_bug.emit()
+
+func _on_landed() -> void:
+	$GroundSound.play()
