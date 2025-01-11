@@ -205,6 +205,9 @@ func _physics_process(delta: float) -> void:
 		if segments[-1].on_surface:
 			# Apply jump sound.  Only once.
 			$JumpSound.play()
+			# Define the direction of jump, based on front segment.
+			# All segments should be jumping in the same direction.
+			var jump_impulse: Vector2 = (segments[-1].facing_direction - segments[-1].feet_direction) * 300
 			for s in segments:
 				# Apply impulse to launch the segment in the air.
 				s.release_from_surface()
@@ -212,7 +215,7 @@ func _physics_process(delta: float) -> void:
 				# Otherwise it sometimes makes the worm fly off in unexpected directions.
 				s.apply_torque_impulse(-s.angular_velocity)
 				# Apply jump force.
-				s.apply_central_impulse((s.facing_direction-s.feet_direction) * 300)
+				s.apply_central_impulse(jump_impulse)
 				# Turn worm around if on a steep surface (wall jumping).
 				if abs(s.facing_direction.x) <= 0.2:
 					s.feet_direction *= -1
