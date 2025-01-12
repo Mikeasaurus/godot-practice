@@ -167,6 +167,13 @@ func _physics_process(delta: float) -> void:
 	for i in range(1,len(segments)):
 		if (not segments[i].on_surface) and segments[i-1].on_surface:
 			gd[i] = segments[i-1].last_surface_normal
+	# Special case: head is disattached from surface, but some other segment is attached.
+	# Use the surface reference of that segment to bring it toward an attachment point.
+	if not segments[0].on_surface:
+		for i in range(1,len(segments)):
+			if segments[i].on_surface:
+				gd[0] = (segments[i].last_surface_reference-segments[0].global_position).normalized()
+				break
 
 	# Keep segments from drifting away from surface.
 	for s in segments:
