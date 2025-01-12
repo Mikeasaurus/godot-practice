@@ -119,7 +119,7 @@ func _physics_process(delta: float) -> void:
 		# Calculate the distance, and apply a correction if distance would be too large.
 		var to_other: Vector2 = v2 - v1
 		var distance: float = to_other.length()
-		if distance > segment_spacing * 1.05:
+		if distance > segment_spacing * 1.05 and distance < segment_spacing * 10:
 			# Close the gap.
 			# Instantaneous.  I had too many problems with other approaches:
 			# - Using a force was too springy.
