@@ -75,7 +75,6 @@ func _process(_delta: float) -> void:
 		segments[i].feet_direction = segments[i-1].feet_direction
 		segments[i].update_sprite()
 
-	# Z-order adjust and flip code was here.
 	# Adjust z-order if facing opposite direction from segment behind.
 	# I.e., moving in opposite direction, visually in front of other segments.
 	for i in range(len(segments)-2,-1,-1):
@@ -131,6 +130,8 @@ func _physics_process(delta: float) -> void:
 			# to allow the correction to take place.
 			if vel > 1000.0 and segment.on_surface:
 				segment.release_from_surface()
+			# Limit the velocity (so things don't fly around the screen)
+			if vel > 2000.0: vel = 2000.0
 			segment.set_velocity_in_direction(to_other, vel)
 
 		# If close enough to front segment, then turn off any further velocity
