@@ -67,15 +67,19 @@ func _predict_slime_location (x0: Vector2, angle: float, t: float) -> Vector2:
 	return x0 + Vector2(Globals.slime_speed*t*cos(angle), Globals.slime_speed*t*sin(angle) + Globals.gravity/2 * t**2)
 
 
-func shoot_slime () -> void:
+func shoot_slime (t = null) -> void:
 		# Where the slime originates from (based on position of worm's mouth).
 		var slime_start: Vector2 = mouth_position.rotated($AnimatedSprite2D.global_rotation)
 		# Get the direction to shoot the slime.
 		# Check if any targets in range.
 		# Otherwise, shoot straight ahead.
 		var slime_direction: Vector2 = facing_direction
-		# Find first viable target (that isn't already sli       med).
-		for target in targets:
+		# Find first viable target (that isn't already slimed).
+		# Or, if a specific target is passed, then only consider that one.
+		var target_list: Array = targets
+		if t != null:
+			target_list = [t]
+		for target in target_list:
 			if not target.is_slimed:
 				var angle: float = _get_targeting_angle(global_position+slime_start, target)
 				# Only if angle is good (e.g. not shooting from back of head)

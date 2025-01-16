@@ -9,6 +9,9 @@ var segment_spacing: float = 30.0
 
 @export var worm_segment_scene: PackedScene
 
+# For capturing jump events from _input, and handling them in _physics_process
+var _jump_triggered: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Organize the segments into an ordered array.
@@ -16,18 +19,36 @@ func _ready() -> void:
 	# elements were all null.  Have to wait until runtime for these references to exist?
 	segments.append_array([$WormFront, $WormSegment3, $WormSegment2, $WormSegment1, $WormTail])
 
-func _input(_event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	# Check if we need to shoot some slime.
-	if Input.is_action_just_pressed("shoot_slime"):
+	# Keyboard event
+	if event is InputEventKey and event.is_action_pressed("shoot_slime"):
 		# Tell head segment to shoot some slime.
 		segments[0].shoot_slime()
+	# Mouse event - user clicked / tapped on a bug within target range.
+	if event is InputEventMouseButton and event.pressed:
+		# Only trigger slime shot if a bug was targetted.
+		# Should the targets be inspected from here?  Or should this be delegated to
+		# the front segment logic?
+		for target in segments[0].targets:
+			# Note: need to use get_global_mouse_position instead of event.position,
+			# because the latter is relative to the screen, which is affected by the
+			# camera movement.
+			if (get_global_mouse_position() - target.position).length() <= target.get_node("CollisionShape2D").shape.radius:
+				segments[0].shoot_slime(target)
+			break
 	# Debug action... grow the worm on command.
-	if Input.is_action_just_pressed("grow"):
+	if event is InputEventKey and event.is_action_pressed("grow"):
 		# Add a new segment, just behind the front segment.
 		var segment: WormSegment = worm_segment_scene.instantiate()
 		add_child(segment)
 		segment.global_position = (segments[0].global_position + segments[1].global_position) / 2
 		segments.insert(1,segment)
+	# Capture jump from user input, wait for _physics_process to handle the details.
+	# Double-click detection is only available from an InputEvent (not Input), so
+	# this can't be detected directly in _physics_process.
+	if event is InputEventMouseButton and event.double_click:
+		_jump_triggered = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -191,6 +212,11 @@ func _physics_process(delta: float) -> void:
 		move_direction += Vector2(0,1)
 	if Input.is_action_pressed("move_up"):
 		move_direction += Vector2(0,-1)
+	# Check for mouse / touchscreen input as well.
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		var click_pos: Vector2 = get_global_mouse_position()
+		var worm_pos: Vector2 = segments[0].global_position
+		move_direction = (click_pos - worm_pos)
 	# Movement only applies to front segment (other segments follow passively)
 	var head: WormSegment = segments[0]
 	# Check if there's any user-driven movement, and if it's not orthogonal
@@ -210,7 +236,12 @@ func _physics_process(delta: float) -> void:
 				gd[i] -= segments[i].linear_velocity.normalized()
 
 	# Do a jump
-	if Input.is_action_just_pressed("jump"):
+	# Even though this is an "event" and may be more appropriately handled in _input,
+	# I'm handling it here because this will interact with the worm's physics, and
+	# I want those modifications to be done as synchronously as possible (all within _physics_process)
+	# so there's no contention of forces/reactions or unexpected behaviour.
+	if Input.is_action_just_pressed("jump") or _jump_triggered:
+		_jump_triggered = false  # _jump_triggered is a flag to capture double-clicks from _input.
 		if segments[0].on_surface:
 			# Apply jump sound.  Only once.
 			$JumpSound.play()
