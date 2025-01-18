@@ -124,4 +124,25 @@ horizontal_alignment = 2
 [node name="Beetle4" parent="." instance=ExtResource("3_uld1f")]
 position = Vector2(144, -2066)
 
+[node name="GameOverScreen" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="ColorRect" type="ColorRect" parent="GameOverScreen"]
+offset_right = 1978.0
+offset_bottom = 1129.0
+color = Color(1, 0, 0, 0.501961)
+
+[node name="Label" type="Label" parent="GameOverScreen"]
+offset_left = 289.0
+offset_top = 198.0
+offset_right = 1803.0
+offset_bottom = 899.0
+theme_override_colors/font_color = Color(1, 1, 1, 0)
+theme_override_font_sizes/font_size = 100
+text = "GAME OVER
+Score: XXXX
+
+Press any key / click to restart"
+horizontal_alignment = 1
+
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]

@@ -24,7 +24,7 @@ func _process(_delta: float) -> void:
 		apply_central_force(Vector2(0,Globals.gravity))
 		return
 	# For debugging - force bug to be in "slimed" state.
-	if Input.is_action_pressed("slime_all"):
+	if Globals.debug_keys and Input.is_action_pressed("slime_all"):
 		get_slimed()
 	# Move the beetle
 	var dx: float = global_position.x - starting_position.x

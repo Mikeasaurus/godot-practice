@@ -12,6 +12,9 @@ var segment_spacing: float = 30.0
 # For capturing jump events from _input, and handling them in _physics_process
 var _jump_triggered: bool = false
 
+# Whether worm is alive or not.
+var _alive: bool = true
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Organize the segments into an ordered array.
@@ -20,6 +23,7 @@ func _ready() -> void:
 	segments.append_array([$WormFront, $WormSegment3, $WormSegment2, $WormSegment1, $WormTail])
 
 func _input(event: InputEvent) -> void:
+	if not _alive: return
 	# Check if we need to shoot some slime.
 	# Keyboard event
 	if event is InputEventKey and event.is_action_pressed("shoot_slime"):
@@ -38,7 +42,7 @@ func _input(event: InputEvent) -> void:
 				segments[0].shoot_slime(target)
 			break
 	# Debug action... grow the worm on command.
-	if event is InputEventKey and event.is_action_pressed("grow"):
+	if Globals.debug_keys and event is InputEventKey and event.is_action_pressed("grow"):
 		# Add a new segment, just behind the front segment.
 		var segment: WormSegment = worm_segment_scene.instantiate()
 		add_child(segment)
@@ -52,6 +56,7 @@ func _input(event: InputEvent) -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
+	if not _alive: return
 	# Modify rotation / flip of the segments
 
 	# Adjust the rotation of the segments so they're aligned w.r.t. to segment
@@ -122,6 +127,11 @@ func _process(_delta: float) -> void:
 
 # The following code controls force of movement for the segments.
 func _physics_process(delta: float) -> void:
+	if not _alive:
+		# Only apply gravity force if not alive.
+		for s in segments:
+			s.apply_central_force(Vector2(0,1)*Globals.gravity)
+		return
 	# This variable defines a force point of attraction for the segments.
 	# Could be force of gravity, or a force sticking the segment to a surface.
 	# Initialized with current attraction points, can be updated to include
@@ -267,6 +277,15 @@ func _physics_process(delta: float) -> void:
 		segments[i].get_node("GravityPoint").global_position = segments[i].global_position + gd[i]
 
 
+# Explode the worm.
+# (WHY???)
+func explode () -> void:
+	# Turn off all activity for the worm (slime shooting, walking, jumping, etc.)
+	_alive = false
+	# Detach the segments from any surface and add a random impulse to each segment.
+	for s in segments:
+		s.release_from_surface()
+		s.apply_central_impulse(Vector2((randf()-0.5)*1000,(randf()-0.5)*1000))
 
 # Pass along signal when a bug is eaten.
 func _on_worm_front_ate_bug() -> void:
