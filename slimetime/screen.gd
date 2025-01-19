@@ -36,4 +36,5 @@ func game_over () -> void:
 
 # Restart the game after a game over screen.
 func restart () -> void:
+	Globals.reset()  # Reset global state (score, etc.)
 	get_tree().reload_current_scene()
