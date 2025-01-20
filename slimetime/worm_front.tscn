@@ -84,7 +84,7 @@ drag_vertical_enabled = true
 [node name="EatingArea" type="Area2D" parent="AnimatedSprite2D"]
 position = Vector2(1, -2)
 collision_layer = 0
-collision_mask = 2
+collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite2D/EatingArea"]
 position = Vector2(25, -37)
@@ -104,7 +104,7 @@ one_shot = true
 
 [node name="ShootingRange" type="Area2D" parent="."]
 collision_layer = 0
-collision_mask = 2
+collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ShootingRange"]
 shape = SubResource("CircleShape2D_83qpy")
