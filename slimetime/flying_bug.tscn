@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://d4kknx6p5slyq"]
+
+[ext_resource type="PackedScene" uid="uid://lnqgkkyiw03c" path="res://bug.tscn" id="1_5o4lq"]
+[ext_resource type="Script" path="res://flying_bug.gd" id="2_ybx1t"]
+
+[node name="FlyingBug" instance=ExtResource("1_5o4lq")]
+script = ExtResource("2_ybx1t")

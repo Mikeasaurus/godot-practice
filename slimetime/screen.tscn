@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=8 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
 [ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm.tscn" id="2_34v46"]
-[ext_resource type="PackedScene" uid="uid://lnqgkkyiw03c" path="res://beetle.tscn" id="3_uld1f"]
+[ext_resource type="PackedScene" uid="uid://d2fqayuwohf12" path="res://beetle.tscn" id="5_6i2ap"]
+[ext_resource type="PackedScene" uid="uid://cg4qk38asbby4" path="res://lady_bug.tscn" id="5_gp822"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
 texture = ExtResource("1_vx3mq")
@@ -100,13 +101,13 @@ tile_set = SubResource("TileSet_6vxb5")
 z_index = 5
 position = Vector2(8, 316)
 
-[node name="Beetle1" parent="." instance=ExtResource("3_uld1f")]
+[node name="Beetle1" parent="." instance=ExtResource("5_6i2ap")]
 position = Vector2(560, 270)
 
-[node name="Beetle2" parent="." instance=ExtResource("3_uld1f")]
+[node name="Beetle2" parent="." instance=ExtResource("5_6i2ap")]
 position = Vector2(471, -764)
 
-[node name="Beetle3" parent="." instance=ExtResource("3_uld1f")]
+[node name="Beetle3" parent="." instance=ExtResource("5_6i2ap")]
 position = Vector2(-102, -920)
 
 [node name="Overlay" type="CanvasLayer" parent="."]
@@ -121,7 +122,7 @@ text = "Score:
 0"
 horizontal_alignment = 2
 
-[node name="Beetle4" parent="." instance=ExtResource("3_uld1f")]
+[node name="Beetle4" parent="." instance=ExtResource("5_6i2ap")]
 position = Vector2(144, -2066)
 
 [node name="GameOverScreen" type="CanvasLayer" parent="."]
@@ -144,5 +145,8 @@ Score: XXXX
 
 Press any key / click to restart"
 horizontal_alignment = 1
+
+[node name="LadyBug1" parent="." instance=ExtResource("5_gp822")]
+position = Vector2(-267, 262)
 
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
