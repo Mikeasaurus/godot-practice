@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://01ew1cglhaiw"]
+
+[ext_resource type="PackedScene" uid="uid://d4kknx6p5slyq" path="res://flying_bug.tscn" id="1_6fl41"]
+[ext_resource type="Texture2D" uid="uid://b1b44napswb5v" path="res://bee1.png" id="2_tm4fi"]
+[ext_resource type="Texture2D" uid="uid://bhiq53g6rkoh3" path="res://bee2.png" id="3_gitr3"]
+[ext_resource type="Texture2D" uid="uid://dwfm2gbs3a5e" path="res://bee-slimed.png" id="4_jlgwj"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lmeqi"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_tm4fi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_gitr3")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_jlgwj")
+}],
+"loop": true,
+"name": &"slimed",
+"speed": 5.0
+}]
+
+[node name="Bee" instance=ExtResource("1_6fl41")]
+turn_style = "flip"
+starting_velocity = Vector2(200, 100)
+springiness = Vector2(1, 50)
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+sprite_frames = SubResource("SpriteFrames_lmeqi")
