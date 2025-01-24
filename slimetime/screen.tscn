@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=10 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://d2fqayuwohf12" path="res://beetle.tscn" id="5_6i2ap"]
 [ext_resource type="PackedScene" uid="uid://cg4qk38asbby4" path="res://lady_bug.tscn" id="5_gp822"]
 [ext_resource type="PackedScene" uid="uid://01ew1cglhaiw" path="res://bee.tscn" id="6_d1ftp"]
+[ext_resource type="PackedScene" uid="uid://b4103dh1cjumw" path="res://pause_menu.tscn" id="7_y7xe8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
 texture = ExtResource("1_vx3mq")
@@ -123,6 +124,10 @@ text = "Score:
 0"
 horizontal_alignment = 2
 
+[node name="PauseMenu" parent="Overlay" instance=ExtResource("7_y7xe8")]
+process_mode = 2
+visible = false
+
 [node name="Beetle4" parent="." instance=ExtResource("5_6i2ap")]
 position = Vector2(144, -2066)
 
@@ -154,3 +159,4 @@ position = Vector2(-267, 262)
 position = Vector2(75, 96)
 
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
+[connection signal="ignore_pausekey" from="Overlay/PauseMenu" to="." method="_on_pause_menu_ignore_pausekey"]

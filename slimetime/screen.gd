@@ -2,6 +2,11 @@ extends Node2D
 
 var is_game_over: bool = false
 
+# Hack for unpausing the game.
+# Otherwise, when hitting escape key to unpause, it will also trigger
+# an immediate re-pause in this scene.
+var _ignore_pausekey: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
@@ -10,15 +15,32 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	pass
 
-# Listen for some debug keys.
+# Listen for some keys.
 func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("menu_toggle"):
+		# Trap stray signals after unpausing from pause menu.
+		if _ignore_pausekey:  # Ignore signal this one time.
+			_ignore_pausekey = false
+		else:
+			pause()
 	if Globals.debug_keys and event.is_action_pressed("instakill"):
 		game_over()
 	elif is_game_over == true and (event is InputEventKey or event is InputEventMouseButton) and event.pressed:
 		restart()
+		
+func _on_pause_menu_ignore_pausekey() -> void:
+	_ignore_pausekey = true
+
 func _on_worm_ate_bug() -> void:
 	Globals.score += 100
 	$Overlay/Score.text = "Score:\n %d"%Globals.score
+
+# Bring up pause menu
+func pause () -> void:
+	get_tree().paused = true
+	$Overlay/PauseMenu.show()
+
+
 
 # Trigger a game over screen.
 func game_over () -> void:
