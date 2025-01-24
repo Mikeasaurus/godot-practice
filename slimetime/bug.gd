@@ -19,9 +19,6 @@ func _process(_delta: float) -> void:
 	if is_slimed:
 		apply_central_force(Vector2(0,Globals.gravity))
 		return
-	# For debugging - force bug to be in "slimed" state.
-	if Globals.debug_keys and Input.is_action_pressed("slime_all"):
-		get_slimed()
 
 # Change state of the bug so it's in a dormant, slimed state.
 func get_slimed () -> void:
