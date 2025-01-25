@@ -36,3 +36,9 @@ func _on_credits_button_pressed() -> void:
 func _return_from_submenu() -> void:
 	$NestedMenuHandler.deactivate_menu()
 	$MarginContainer.show()
+
+# A hack to redraw the MarginContainer when returning from a submenu from the escape key.
+# In that case, there's no "Back" button press to get a signal from, so have to trap the key stroke?
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("menu_toggle") and len($NestedMenuHandler.menu_stack) == 0:
+		$MarginContainer.show()
