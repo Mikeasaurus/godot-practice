@@ -15,6 +15,9 @@ func set_volume (level: float) -> void:
 	volume = level
 	AudioServer.set_bus_volume_db(0, (volume-100)/5)
 
+# Graphics level (not used)
+var graphics_level: int = 0
+
 # Current score
 var score: int = 0
 

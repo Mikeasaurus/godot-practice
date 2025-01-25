@@ -9,9 +9,9 @@ var menu_stack: Array = []
 
 # Set another menu scene as the active one.
 func activate_menu (menu) -> void:
-	menu.show()
 	if len(menu_stack) > 0:
 		menu_stack[-1].hide()
+	menu.show()
 	menu_stack.append(menu)
 
 # Deactivate a menu and return to the parent menu.

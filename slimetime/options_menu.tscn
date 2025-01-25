@@ -121,4 +121,5 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Back"
 
+[connection signal="item_selected" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/GraphicsOptionButton" to="." method="_on_graphics_option_button_item_selected"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

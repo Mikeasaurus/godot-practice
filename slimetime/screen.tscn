@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=11 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
@@ -7,7 +7,6 @@
 [ext_resource type="PackedScene" uid="uid://d2fqayuwohf12" path="res://beetle.tscn" id="5_6i2ap"]
 [ext_resource type="PackedScene" uid="uid://cg4qk38asbby4" path="res://lady_bug.tscn" id="5_gp822"]
 [ext_resource type="PackedScene" uid="uid://01ew1cglhaiw" path="res://bee.tscn" id="6_d1ftp"]
-[ext_resource type="PackedScene" uid="uid://16iuasf15alq" path="res://options_menu.tscn" id="7_r4fme"]
 [ext_resource type="PackedScene" uid="uid://b4103dh1cjumw" path="res://pause_menu.tscn" id="7_y7xe8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
@@ -132,9 +131,6 @@ horizontal_alignment = 2
 process_mode = 2
 visible = false
 
-[node name="OptionsMenu" parent="Overlay" instance=ExtResource("7_r4fme")]
-visible = false
-
 [node name="Beetle4" parent="." instance=ExtResource("5_6i2ap")]
 position = Vector2(144, -2066)
 
@@ -166,7 +162,6 @@ position = Vector2(-267, 262)
 position = Vector2(75, 96)
 
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
-[connection signal="options" from="Overlay/PauseMenu" to="." method="_on_pause_menu_options"]
+[connection signal="pop_menu" from="Overlay/PauseMenu" to="Overlay/NestedMenuHandler" method="deactivate_menu"]
+[connection signal="push_menu" from="Overlay/PauseMenu" to="Overlay/NestedMenuHandler" method="activate_menu"]
 [connection signal="quit" from="Overlay/PauseMenu" to="." method="restart"]
-[connection signal="resume" from="Overlay/PauseMenu" to="Overlay/NestedMenuHandler" method="deactivate_menu"]
-[connection signal="back" from="Overlay/OptionsMenu" to="Overlay/NestedMenuHandler" method="deactivate_menu"]
