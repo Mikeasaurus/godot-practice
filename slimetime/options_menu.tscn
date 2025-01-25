@@ -1,0 +1,124 @@
+[gd_scene load_steps=6 format=3 uid="uid://16iuasf15alq"]
+
+[ext_resource type="Script" path="res://options_menu.gd" id="1_o3wot"]
+[ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm.tscn" id="2_36ki1"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_tp0d4"]
+color = Color(1, 1, 1, 1)
+thickness = 3
+
+[sub_resource type="Theme" id="Theme_nq3g0"]
+PopupMenu/font_sizes/font_size = 36
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_ai5tv"]
+color = Color(1, 1, 1, 1)
+thickness = 3
+
+[node name="OptionsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_o3wot")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.501961)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Options"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+theme_override_styles/separator = SubResource("StyleBoxLine_tp0d4")
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 48
+columns = 2
+
+[node name="VolumeLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Volume"
+horizontal_alignment = 2
+
+[node name="VolumeHSlider" type="HSlider" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="GraphicsLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Graphics"
+horizontal_alignment = 2
+
+[node name="GraphicsOptionButton" type="OptionButton" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme = SubResource("Theme_nq3g0")
+theme_override_font_sizes/font_size = 36
+selected = 0
+item_count = 2
+popup/item_0/text = "Bad"
+popup/item_1/text = "Still Bad"
+popup/item_1/id = 1
+
+[node name="Label" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Appearance"
+
+[node name="SubViewPortContainer" type="SubViewportContainer" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="SubViewport" type="SubViewport" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer/SubViewPortContainer"]
+disable_3d = true
+handle_input_locally = false
+size = Vector2i(200, 150)
+render_target_update_mode = 4
+
+[node name="Worm" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer/SubViewPortContainer/SubViewport" instance=ExtResource("2_36ki1")]
+process_mode = 4
+position = Vector2(0, 0)
+scale = Vector2(0.4, 0.4)
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+theme_override_styles/separator = SubResource("StyleBoxLine_ai5tv")
+
+[node name="BackButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer"]
+process_mode = 3
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Back"
+
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

@@ -2,14 +2,10 @@ extends Node2D
 
 var is_game_over: bool = false
 
-# Hack for unpausing the game.
-# Otherwise, when hitting escape key to unpause, it will also trigger
-# an immediate re-pause in this scene.
-var _ignore_pausekey: bool = false
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	# Set up some menu logic.
+	$Overlay/NestedMenuHandler.pause_menu = $Overlay/PauseMenu
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -17,30 +13,14 @@ func _process(_delta: float) -> void:
 
 # Listen for some keys.
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("menu_toggle"):
-		# Trap stray signals after unpausing from pause menu.
-		if _ignore_pausekey:  # Ignore signal this one time.
-			_ignore_pausekey = false
-		else:
-			pause()
 	if Globals.debug_keys and event.is_action_pressed("instakill"):
 		game_over()
 	elif is_game_over == true and (event is InputEventKey or event is InputEventMouseButton) and event.pressed:
 		restart()
 		
-func _on_pause_menu_ignore_pausekey() -> void:
-	_ignore_pausekey = true
-
 func _on_worm_ate_bug() -> void:
 	Globals.score += 100
 	$Overlay/Score.text = "Score:\n %d"%Globals.score
-
-# Bring up pause menu
-func pause () -> void:
-	get_tree().paused = true
-	$Overlay/PauseMenu.show()
-
-
 
 # Trigger a game over screen.
 func game_over () -> void:
@@ -59,4 +39,8 @@ func game_over () -> void:
 # Restart the game after a game over screen.
 func restart () -> void:
 	Globals.reset()  # Reset global state (score, etc.)
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file("res://main_menu.tscn")
+
+# Navigating between sub-menus.
+func _on_pause_menu_options() -> void:
+	$Overlay/NestedMenuHandler.activate_menu($Overlay/OptionsMenu)

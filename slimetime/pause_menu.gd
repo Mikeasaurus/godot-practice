@@ -1,22 +1,23 @@
 extends Control
 
-# Tell parent screen to ignore any pause key, because it's still the leftover
-# "unpause" signal, not a new signal.
-signal ignore_pausekey
+signal resume
+signal options
+signal quit
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
 
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("menu_toggle"):
-		ignore_pausekey.emit()
-		unpause_game()
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	pass
 
-func unpause_game () -> void:
-	hide()
-	get_tree().paused = false
+func _on_resume_button_pressed() -> void:
+	resume.emit()
+
+func _on_options_button_pressed() -> void:
+	options.emit()
+
+func _on_quit_button_pressed() -> void:
+	get_tree().paused = false  # Unpause before sending quit signal.
+	quit.emit()

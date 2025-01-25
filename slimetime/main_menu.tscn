@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://nvvudbtxijls"]
+[gd_scene load_steps=4 format=3 uid="uid://nvvudbtxijls"]
 
 [ext_resource type="Script" path="res://main_menu.gd" id="1_1sfdb"]
+[ext_resource type="PackedScene" uid="uid://16iuasf15alq" path="res://options_menu.tscn" id="2_oifqy"]
+[ext_resource type="PackedScene" uid="uid://cyqef488potj7" path="res://nested_menu_handler.tscn" id="3_ofhjl"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -11,13 +13,22 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_1sfdb")
 
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
 [node name="VersionLabel" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -1920.0
-offset_bottom = 23.0
+offset_bottom = 50.0
 grow_horizontal = 0
 theme_override_font_sizes/font_size = 36
 text = "Slime Time v0.1.0"
@@ -63,4 +74,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Credits"
 
+[node name="OptionsMenu" parent="." instance=ExtResource("2_oifqy")]
+visible = false
+layout_mode = 1
+
+[node name="NestedMenuHandler" parent="." instance=ExtResource("3_ofhjl")]
+
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/NewGameButton" to="." method="_on_new_game_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/OptionsButton" to="." method="_on_options_button_pressed"]
+[connection signal="back" from="OptionsMenu" to="." method="_on_options_menu_back"]
