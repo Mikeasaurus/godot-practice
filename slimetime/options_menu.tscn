@@ -15,6 +15,7 @@ color = Color(1, 1, 1, 1)
 thickness = 3
 
 [node name="OptionsMenu" type="Control"]
+process_mode = 3
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -107,7 +108,6 @@ render_target_update_mode = 4
 
 [node name="Worm" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer/SubViewPortContainer/SubViewport" instance=ExtResource("2_36ki1")]
 process_mode = 4
-position = Vector2(0, 0)
 scale = Vector2(0.4, 0.4)
 
 [node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
