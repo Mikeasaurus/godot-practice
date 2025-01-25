@@ -1,0 +1,110 @@
+[gd_scene load_steps=4 format=3 uid="uid://dghirlf6381r8"]
+
+[ext_resource type="Script" path="res://credits_menu.gd" id="1_odl0w"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_d8rk4"]
+color = Color(1, 1, 1, 1)
+thickness = 3
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_nk5i5"]
+color = Color(1, 1, 1, 1)
+thickness = 3
+
+[node name="CreditsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_odl0w")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.501961)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Credits"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+theme_override_styles/separator = SubResource("StyleBoxLine_d8rk4")
+
+[node name="Credits" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(1000, 0)
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+theme_override_font_sizes/bold_font_size = 24
+bbcode_enabled = true
+text = "[center]
+Code by Mike
+Graphics by Mike
+
+Audio from freesound.org:
+[/center]
+[table=2]
+[cell][b]Wet Splat 1.mp3[/b] by nebulasnails
+	[url]https://freesound.org/s/495118/[/url]
+	License: Creative Commons 0
+[/cell]
+
+[cell][b]Apple_Crunch_16.wav[/b] by Koops
+	[url]https://freesound.org/s/20279/[/url]
+	License: Attribution 4.0
+[/cell]
+
+[cell]
+[b]thud.wav[/b] by OtisJames
+	[url]https://freesound.org/s/215162/[/url]
+	License: Creative Commons 0
+[/cell]
+
+[cell]
+[b]Whoosh by Natty23[/b]
+	[url]https://freesound.org/s/349182/[/url]
+	License: Attribution 4.0
+[/cell]
+
+[cell]
+[b]NPX Throat Gathering Spit 2.wav[/b] by noahpardo
+	[url]https://freesound.org/s/352402/[/url]
+	License: Creative Commons 0
+[/cell]
+[/table]"
+fit_content = true
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+theme_override_styles/separator = SubResource("StyleBoxLine_nk5i5")
+
+[node name="BackButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Back"
+
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
