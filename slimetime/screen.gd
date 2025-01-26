@@ -41,7 +41,7 @@ func game_over () -> void:
 func restart () -> void:
 	get_tree().paused = false  # Unpause the game.
 	Globals.reset()  # Reset global state (score, etc.)
-	get_tree().change_scene_to_file("res://main_menu.tscn")
+	get_tree().change_scene_to_file("res://menus/main_menu.tscn")
 
 # Bring up pause menu.
 func pause_game () -> void:

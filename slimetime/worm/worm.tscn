@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://bl2u1vwrkn7sx"]
+
+[ext_resource type="Script" path="res://worm/worm.gd" id="1_qcnrn"]
+[ext_resource type="PackedScene" uid="uid://ss2xikvy6bt7" path="res://worm/worm_segment.tscn" id="2_om62i"]
+[ext_resource type="PackedScene" uid="uid://c6aw5rjsklap6" path="res://worm/worm_tail.tscn" id="3_ombl0"]
+[ext_resource type="PackedScene" uid="uid://dd7mpa5anwn06" path="res://worm/worm_front.tscn" id="4_x58aa"]
+[ext_resource type="AudioStream" uid="uid://bytvlsxnxc076" path="res://audio/349182__natty23__whoosh.wav" id="5_en2ek"]
+
+[node name="Worm" type="Node2D"]
+script = ExtResource("1_qcnrn")
+worm_segment_scene = ExtResource("2_om62i")
+
+[node name="WormTail" parent="." instance=ExtResource("3_ombl0")]
+position = Vector2(112, 232)
+
+[node name="WormSegment1" parent="." instance=ExtResource("2_om62i")]
+position = Vector2(142, 234)
+
+[node name="WormSegment2" parent="." instance=ExtResource("2_om62i")]
+position = Vector2(180, 231)
+
+[node name="WormSegment3" parent="." instance=ExtResource("2_om62i")]
+position = Vector2(216, 233)
+
+[node name="WormFront" parent="." instance=ExtResource("4_x58aa")]
+position = Vector2(259, 231)
+
+[node name="JumpSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_en2ek")
+
+[connection signal="ate_bug" from="WormFront" to="." method="_on_worm_front_ate_bug"]

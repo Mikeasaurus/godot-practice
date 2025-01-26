@@ -1,33 +1,33 @@
 [gd_scene load_steps=18 format=3 uid="uid://dd7mpa5anwn06"]
 
-[ext_resource type="Script" path="res://worm_front.gd" id="1_rw4nf"]
-[ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://slime.tscn" id="2_dv6bn"]
-[ext_resource type="Texture2D" uid="uid://xmouf5q1t8ww" path="res://worm/front-walk1.png" id="2_m32wx"]
-[ext_resource type="Texture2D" uid="uid://blojcrk05bmn0" path="res://worm/front-walk2.png" id="3_4unqo"]
-[ext_resource type="PackedScene" uid="uid://qs6dhqvybwnq" path="res://crumb.tscn" id="3_5oyt6"]
-[ext_resource type="Texture2D" uid="uid://cy8ey6er2jslo" path="res://worm/front-walk3.png" id="4_ye44h"]
-[ext_resource type="Texture2D" uid="uid://xr53vj2ebvu" path="res://worm/front-outline.png" id="5_vclal"]
-[ext_resource type="Texture2D" uid="uid://bl12tabuh2g" path="res://worm/front-body.png" id="6_xwa5c"]
-[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://hit.png" id="7_0jjxr"]
-[ext_resource type="Texture2D" uid="uid://crr3r5rv3umqa" path="res://worm/front-top.png" id="7_prwf5"]
-[ext_resource type="AudioStream" uid="uid://4r8shsnsbali" path="res://audio/215162__otisjames__thud.wav" id="12_eqvkb"]
-[ext_resource type="AudioStream" uid="uid://bsyma0k5y5heh" path="res://audio/352402__noahpardo__npx-throat-gathering-spit-2.wav" id="13_8n3bq"]
-[ext_resource type="AudioStream" uid="uid://boua4s0jseys6" path="res://audio/20279__koops__apple_crunch_16.wav" id="14_0o6yv"]
+[ext_resource type="Script" path="res://worm/worm_front.gd" id="1_7ixcj"]
+[ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://effects/slime.tscn" id="2_4874p"]
+[ext_resource type="PackedScene" uid="uid://qs6dhqvybwnq" path="res://effects/crumb.tscn" id="3_6ydm7"]
+[ext_resource type="Texture2D" uid="uid://xmouf5q1t8ww" path="res://worm/front-walk1.png" id="4_1y5hy"]
+[ext_resource type="Texture2D" uid="uid://blojcrk05bmn0" path="res://worm/front-walk2.png" id="5_ot7bf"]
+[ext_resource type="Texture2D" uid="uid://cy8ey6er2jslo" path="res://worm/front-walk3.png" id="6_4782m"]
+[ext_resource type="Texture2D" uid="uid://xr53vj2ebvu" path="res://worm/front-outline.png" id="7_fc3qa"]
+[ext_resource type="Texture2D" uid="uid://bl12tabuh2g" path="res://worm/front-body.png" id="8_gug04"]
+[ext_resource type="Texture2D" uid="uid://crr3r5rv3umqa" path="res://worm/front-top.png" id="9_30gi8"]
+[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://effects/hit.png" id="10_v1jwa"]
+[ext_resource type="AudioStream" uid="uid://4r8shsnsbali" path="res://audio/215162__otisjames__thud.wav" id="11_04yj1"]
+[ext_resource type="AudioStream" uid="uid://bsyma0k5y5heh" path="res://audio/352402__noahpardo__npx-throat-gathering-spit-2.wav" id="12_wkfij"]
+[ext_resource type="AudioStream" uid="uid://boua4s0jseys6" path="res://audio/20279__koops__apple_crunch_16.wav" id="13_hk801"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_di2j6"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_m32wx")
+"texture": ExtResource("4_1y5hy")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3_4unqo")
+"texture": ExtResource("5_ot7bf")
 }, {
 "duration": 1.0,
-"texture": ExtResource("4_ye44h")
+"texture": ExtResource("6_4782m")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3_4unqo")
+"texture": ExtResource("5_ot7bf")
 }],
 "loop": true,
 "name": &"default",
@@ -50,9 +50,9 @@ collision_layer = 0
 gravity_scale = 0.0
 contact_monitor = true
 max_contacts_reported = 2
-script = ExtResource("1_rw4nf")
-slime_scene = ExtResource("2_dv6bn")
-crumb_scene = ExtResource("3_5oyt6")
+script = ExtResource("1_7ixcj")
+slime_scene = ExtResource("2_4874p")
+crumb_scene = ExtResource("3_6ydm7")
 metadata/_edit_lock_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -61,17 +61,17 @@ offset = Vector2(27, -50)
 
 [node name="Outline" type="Sprite2D" parent="AnimatedSprite2D"]
 z_index = -3
-texture = ExtResource("5_vclal")
+texture = ExtResource("7_fc3qa")
 offset = Vector2(27, -50)
 
 [node name="Body" type="Sprite2D" parent="AnimatedSprite2D"]
 z_index = -1
-texture = ExtResource("6_xwa5c")
+texture = ExtResource("8_gug04")
 offset = Vector2(27, -50)
 
 [node name="Top" type="Sprite2D" parent="AnimatedSprite2D"]
 z_index = -1
-texture = ExtResource("7_prwf5")
+texture = ExtResource("9_30gi8")
 offset = Vector2(27, -50)
 
 [node name="SlimeSource" type="Marker2D" parent="AnimatedSprite2D"]
@@ -96,7 +96,7 @@ shape = SubResource("CircleShape2D_wfloj")
 [node name="GravityPoint" type="Sprite2D" parent="."]
 visible = false
 scale = Vector2(0.25, 0.25)
-texture = ExtResource("7_0jjxr")
+texture = ExtResource("10_v1jwa")
 
 [node name="JumpTimer" type="Timer" parent="."]
 wait_time = 0.1
@@ -110,13 +110,13 @@ collision_mask = 4
 shape = SubResource("CircleShape2D_83qpy")
 
 [node name="GroundSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("12_eqvkb")
+stream = ExtResource("11_04yj1")
 
 [node name="SpitSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("13_8n3bq")
+stream = ExtResource("12_wkfij")
 
 [node name="EatSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("14_0o6yv")
+stream = ExtResource("13_hk801")
 
 [connection signal="landed" from="." to="." method="_on_landed"]
 [connection signal="body_entered" from="AnimatedSprite2D/EatingArea" to="." method="_on_eating_area_body_entered"]

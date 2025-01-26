@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://nvvudbtxijls"]
 
-[ext_resource type="Script" path="res://main_menu.gd" id="1_1sfdb"]
-[ext_resource type="PackedScene" uid="uid://16iuasf15alq" path="res://options_menu.tscn" id="2_aawq7"]
-[ext_resource type="PackedScene" uid="uid://dghirlf6381r8" path="res://credits_menu.tscn" id="3_yjqcj"]
+[ext_resource type="Script" path="res://menus/main_menu.gd" id="1_kjikk"]
+[ext_resource type="PackedScene" uid="uid://16iuasf15alq" path="res://menus/options_menu.tscn" id="2_mhw2o"]
+[ext_resource type="PackedScene" uid="uid://dghirlf6381r8" path="res://menus/credits_menu.tscn" id="3_ox7cp"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -11,7 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_1sfdb")
+script = ExtResource("1_kjikk")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
@@ -22,11 +22,11 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
-[node name="OptionsMenu" parent="." instance=ExtResource("2_aawq7")]
+[node name="OptionsMenu" parent="." instance=ExtResource("2_mhw2o")]
 visible = false
 layout_mode = 1
 
-[node name="CreditsMenu" parent="." instance=ExtResource("3_yjqcj")]
+[node name="CreditsMenu" parent="." instance=ExtResource("3_ox7cp")]
 visible = false
 layout_mode = 1
 

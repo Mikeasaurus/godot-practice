@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bf6yc8ofpu7in"
-path="res://.godot/imported/ladybug-slimed.png-06c30af279cc66b8dbf87da5cf0800f0.ctex"
+uid="uid://dwfm2gbs3a5e"
+path="res://.godot/imported/bee-slimed.png-561846bf5ac12dd817d389c2ac7feafa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ladybug-slimed.png"
-dest_files=["res://.godot/imported/ladybug-slimed.png-06c30af279cc66b8dbf87da5cf0800f0.ctex"]
+source_file="res://bugs/bee-slimed.png"
+dest_files=["res://.godot/imported/bee-slimed.png-561846bf5ac12dd817d389c2ac7feafa.ctex"]
 
 [params]
 

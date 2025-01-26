@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=3 uid="uid://d2fqayuwohf12"]
 
-[ext_resource type="Texture2D" uid="uid://psliqeeiy8kv" path="res://beetle1.png" id="1_u2afi"]
-[ext_resource type="Texture2D" uid="uid://bkr42pw6odav" path="res://beetle2.png" id="2_bpdfk"]
-[ext_resource type="Texture2D" uid="uid://cc1wpweqrk0i2" path="res://beetle-slimed.png" id="4_w6v2j"]
-[ext_resource type="PackedScene" uid="uid://d4kknx6p5slyq" path="res://flying_bug.tscn" id="5_jg0xg"]
+[ext_resource type="Texture2D" uid="uid://psliqeeiy8kv" path="res://bugs/beetle1.png" id="1_u2afi"]
+[ext_resource type="Texture2D" uid="uid://bkr42pw6odav" path="res://bugs/beetle2.png" id="2_bpdfk"]
+[ext_resource type="Texture2D" uid="uid://cc1wpweqrk0i2" path="res://bugs/beetle-slimed.png" id="4_w6v2j"]
+[ext_resource type="PackedScene" uid="uid://d4kknx6p5slyq" path="res://bugs/flying_bug.tscn" id="5_jg0xg"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_i10ro"]
 animations = [{

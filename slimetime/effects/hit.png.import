@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bkr42pw6odav"
-path="res://.godot/imported/beetle2.png-3b9be8e587543ce49633487136a7eb3b.ctex"
+uid="uid://6h1ew214snop"
+path="res://.godot/imported/hit.png-3243b310135c12289115a283f677b5a0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://beetle2.png"
-dest_files=["res://.godot/imported/beetle2.png-3b9be8e587543ce49633487136a7eb3b.ctex"]
+source_file="res://effects/hit.png"
+dest_files=["res://.godot/imported/hit.png-3243b310135c12289115a283f677b5a0.ctex"]
 
 [params]
 

@@ -1,28 +1,28 @@
 [gd_scene load_steps=11 format=3 uid="uid://ss2xikvy6bt7"]
 
-[ext_resource type="Script" path="res://worm_segment.gd" id="1_i22me"]
-[ext_resource type="Texture2D" uid="uid://dca0wcvf7auln" path="res://worm/segment-walk1.png" id="1_yvgym"]
-[ext_resource type="Texture2D" uid="uid://fsoeijujxmy5" path="res://worm/segment-walk2.png" id="2_opyea"]
-[ext_resource type="Texture2D" uid="uid://bobv50cj7vfr6" path="res://worm/segment-walk3.png" id="3_rtdus"]
-[ext_resource type="Texture2D" uid="uid://bfuivwhhj5fjg" path="res://worm/segment-outline.png" id="5_gd7kj"]
-[ext_resource type="Texture2D" uid="uid://csxipffvdith0" path="res://worm/segment-top.png" id="6_f5u7s"]
-[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://hit.png" id="6_ntq0u"]
-[ext_resource type="Texture2D" uid="uid://b0rc5xm2pb8pk" path="res://worm/segment-body.png" id="6_rmkjy"]
+[ext_resource type="Script" path="res://worm/worm_segment.gd" id="1_uf7xy"]
+[ext_resource type="Texture2D" uid="uid://dca0wcvf7auln" path="res://worm/segment-walk1.png" id="2_a5yre"]
+[ext_resource type="Texture2D" uid="uid://fsoeijujxmy5" path="res://worm/segment-walk2.png" id="3_ejrf1"]
+[ext_resource type="Texture2D" uid="uid://bobv50cj7vfr6" path="res://worm/segment-walk3.png" id="4_5j156"]
+[ext_resource type="Texture2D" uid="uid://bfuivwhhj5fjg" path="res://worm/segment-outline.png" id="5_amkpd"]
+[ext_resource type="Texture2D" uid="uid://b0rc5xm2pb8pk" path="res://worm/segment-body.png" id="6_iebpy"]
+[ext_resource type="Texture2D" uid="uid://csxipffvdith0" path="res://worm/segment-top.png" id="7_uvbwv"]
+[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://effects/hit.png" id="8_c6u01"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_okwhj"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("1_yvgym")
+"texture": ExtResource("2_a5yre")
 }, {
 "duration": 1.0,
-"texture": ExtResource("2_opyea")
+"texture": ExtResource("3_ejrf1")
 }, {
 "duration": 1.0,
-"texture": ExtResource("3_rtdus")
+"texture": ExtResource("4_5j156")
 }, {
 "duration": 1.0,
-"texture": ExtResource("2_opyea")
+"texture": ExtResource("3_ejrf1")
 }],
 "loop": true,
 "name": &"default",
@@ -37,7 +37,7 @@ collision_layer = 0
 gravity_scale = 0.0
 contact_monitor = true
 max_contacts_reported = 2
-script = ExtResource("1_i22me")
+script = ExtResource("1_uf7xy")
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -47,15 +47,15 @@ frame_progress = 0.813933
 
 [node name="Outline" type="Sprite2D" parent="AnimatedSprite2D"]
 z_index = -3
-texture = ExtResource("5_gd7kj")
+texture = ExtResource("5_amkpd")
 
 [node name="Body" type="Sprite2D" parent="AnimatedSprite2D"]
 z_index = -2
-texture = ExtResource("6_rmkjy")
+texture = ExtResource("6_iebpy")
 
 [node name="Top" type="Sprite2D" parent="AnimatedSprite2D"]
 z_index = -1
-texture = ExtResource("6_f5u7s")
+texture = ExtResource("7_uvbwv")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-4, -3)
@@ -64,7 +64,7 @@ shape = SubResource("CircleShape2D_alg25")
 [node name="GravityPoint" type="Sprite2D" parent="."]
 visible = false
 scale = Vector2(0.25, 0.25)
-texture = ExtResource("6_ntq0u")
+texture = ExtResource("8_c6u01")
 
 [node name="JumpTimer" type="Timer" parent="."]
 wait_time = 0.1

@@ -1,13 +1,13 @@
 [gd_scene load_steps=11 format=3 uid="uid://c6aw5rjsklap6"]
 
-[ext_resource type="Script" path="res://worm_tail.gd" id="1_onfeh"]
+[ext_resource type="Script" path="res://worm/worm_tail.gd" id="1_onfeh"]
 [ext_resource type="Texture2D" uid="uid://blls77duj641x" path="res://worm/tail-walk1.png" id="1_s7icc"]
 [ext_resource type="Texture2D" uid="uid://c4dsadwsrp0qd" path="res://worm/tail-walk2.png" id="2_vbqgt"]
 [ext_resource type="Texture2D" uid="uid://clepa24iv8d2a" path="res://worm/tail-walk3.png" id="3_nseqk"]
 [ext_resource type="Texture2D" uid="uid://daoi0drmdmmdn" path="res://worm/tail-outline.png" id="4_o4jfh"]
 [ext_resource type="Texture2D" uid="uid://d1aiefgpj6kgq" path="res://worm/tail-body.png" id="5_uoy1x"]
 [ext_resource type="Texture2D" uid="uid://tgpfeqvj6lv8" path="res://worm/tail-top.png" id="6_pw6xx"]
-[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://hit.png" id="7_hw7jy"]
+[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://effects/hit.png" id="7_hw7jy"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_o8qp8"]
 animations = [{

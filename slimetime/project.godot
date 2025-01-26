@@ -17,7 +17,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Globals="*res://globals.gd"
-MenuHandler="*res://menu_handler.gd"
+MenuHandler="*res://menus/menu_handler.gd"
 
 [display]
 

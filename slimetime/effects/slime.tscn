@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://c3celykknp05n"]
 
-[ext_resource type="Script" path="res://slime.gd" id="1_2jvy3"]
-[ext_resource type="Texture2D" uid="uid://calncc3kymvdr" path="res://slime.png" id="1_hb2nk"]
-[ext_resource type="PackedScene" uid="uid://b675104byppv0" path="res://particle.tscn" id="3_y2ch6"]
+[ext_resource type="Script" path="res://effects/slime.gd" id="1_2jvy3"]
+[ext_resource type="Texture2D" uid="uid://calncc3kymvdr" path="res://effects/slime.png" id="1_hb2nk"]
+[ext_resource type="PackedScene" uid="uid://b675104byppv0" path="res://effects/particle.tscn" id="3_y2ch6"]
 [ext_resource type="AudioStream" uid="uid://c20jw10h4xbfj" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="4_hsgpw"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qembf"]

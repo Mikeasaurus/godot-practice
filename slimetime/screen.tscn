@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
-[ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm.tscn" id="2_34v46"]
-[ext_resource type="PackedScene" uid="uid://d2fqayuwohf12" path="res://beetle.tscn" id="5_6i2ap"]
-[ext_resource type="PackedScene" uid="uid://cg4qk38asbby4" path="res://lady_bug.tscn" id="5_gp822"]
-[ext_resource type="PackedScene" uid="uid://01ew1cglhaiw" path="res://bee.tscn" id="6_d1ftp"]
-[ext_resource type="PackedScene" uid="uid://b4103dh1cjumw" path="res://pause_menu.tscn" id="7_y7xe8"]
+[ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm/worm.tscn" id="2_34v46"]
+[ext_resource type="PackedScene" uid="uid://d2fqayuwohf12" path="res://bugs/beetle.tscn" id="5_6i2ap"]
+[ext_resource type="PackedScene" uid="uid://cg4qk38asbby4" path="res://bugs/lady_bug.tscn" id="5_gp822"]
+[ext_resource type="PackedScene" uid="uid://01ew1cglhaiw" path="res://bugs/bee.tscn" id="6_d1ftp"]
+[ext_resource type="PackedScene" uid="uid://b4103dh1cjumw" path="res://menus/pause_menu.tscn" id="7_y7xe8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
 texture = ExtResource("1_vx3mq")
