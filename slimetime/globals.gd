@@ -8,6 +8,16 @@ var gravity: float = 500
 # How fast slime shoots out.
 var slime_speed: float = 1000.0
 
+# Master volume control.
+var volume: float = 100
+# This could be connected to a control, via a signal.
+func set_volume (level: float) -> void:
+	volume = level
+	AudioServer.set_bus_volume_db(0, (volume-100)/5)
+
+# Graphics level (not used)
+var graphics_level: int = 0
+
 # Current score
 var score: int = 0
 
