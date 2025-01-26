@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b4103dh1cjumw"]
+[gd_scene load_steps=3 format=3 uid="uid://b4103dh1cjumw"]
 
 [ext_resource type="Script" path="res://pause_menu.gd" id="1_4j3lk"]
+[ext_resource type="PackedScene" uid="uid://16iuasf15alq" path="res://options_menu.tscn" id="2_qaw5y"]
 
 [node name="PauseMenu" type="Control"]
 layout_mode = 3
@@ -18,7 +19,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.501961)
+color = Color(0, 0, 0, 0.768627)
+
+[node name="OptionsMenu" parent="." instance=ExtResource("2_qaw5y")]
+visible = false
+layout_mode = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1

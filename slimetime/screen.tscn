@@ -1,9 +1,8 @@
-[gd_scene load_steps=11 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=10 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
 [ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm.tscn" id="2_34v46"]
-[ext_resource type="PackedScene" uid="uid://cyqef488potj7" path="res://nested_menu_handler.tscn" id="5_1ajec"]
 [ext_resource type="PackedScene" uid="uid://d2fqayuwohf12" path="res://beetle.tscn" id="5_6i2ap"]
 [ext_resource type="PackedScene" uid="uid://cg4qk38asbby4" path="res://lady_bug.tscn" id="5_gp822"]
 [ext_resource type="PackedScene" uid="uid://01ew1cglhaiw" path="res://bee.tscn" id="6_d1ftp"]
@@ -125,8 +124,6 @@ text = "Score:
 0"
 horizontal_alignment = 2
 
-[node name="NestedMenuHandler" parent="Overlay" instance=ExtResource("5_1ajec")]
-
 [node name="PauseMenu" parent="Overlay" instance=ExtResource("7_y7xe8")]
 process_mode = 2
 visible = false
@@ -162,6 +159,4 @@ position = Vector2(-267, 262)
 position = Vector2(75, 96)
 
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
-[connection signal="pop_menu" from="Overlay/PauseMenu" to="Overlay/NestedMenuHandler" method="deactivate_menu"]
-[connection signal="push_menu" from="Overlay/PauseMenu" to="Overlay/NestedMenuHandler" method="activate_menu"]
 [connection signal="quit" from="Overlay/PauseMenu" to="." method="restart"]

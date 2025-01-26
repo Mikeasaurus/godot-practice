@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://16iuasf15alq"]
+[gd_scene load_steps=7 format=3 uid="uid://16iuasf15alq"]
 
 [ext_resource type="Script" path="res://options_menu.gd" id="1_o3wot"]
 [ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm.tscn" id="2_36ki1"]
+[ext_resource type="PackedScene" uid="uid://b88skvef3btfn" path="res://controls_menu.tscn" id="2_o8vdk"]
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_tp0d4"]
 color = Color(1, 1, 1, 1)
@@ -24,14 +25,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_o3wot")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ControlsMenu" parent="." instance=ExtResource("2_o8vdk")]
+visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.501961)
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1

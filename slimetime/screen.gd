@@ -4,8 +4,9 @@ var is_game_over: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# Set up some menu logic.
-	$Overlay/NestedMenuHandler.pause_menu = $Overlay/PauseMenu
+	# Connect the menu toggle key for pausing / unpausing the game.
+	MenuHandler.pause.connect(pause_game)
+	MenuHandler.done_submenus.connect(unpause_game)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -27,8 +28,6 @@ func game_over () -> void:
 	$Worm.explode()
 	$GameOverScreen/Label.text = "GAME OVER\nScore: %d\n\nPress any key / click to restart"%Globals.score
 	$GameOverScreen.visible = true
-	# Turn off pause function.
-	$Overlay/NestedMenuHandler.set_process_input(false)
 	# Fade in the "GAME OVER" text.
 	var tween: Tween = get_tree().create_tween()
 	tween.tween_interval(1.0)
@@ -40,9 +39,16 @@ func game_over () -> void:
 
 # Restart the game after a game over screen.
 func restart () -> void:
+	get_tree().paused = false  # Unpause the game.
 	Globals.reset()  # Reset global state (score, etc.)
 	get_tree().change_scene_to_file("res://main_menu.tscn")
 
-# Navigating between sub-menus.
-func _on_pause_menu_options() -> void:
-	$Overlay/NestedMenuHandler.activate_menu($Overlay/OptionsMenu)
+# Bring up pause menu.
+func pause_game () -> void:
+	# Ignore the pause functionality if in a game over state.
+	if is_game_over: return
+	get_tree().paused = true
+	MenuHandler.activate_menu($Overlay/PauseMenu)
+
+func unpause_game () -> void:
+	get_tree().paused = false
