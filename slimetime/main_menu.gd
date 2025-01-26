@@ -9,6 +9,7 @@ var credits_menu: Control
 func _ready() -> void:
 	options_menu = options_scene.instantiate()
 	options_menu.hide()
+	options_menu.push_menu.connect($NestedMenuHandler.activate_menu)
 	options_menu.pop_menu.connect(_return_from_submenu)
 	add_sibling.call_deferred(options_menu)
 	credits_menu = credits_scene.instantiate()
@@ -35,7 +36,8 @@ func _on_credits_button_pressed() -> void:
 
 func _return_from_submenu() -> void:
 	$NestedMenuHandler.deactivate_menu()
-	$MarginContainer.show()
+	if len($NestedMenuHandler.menu_stack) == 0:
+		$MarginContainer.show()
 
 # A hack to redraw the MarginContainer when returning from a submenu from the escape key.
 # In that case, there's no "Back" button press to get a signal from, so have to trap the key stroke?

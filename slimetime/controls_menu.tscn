@@ -1,0 +1,118 @@
+[gd_scene load_steps=4 format=3 uid="uid://b88skvef3btfn"]
+
+[ext_resource type="Script" path="res://controls_menu.gd" id="1_srpky"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_5ajxi"]
+color = Color(1, 1, 1, 1)
+thickness = 3
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_curnv"]
+color = Color(1, 1, 1, 1)
+thickness = 3
+
+[node name="ControlsMenu" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_srpky")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.501961)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Controls"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+theme_override_styles/separator = SubResource("StyleBoxLine_5ajxi")
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 48
+theme_override_constants/v_separation = 20
+columns = 2
+
+[node name="MovementLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Movement"
+
+[node name="MovementText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Arrow keys, or 
+Hold mouse button / touch screen in direction of travel"
+
+[node name="ShootSlimeLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Shoot slime"
+
+[node name="ShootSlimeText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Space bar, or
+Click / tap on nearby bug"
+
+[node name="JumpLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Jump"
+
+[node name="JumpText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Left-Ctrl key, or
+Double-click / double-tap on screen"
+
+[node name="PauseLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Pause"
+
+[node name="PauseText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Escape key, or
+Pause button in top left corner of screen"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+theme_override_styles/separator = SubResource("StyleBoxLine_curnv")
+
+[node name="BackButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Back"
+
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

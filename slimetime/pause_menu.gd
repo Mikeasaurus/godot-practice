@@ -13,6 +13,7 @@ func _ready() -> void:
 	# Not a child, because then the show/hide logic will interfere between them.
 	options_menu = options_scene.instantiate()
 	options_menu.hide()
+	options_menu.push_menu.connect(push_menu.emit)
 	options_menu.pop_menu.connect(pop_menu.emit)
 	add_sibling.call_deferred(options_menu)
 	

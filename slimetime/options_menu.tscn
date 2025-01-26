@@ -119,6 +119,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Edit..."
 
+[node name="ControlsButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Controls..."
+
 [node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 20
@@ -131,4 +136,5 @@ theme_override_font_sizes/font_size = 48
 text = "Back"
 
 [connection signal="item_selected" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/GraphicsOptionButton" to="." method="_on_graphics_option_button_item_selected"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/ControlsButton" to="." method="_on_controls_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
