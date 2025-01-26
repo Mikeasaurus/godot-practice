@@ -27,6 +27,8 @@ func game_over () -> void:
 	$Worm.explode()
 	$GameOverScreen/Label.text = "GAME OVER\nScore: %d\n\nPress any key / click to restart"%Globals.score
 	$GameOverScreen.visible = true
+	# Turn off pause function.
+	$Overlay/NestedMenuHandler.set_process_input(false)
 	# Fade in the "GAME OVER" text.
 	var tween: Tween = get_tree().create_tween()
 	tween.tween_interval(1.0)
