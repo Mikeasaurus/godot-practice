@@ -11,11 +11,35 @@ signal ate_bug
 
 # Where the mouth is located on the sprite.
 var mouth_position: Vector2
-# Flip mouth position whenever head flips direction.
+
+# Helper method - flip the segment in the opposite direction.
+# Maybe there's a better way to do this?
+# can't find a way to do this to all child nodes in one shot, need to
+# do each one individually?
 func flip_segment():
+	# Flip mouth position whenever head flips direction.
 	mouth_position.x *= -1
-	$AnimatedSprite2D/EatingArea/CollisionShape2D.position.x *= -1
-	super()
+	$Sprites/EatingArea/CollisionShape2D.position.x *= -1
+	# Flip the components.
+	$Sprites/Outline.flip_h = not $Sprites/Outline.flip_h
+	$Sprites/Body.flip_h = not $Sprites/Body.flip_h
+	$Sprites/Top.flip_h = not $Sprites/Top.flip_h
+	$Sprites/Belly.flip_h = not $Sprites/Belly.flip_h
+	$Sprites/AppendageOutline.flip_h = not $Sprites/AppendageOutline.flip_h
+	$Sprites/Eyes.flip_h = not $Sprites/Eyes.flip_h
+	$Sprites/Mouth.flip_h = not $Sprites/Mouth.flip_h
+	# Change sign of horizontal offset.
+	$Sprites/Outline.offset.x *= -1
+	$Sprites/Body.offset.x *= -1
+	$Sprites/Top.offset.x *= -1
+	$Sprites/Belly.offset.x *= -1
+	$Sprites/AppendageOutline.offset.x *= -1
+	$Sprites/Eyes.offset.x *= -1
+	$Sprites/Mouth.offset.x *= -1
+	for frame in $Sprites/Animation.get_children():
+		for s in frame.get_children():
+			s.flip_h = not s.flip_h
+			s.offset.x *= -1
 
 # Keep track of all bugs within range.
 var targets: Array = []
@@ -23,9 +47,23 @@ var targets: Array = []
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Get position of mouth (for where to shoot slime from)
-	mouth_position = $AnimatedSprite2D/SlimeSource.position
+	mouth_position = $Sprites/SlimeSource.position
+	# Continue setting up other properties of the segment.
 	super()
 
+# Called when the worm's colour scheme needs to be updated.
+func refresh_colour_scheme () -> void:
+	$Sprites/Body.modulate = Globals.worm_body_colour
+	$Sprites/Top.modulate = Globals.worm_back_colour
+	$Sprites/Belly.modulate = Globals.worm_front_colour
+	$Sprites/AppendageOutline.modulate = Globals.worm_outline_colour
+	$Sprites/Eyes.modulate = Globals.worm_outline_colour
+	$Sprites/Mouth.modulate = Globals.worm_body_colour
+	$Sprites/Outline.modulate = Globals.worm_outline_colour
+	for frame in $Sprites/Animation.get_children():
+		frame.get_node("Foreleg").modulate = Globals.worm_body_colour
+		frame.get_node("Backleg").modulate = Globals.worm_front_colour
+		frame.get_node("Outlines").modulate = Globals.worm_outline_colour
 # Helper method - get optimal angle for targeting the given object.
 # Used for targeting bugs with slime.
 func _get_targeting_angle (pos: Vector2, obj) -> float:
@@ -69,7 +107,7 @@ func _predict_slime_location (x0: Vector2, angle: float, t: float) -> Vector2:
 
 func shoot_slime (t = null) -> void:
 		# Where the slime originates from (based on position of worm's mouth).
-		var slime_start: Vector2 = mouth_position.rotated($AnimatedSprite2D.global_rotation)
+		var slime_start: Vector2 = mouth_position.rotated($Sprites.global_rotation)
 		# Get the direction to shoot the slime.
 		# Check if any targets in range.
 		# Otherwise, shoot straight ahead.
@@ -104,7 +142,7 @@ func _chew_food () -> void:
 		var p: Node2D = crumb_scene.instantiate()
 		var angle: float = (randf() - 0.5) * PI
 		var speed: float = 100 + randf() * 200
-		p.position = position + mouth_position.rotated($AnimatedSprite2D.global_rotation)
+		p.position = position + mouth_position.rotated($Sprites.global_rotation)
 		p.linear_velocity = facing_direction.rotated(angle) * speed
 		# Have to do a deferred call for adding the particles, otherwise get the error message:
 		# ERROR: Can't change this state while flushing queries. Use call_deferred() or set_deferred() to change monitoring state instead.

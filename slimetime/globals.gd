@@ -18,6 +18,30 @@ func set_volume (level: float) -> void:
 # Graphics level (not used)
 var graphics_level: int = 0
 
+# Worm colour scheme
+signal worm_colour_updated
+func set_worm_body_colour(c: Color):
+	worm_body_colour = c
+	worm_colour_updated.emit()
+func set_worm_back_colour(c: Color):
+	worm_back_colour = c
+	worm_colour_updated.emit()
+func set_worm_front_colour(c: Color):
+	worm_front_colour = c
+	worm_colour_updated.emit()
+func set_worm_outline_colour(c: Color):
+	worm_outline_colour = c
+	worm_colour_updated.emit()
+var worm_body_colour: Color = Color.hex(0xff8e5bff): set = set_worm_body_colour
+var worm_back_colour: Color = Color.hex(0xf15c61ff): set = set_worm_back_colour
+var worm_front_colour: Color = Color.hex(0xfef0ccff): set = set_worm_front_colour
+var worm_outline_colour: Color = Color.hex(0x000000ff): set = set_worm_outline_colour
+# Remember original colour values, in case they need to be reset.
+var original_worm_body_colour = worm_body_colour
+var original_worm_back_colour = worm_back_colour
+var original_worm_front_colour = worm_front_colour
+var original_worm_outline_colour = worm_outline_colour
+
 # Current score
 var score: int = 0
 

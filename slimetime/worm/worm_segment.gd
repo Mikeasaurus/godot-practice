@@ -24,6 +24,10 @@ var feet_direction: Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# Initialize the colour scheme of the worm.
+	refresh_colour_scheme()
+	# Listen for any further updates to colour scheme, and update accordingly.
+	Globals.worm_colour_updated.connect(refresh_colour_scheme)
 	# Set gravity, so segment will start falling onto the surface below
 	# if it's placed above the ground.
 	last_surface_normal = Vector2(0,1)
@@ -35,6 +39,20 @@ func _ready() -> void:
 	# Ready to land and stick to a surface.
 	on_surface = false
 	sticky_feet = true
+	# Show the first frame of the walking sprites.
+	$Sprites/Animation/Frame1.show()
+	$Sprites/Animation/Frame2.hide()
+	$Sprites/Animation/Frame3.hide()
+
+# Called when the worm's colour scheme needs to be updated.
+func refresh_colour_scheme () -> void:
+	$Sprites/Body.modulate = Globals.worm_body_colour
+	$Sprites/Top.modulate = Globals.worm_back_colour
+	$Sprites/Outline.modulate = Globals.worm_outline_colour
+	for frame in $Sprites/Animation.get_children():
+		frame.get_node("Foreleg").modulate = Globals.worm_body_colour
+		frame.get_node("Outlines").modulate = Globals.worm_outline_colour
+
 
 # Helper method - flip the segment in the opposite direction.
 # Maybe there's a better way to do this?
@@ -42,17 +60,19 @@ func _ready() -> void:
 # do each one individually?
 func flip_segment() -> void:
 	# Flip the components.
-	$AnimatedSprite2D.flip_h = not $AnimatedSprite2D.flip_h
-	$AnimatedSprite2D/Outline.flip_h = not $AnimatedSprite2D/Outline.flip_h
-	$AnimatedSprite2D/Body.flip_h = not $AnimatedSprite2D/Body.flip_h
-	$AnimatedSprite2D/Top.flip_h = not $AnimatedSprite2D/Top.flip_h
+	$Sprites/Outline.flip_h = not $Sprites/Outline.flip_h
+	$Sprites/Body.flip_h = not $Sprites/Body.flip_h
+	$Sprites/Top.flip_h = not $Sprites/Top.flip_h
 	# Change sign of horizontal offset.
-	$AnimatedSprite2D.offset.x *= -1
-	$AnimatedSprite2D/Outline.offset.x *= -1
-	$AnimatedSprite2D/Body.offset.x *= -1
-	$AnimatedSprite2D/Top.offset.x *= -1
+	$Sprites/Outline.offset.x *= -1
+	$Sprites/Body.offset.x *= -1
+	$Sprites/Top.offset.x *= -1
+	for frame in $Sprites/Animation.get_children():
+		for s in frame.get_children():
+			s.flip_h = not s.flip_h
+			s.offset.x *= -1
 func is_flipped() -> bool:
-	return $AnimatedSprite2D.flip_h
+	return $Sprites/Body.flip_h
 
 # Helper method - update sprite based on current facing direction and feet direction.
 func update_sprite() -> void:
@@ -65,7 +85,7 @@ func update_sprite() -> void:
 		flip_segment()
 	if is_flipped():
 		orientation *= -1
-	$AnimatedSprite2D.global_rotation = orientation.angle()
+	$Sprites.global_rotation = orientation.angle()
 	# Update feet direction.
 	var v: Vector2 = orientation.rotated(PI/2)
 	if v.dot(feet_direction) > 0:
@@ -100,9 +120,9 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 func _process(_delta: float) -> void:
 	# Check if moving, need to animate legs?
 	if on_surface and linear_velocity.length() > 10:
-		$AnimatedSprite2D.play()
+		$AnimationPlayer.play("walk")
 	else:
-		$AnimatedSprite2D.pause()
+		$AnimationPlayer.pause()
 
 # Helper method - Set the velocity along the given direction.
 # Velocity in orthogonal direction is left untouched.

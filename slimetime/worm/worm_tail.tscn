@@ -1,33 +1,102 @@
-[gd_scene load_steps=11 format=3 uid="uid://c6aw5rjsklap6"]
+[gd_scene load_steps=16 format=3 uid="uid://c6aw5rjsklap6"]
 
 [ext_resource type="Script" path="res://worm/worm_tail.gd" id="1_onfeh"]
-[ext_resource type="Texture2D" uid="uid://blls77duj641x" path="res://worm/tail-walk1.png" id="1_s7icc"]
-[ext_resource type="Texture2D" uid="uid://c4dsadwsrp0qd" path="res://worm/tail-walk2.png" id="2_vbqgt"]
-[ext_resource type="Texture2D" uid="uid://clepa24iv8d2a" path="res://worm/tail-walk3.png" id="3_nseqk"]
 [ext_resource type="Texture2D" uid="uid://daoi0drmdmmdn" path="res://worm/tail-outline.png" id="4_o4jfh"]
 [ext_resource type="Texture2D" uid="uid://d1aiefgpj6kgq" path="res://worm/tail-body.png" id="5_uoy1x"]
+[ext_resource type="Texture2D" uid="uid://blls77duj641x" path="res://worm/tail-walk1.png" id="5_w4ufm"]
+[ext_resource type="Texture2D" uid="uid://du3tj8umvo4vo" path="res://worm/tail-walk1-outline.png" id="6_lq3kc"]
 [ext_resource type="Texture2D" uid="uid://tgpfeqvj6lv8" path="res://worm/tail-top.png" id="6_pw6xx"]
 [ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://effects/hit.png" id="7_hw7jy"]
+[ext_resource type="Texture2D" uid="uid://c4dsadwsrp0qd" path="res://worm/tail-walk2.png" id="7_qgy4y"]
+[ext_resource type="Texture2D" uid="uid://c6pbtxd2rapfh" path="res://worm/tail-walk2-outline.png" id="8_jdxqr"]
+[ext_resource type="Texture2D" uid="uid://clepa24iv8d2a" path="res://worm/tail-walk3.png" id="9_xc0ei"]
+[ext_resource type="Texture2D" uid="uid://b1b3kriwg4j0t" path="res://worm/tail-walk3-outline.png" id="10_82x5n"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_o8qp8"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("1_s7icc")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_vbqgt")
-}, {
-"duration": 1.0,
-"texture": ExtResource("3_nseqk")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_vbqgt")
-}],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
+[sub_resource type="Animation" id="Animation_q1xqk"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprites/Animation/Frame1:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprites/Animation/Frame2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprites/Animation/Frame3:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_hj0qd"]
+resource_name = "walk"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprites/Animation/Frame1:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [true, false, false, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprites/Animation/Frame2:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [false, true, false, true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprites/Animation/Frame3:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [false, false, true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_edwdy"]
+_data = {
+"RESET": SubResource("Animation_q1xqk"),
+"walk": SubResource("Animation_hj0qd")
+}
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rh2oh"]
 radius = 41.0
@@ -40,23 +109,59 @@ max_contacts_reported = 2
 script = ExtResource("1_onfeh")
 metadata/_edit_lock_ = true
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-sprite_frames = SubResource("SpriteFrames_o8qp8")
-offset = Vector2(-20, 5)
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_edwdy")
+}
 
-[node name="Outline" type="Sprite2D" parent="AnimatedSprite2D"]
+[node name="Sprites" type="Node2D" parent="."]
+
+[node name="Outline" type="Sprite2D" parent="Sprites"]
 z_index = -3
 texture = ExtResource("4_o4jfh")
 offset = Vector2(-20, 5)
 
-[node name="Body" type="Sprite2D" parent="AnimatedSprite2D"]
+[node name="Body" type="Sprite2D" parent="Sprites"]
 z_index = -2
 texture = ExtResource("5_uoy1x")
 offset = Vector2(-20, 5)
 
-[node name="Top" type="Sprite2D" parent="AnimatedSprite2D"]
+[node name="Top" type="Sprite2D" parent="Sprites"]
 z_index = -1
 texture = ExtResource("6_pw6xx")
+offset = Vector2(-20, 5)
+
+[node name="Animation" type="Node2D" parent="Sprites"]
+z_index = -1
+
+[node name="Frame1" type="Node2D" parent="Sprites/Animation"]
+
+[node name="Foreleg" type="Sprite2D" parent="Sprites/Animation/Frame1"]
+texture = ExtResource("5_w4ufm")
+offset = Vector2(-20, 5)
+
+[node name="Outlines" type="Sprite2D" parent="Sprites/Animation/Frame1"]
+texture = ExtResource("6_lq3kc")
+offset = Vector2(-20, 5)
+
+[node name="Frame2" type="Node2D" parent="Sprites/Animation"]
+
+[node name="Foreleg" type="Sprite2D" parent="Sprites/Animation/Frame2"]
+texture = ExtResource("7_qgy4y")
+offset = Vector2(-20, 5)
+
+[node name="Outlines" type="Sprite2D" parent="Sprites/Animation/Frame2"]
+texture = ExtResource("8_jdxqr")
+offset = Vector2(-20, 5)
+
+[node name="Frame3" type="Node2D" parent="Sprites/Animation"]
+
+[node name="Foreleg" type="Sprite2D" parent="Sprites/Animation/Frame3"]
+texture = ExtResource("9_xc0ei")
+offset = Vector2(-20, 5)
+
+[node name="Outlines" type="Sprite2D" parent="Sprites/Animation/Frame3"]
+texture = ExtResource("10_82x5n")
 offset = Vector2(-20, 5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

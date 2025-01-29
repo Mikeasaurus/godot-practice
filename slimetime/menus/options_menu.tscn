@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://16iuasf15alq"]
+[gd_scene load_steps=8 format=3 uid="uid://16iuasf15alq"]
 
 [ext_resource type="Script" path="res://menus/options_menu.gd" id="1_iwixp"]
 [ext_resource type="PackedScene" uid="uid://b88skvef3btfn" path="res://menus/controls_menu.tscn" id="2_0g7yr"]
+[ext_resource type="PackedScene" uid="uid://b1jnthm2msap" path="res://menus/appearance_menu.tscn" id="2_7gb7c"]
 [ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm/worm.tscn" id="3_qrlsc"]
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_tp0d4"]
@@ -24,6 +25,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_iwixp")
+
+[node name="AppearanceMenu" parent="." instance=ExtResource("2_7gb7c")]
+visible = false
+layout_mode = 1
 
 [node name="ControlsMenu" parent="." instance=ExtResource("2_0g7yr")]
 visible = false
@@ -102,6 +107,7 @@ layout_mode = 2
 
 [node name="SubViewport" type="SubViewport" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer/SubViewPortContainer"]
 disable_3d = true
+transparent_bg = true
 handle_input_locally = false
 size = Vector2i(170, 100)
 render_target_update_mode = 4
@@ -110,7 +116,7 @@ render_target_update_mode = 4
 process_mode = 4
 scale = Vector2(0.5, 0.5)
 
-[node name="Button" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer"]
+[node name="EditAppearanceButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Edit..."
@@ -132,5 +138,6 @@ theme_override_font_sizes/font_size = 48
 text = "Back"
 
 [connection signal="item_selected" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/GraphicsOptionButton" to="." method="_on_graphics_option_button_item_selected"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer/EditAppearanceButton" to="." method="_on_edit_appearance_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/ControlsButton" to="." method="_on_controls_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

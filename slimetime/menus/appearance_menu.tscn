@@ -1,0 +1,143 @@
+[gd_scene load_steps=4 format=3 uid="uid://b1jnthm2msap"]
+
+[ext_resource type="Script" path="res://menus/appearance_menu.gd" id="1_k7x11"]
+[ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm/worm.tscn" id="2_dagsf"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_4klod"]
+color = Color(1, 1, 1, 1)
+thickness = 3
+
+[node name="AppearanceMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_k7x11")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Appearance"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+theme_override_styles/separator = SubResource("StyleBoxLine_4klod")
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="SubViewport" type="SubViewport" parent="MarginContainer/CenterContainer/VBoxContainer/SubViewportContainer"]
+disable_3d = true
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(350, 200)
+render_target_update_mode = 4
+
+[node name="Worm" parent="MarginContainer/CenterContainer/VBoxContainer/SubViewportContainer/SubViewport" instance=ExtResource("2_dagsf")]
+process_mode = 4
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 40
+theme_override_constants/v_separation = 20
+columns = 3
+
+[node name="BackLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Top:"
+horizontal_alignment = 2
+
+[node name="BackColorPickerButton" type="ColorPickerButton" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(75, 50)
+layout_mode = 2
+edit_alpha = false
+
+[node name="BackResetButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Reset"
+
+[node name="BodyLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Body:"
+horizontal_alignment = 2
+
+[node name="BodyColorPickerButton" type="ColorPickerButton" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(75, 50)
+layout_mode = 2
+edit_alpha = false
+
+[node name="BodyResetButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Reset"
+
+[node name="FrontLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Front:"
+horizontal_alignment = 2
+
+[node name="FrontColorPickerButton" type="ColorPickerButton" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(75, 50)
+layout_mode = 2
+edit_alpha = false
+
+[node name="FrontResetButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Reset"
+
+[node name="OutlineLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Outline:"
+horizontal_alignment = 2
+
+[node name="OutlineColorPickerButton" type="ColorPickerButton" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(75, 50)
+layout_mode = 2
+edit_alpha = false
+
+[node name="OutlineResetButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Reset"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+theme_override_styles/separator = SubResource("StyleBoxLine_4klod")
+
+[node name="BackButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Back"
+
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/BackResetButton" to="." method="_on_back_reset_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/BodyResetButton" to="." method="_on_body_reset_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/FrontResetButton" to="." method="_on_front_reset_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/GridContainer/OutlineResetButton" to="." method="_on_outline_reset_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
