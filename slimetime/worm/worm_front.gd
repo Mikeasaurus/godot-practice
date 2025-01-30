@@ -144,6 +144,7 @@ func _chew_food () -> void:
 		var speed: float = 100 + randf() * 200
 		p.position = position + mouth_position.rotated($Sprites.global_rotation)
 		p.linear_velocity = facing_direction.rotated(angle) * speed
+		p.z_index = z_index
 		# Have to do a deferred call for adding the particles, otherwise get the error message:
 		# ERROR: Can't change this state while flushing queries. Use call_deferred() or set_deferred() to change monitoring state instead.
 		call_deferred("add_sibling",p)
