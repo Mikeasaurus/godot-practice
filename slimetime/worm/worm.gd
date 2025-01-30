@@ -118,7 +118,8 @@ func _process(_delta: float) -> void:
 		if v.dot(segment.facing_direction) < 0:
 			segment.facing_direction *= -1
 			# Update z-order unless front is turned around, then let it stay in front.
-			if front_segment.facing_direction.dot(v) > 0 and back_segment != null:
+			# Also, don't update zorder of tail (does not need to ever be in front of any other segments).
+			if front_segment.facing_direction.dot(v) > 0 and i < len(segments)-1:
 				segment.z_index = front_segment.z_index
 
 	# Update segment sprites.
