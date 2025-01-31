@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=13 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://d2fqayuwohf12" path="res://bugs/beetle.tscn" id="5_6i2ap"]
 [ext_resource type="PackedScene" uid="uid://cg4qk38asbby4" path="res://bugs/lady_bug.tscn" id="5_gp822"]
 [ext_resource type="PackedScene" uid="uid://01ew1cglhaiw" path="res://bugs/bee.tscn" id="6_d1ftp"]
+[ext_resource type="PackedScene" uid="uid://buloqvk1emlul" path="res://bugs/fly.tscn" id="6_etxo6"]
 [ext_resource type="PackedScene" uid="uid://b4103dh1cjumw" path="res://menus/pause_menu.tscn" id="7_y7xe8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
@@ -78,6 +79,16 @@ tile_size = Vector2i(120, 120)
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_b7afo")
 
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_kvu05"]
+scenes/1/scene = ExtResource("5_6i2ap")
+scenes/2/scene = ExtResource("5_gp822")
+scenes/3/scene = ExtResource("6_d1ftp")
+scenes/4/scene = ExtResource("6_etxo6")
+
+[sub_resource type="TileSet" id="TileSet_kemkm"]
+tile_size = Vector2i(120, 120)
+sources/0 = SubResource("TileSetScenesCollectionSource_kvu05")
+
 [node name="Screen" type="Node2D"]
 script = ExtResource("1_lwfk5")
 
@@ -95,22 +106,17 @@ offset_right = 2668.0
 offset_bottom = 1764.0
 color = Color(0.172549, 0.121569, 0, 1)
 
-[node name="TileMapLayer" type="TileMapLayer" parent="."]
+[node name="LevelTileMapLayer" type="TileMapLayer" parent="."]
 tile_map_data = PackedByteArray("AAAAAAUAAAACAAAAAAABAAUAAAACAAAAAAACAAUAAAACAAEAAAADAAUAAAACAAAAAAAEAAUAAAACAAAAAAAFAAUAAAACAAEAAAAGAAUAAAACAAAAAAAHAAUAAAACAAAAAAAJAAUAAAACAAAAAAAEAAQAAAAAAAAAAAAFAAQAAAABAAAAAAAGAAQAAAACAAAAAAAHAAQAAAACAAEAAAAIAAQAAAACAAAAAAAJAAQAAAACAAAAAAAIAAEAAAACAAAAAAAIAAAAAAACAAEAAAAFAAAAAAACAAEAAAAFAP//AAACAAAAAAAFAP7/AAACAAAAAAAIAP//AAACAAAAAAAIAP7/AAACAAEAAAAFAAEAAAAJAAEAAAAFAP3/AAACAAAAAAAIAP3/AAAJAAAAAAAKAAQAAAAGAAAAAAAKAAUAAAAGAAEAAAD//wUAAAACAAAAAAAIAAIAAAAJAAEAAAAIAAUAAAACAAEAAAAFAPz/AAACAAAAAAAFAPv/AAAGAAAAAAAEAPv/AAACAAAAAAADAPv/AAACAAAAAAACAPv/AAACAAEAAAABAPv/AAACAAEAAAAAAPv/AAACAAAAAAD///v/AAACAAEAAAD+//v/AAACAAEAAAD9//v/AAACAAAAAAD7//r/AAAIAAMAAAD6//n/AAACAAAAAAD6//r/AAACAAAAAAD8//v/AAACAAAAAAD7//v/AAACAAAAAAD6//v/AAACAAAAAAD6//j/AAACAAAAAAD6//f/AAACAAEAAAD6//b/AAACAAAAAAD6//X/AAACAAAAAAD6//T/AAACAAEAAAD6//P/AAACAAAAAAD6//L/AAAGAAAAAAD+/wUAAAACAAAAAAD9/wUAAAACAAAAAAD8/wUAAAACAAAAAAD7/wUAAAACAAAAAAD6/wUAAAACAAAAAAD5/wUAAAACAAAAAAD4/wUAAAACAAAAAAD3/wUAAAACAAAAAAD2/wUAAAACAAAAAAD9//P/AAAFAAEAAAD+//P/AAACAAAAAAD///P/AAACAAAAAAAAAPP/AAACAAAAAAABAPP/AAACAAAAAAACAPP/AAACAAAAAAADAPP/AAACAAAAAAAEAPP/AAACAAAAAAAFAPP/AAACAAAAAAD9//L/AAAFAAAAAAD+//L/AAACAAAAAAD///L/AAACAAAAAAAAAPL/AAACAAAAAAABAPL/AAACAAAAAAACAPL/AAACAAAAAAADAPL/AAACAAAAAAAEAPL/AAACAAAAAAAFAPL/AAACAAAAAAAGAPL/AAACAAAAAAAHAPL/AAACAAAAAAAIAPL/AAACAAAAAAAJAPL/AAACAAAAAAAKAPL/AAACAAAAAAALAPL/AAACAAAAAAAMAPL/AAACAAAAAAANAPL/AAACAAAAAAAOAPL/AAACAAAAAAAPAPL/AAACAAAAAAD2//L/AAACAAAAAAD2//P/AAACAAAAAAD2//T/AAACAAAAAAD2//X/AAACAAEAAAD2//b/AAACAAAAAAD2//f/AAACAAAAAAD2//j/AAACAAAAAAD2//n/AAACAAAAAAD2//r/AAACAAEAAAD2//v/AAACAAAAAAD2//z/AAACAAAAAAD2//3/AAACAAAAAAD2//7/AAAKAAEAAAD2////AAACAAAAAAD2/wAAAAACAAAAAAD2/wEAAAACAAEAAAD2/wIAAAACAAEAAAD2/wMAAAACAAAAAAD2/wQAAAACAAAAAAD3//L/AAACAAAAAAD3//P/AAACAAAAAAD3//T/AAACAAAAAAD3//X/AAACAAAAAAD3//b/AAAKAAAAAAD3//f/AAACAAAAAAD3//j/AAACAAAAAAD3//n/AAACAAAAAAD3//r/AAACAAEAAAD3//v/AAACAAAAAAD3//z/AAACAAAAAAD3//3/AAACAAAAAAD3//7/AAACAAAAAAD3////AAACAAAAAAD3/wAAAAACAAAAAAD3/wEAAAACAAEAAAD3/wIAAAACAAAAAAD3/wMAAAACAAEAAAD3/wQAAAACAAAAAAD4//L/AAACAAAAAAD4//P/AAACAAAAAAD4//T/AAACAAEAAAD4//X/AAACAAAAAAD4//b/AAACAAAAAAD4//f/AAACAAAAAAD4//j/AAACAAAAAAD4//n/AAACAAAAAAD4//r/AAACAAAAAAD4//v/AAACAAEAAAD4//z/AAACAAAAAAD4//3/AAACAAAAAAD4//7/AAACAAAAAAD4////AAACAAEAAAD4/wAAAAACAAAAAAD4/wEAAAACAAAAAAD4/wIAAAACAAEAAAD4/wMAAAACAAAAAAD4/wQAAAACAAAAAAD5//L/AAACAAAAAAD5//P/AAACAAAAAAD5//T/AAACAAEAAAD5//X/AAACAAAAAAD5//b/AAACAAAAAAD5//f/AAACAAEAAAD5//j/AAACAAAAAAD5//n/AAACAAEAAAD5//r/AAACAAAAAAD5//v/AAACAAAAAAD5//z/AAACAAAAAAD5//3/AAACAAAAAAD5//7/AAACAAAAAAD5////AAACAAAAAAD5/wAAAAACAAAAAAD5/wEAAAACAAAAAAD5/wIAAAACAAAAAAD5/wMAAAACAAAAAAD5/wQAAAACAAAAAAD6//z/AAAIAAIAAAD6/wQAAAAIAAMAAAD3//H/AAAEAAIAAAD4//H/AAADAAIAAAD5//H/AAAFAAIAAAD2//H/AAADAAIAAAD+//H/AAADAAIAAAD///H/AAADAAIAAAAAAPH/AAADAAIAAAABAPH/AAADAAIAAAACAPH/AAADAAIAAAADAPH/AAADAAIAAAAEAPH/AAADAAIAAAAFAPH/AAADAAIAAAAGAPH/AAABAAMAAAAHAPH/AAACAAMAAAAIAPH/AAACAAAAAAAJAPH/AAACAAAAAAAKAPH/AAACAAAAAAALAPH/AAACAAAAAAAMAPH/AAACAAAAAAANAPH/AAACAAAAAAAOAPH/AAACAAAAAAAPAPH/AAACAAAAAAAHAPD/AAACAAIAAAAIAPD/AAADAAIAAAAJAPD/AAAEAAIAAAAKAPD/AAAEAAIAAAALAPD/AAAFAAIAAAAMAPD/AAADAAIAAAANAPD/AAAEAAIAAAAOAPD/AAADAAIAAAAPAPD/AAAFAAIAAAD1//L/AAACAAAAAAD0//L/AAACAAAAAADz//L/AAACAAAAAADy//L/AAACAAAAAADx//L/AAACAAAAAAD1//H/AAADAAIAAAD0//H/AAADAAIAAADz//H/AAAEAAIAAADy//H/AAAEAAIAAADx//H/AAAFAAIAAAAEAPz/AAAJAAIAAAAGAPP/AAADAAEAAAAHAPP/AAAEAAEAAAA=")
 tile_set = SubResource("TileSet_6vxb5")
+
+[node name="SpriteTileMapLayer" type="TileMapLayer" parent="."]
+tile_map_data = PackedByteArray("AAD9/wIAAAAAAAAAAgAEAAIAAAAAAAAAAQADAPn/AAAAAAAAAQD///j/AAAAAAAAAQABAO7/AAAAAAAAAQAAAAAAAAAAAAAAAwA=")
+tile_set = SubResource("TileSet_kemkm")
 
 [node name="Worm" parent="." instance=ExtResource("2_34v46")]
 z_index = 5
 position = Vector2(8, 316)
-
-[node name="Beetle1" parent="." instance=ExtResource("5_6i2ap")]
-position = Vector2(560, 270)
-
-[node name="Beetle2" parent="." instance=ExtResource("5_6i2ap")]
-position = Vector2(471, -764)
-
-[node name="Beetle3" parent="." instance=ExtResource("5_6i2ap")]
-position = Vector2(-102, -920)
 
 [node name="Overlay" type="CanvasLayer" parent="."]
 
@@ -127,9 +133,6 @@ horizontal_alignment = 2
 [node name="PauseMenu" parent="Overlay" instance=ExtResource("7_y7xe8")]
 process_mode = 2
 visible = false
-
-[node name="Beetle4" parent="." instance=ExtResource("5_6i2ap")]
-position = Vector2(144, -2066)
 
 [node name="GameOverScreen" type="CanvasLayer" parent="."]
 visible = false
@@ -152,11 +155,11 @@ Score: XXXX
 Press any key / click to restart"
 horizontal_alignment = 1
 
-[node name="LadyBug1" parent="." instance=ExtResource("5_gp822")]
-position = Vector2(-267, 262)
-
-[node name="Bee" parent="." instance=ExtResource("6_d1ftp")]
-position = Vector2(75, 96)
-
+[connection signal="body_entered" from="SpriteTileMapLayer/LadyBug" to="SpriteTileMapLayer/LadyBug" method="_on_body_entered"]
+[connection signal="body_entered" from="SpriteTileMapLayer/Beetle" to="SpriteTileMapLayer/Beetle" method="_on_body_entered"]
+[connection signal="body_entered" from="SpriteTileMapLayer/@RigidBody2D@36901" to="SpriteTileMapLayer/@RigidBody2D@36901" method="_on_body_entered"]
+[connection signal="body_entered" from="SpriteTileMapLayer/@RigidBody2D@36902" to="SpriteTileMapLayer/@RigidBody2D@36902" method="_on_body_entered"]
+[connection signal="body_entered" from="SpriteTileMapLayer/@RigidBody2D@36903" to="SpriteTileMapLayer/@RigidBody2D@36903" method="_on_body_entered"]
+[connection signal="body_entered" from="SpriteTileMapLayer/Bee" to="SpriteTileMapLayer/Bee" method="_on_body_entered"]
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
 [connection signal="quit" from="Overlay/PauseMenu" to="." method="restart"]
