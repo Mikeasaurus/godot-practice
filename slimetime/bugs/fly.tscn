@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://buloqvk1emlul"]
+
+[ext_resource type="PackedScene" uid="uid://d4kknx6p5slyq" path="res://bugs/flying_bug.tscn" id="1_ay1fj"]
+[ext_resource type="Texture2D" uid="uid://begapfpwmrafi" path="res://bugs/fly1.png" id="2_np7wx"]
+[ext_resource type="Texture2D" uid="uid://cpdd4icyukpih" path="res://bugs/fly2.png" id="3_k7exh"]
+[ext_resource type="Texture2D" uid="uid://cjttfbw835k24" path="res://bugs/fly-slimed.png" id="4_8g0f7"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_q7k5v"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_np7wx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_k7exh")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_8g0f7")
+}],
+"loop": true,
+"name": &"slimed",
+"speed": 5.0
+}]
+
+[node name="Fly" instance=ExtResource("1_ay1fj")]
+turn_style = "flip"
+starting_velocity = Vector2(200, 100)
+springiness = Vector2(1, 50)
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+sprite_frames = SubResource("SpriteFrames_q7k5v")
