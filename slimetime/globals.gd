@@ -48,6 +48,10 @@ var score: int = 0
 # Enable debug keys
 var debug_keys: bool = true
 
+# Enable auto-target mode?
+# (will target a bug if it's within close enough range).
+var auto_target: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.

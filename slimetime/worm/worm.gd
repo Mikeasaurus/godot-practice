@@ -26,21 +26,26 @@ func _input(event: InputEvent) -> void:
 	if not _alive: return
 	# Check if we need to shoot some slime.
 	# Keyboard event
-	if event is InputEventKey and event.is_action_pressed("shoot_slime"):
+	if Globals.auto_target and event is InputEventKey and event.is_action_pressed("shoot_slime"):
 		# Tell head segment to shoot some slime.
 		segments[0].shoot_slime()
 	# Mouse event - user clicked / tapped on a bug within target range.
 	if event is InputEventMouseButton and event.pressed:
-		# Only trigger slime shot if a bug was targetted.
-		# Should the targets be inspected from here?  Or should this be delegated to
-		# the front segment logic?
-		for target in segments[0].targets:
-			# Note: need to use get_global_mouse_position instead of event.position,
-			# because the latter is relative to the screen, which is affected by the
-			# camera movement.
-			if (get_global_mouse_position() - target.position).length() <= target.get_node("CollisionShape2D").shape.radius:
-				segments[0].shoot_slime(target)
-			break
+		# For auto-target mode, send the target that was clicked on.
+		if Globals.auto_target:
+			# Only trigger slime shot if a bug was targetted.
+			# Should the targets be inspected from here?  Or should this be delegated to
+			# the front segment logic?
+			for target in segments[0].targets:
+				# Note: need to use get_global_mouse_position instead of event.position,
+				# because the latter is relative to the screen, which is affected by the
+				# camera movement.
+				if (get_global_mouse_position() - target.position).length() <= target.get_node("CollisionShape2D").shape.radius:
+					segments[0].shoot_slime(target)
+				break
+		# Normal mode for shooting slime, pass the general direction for shooting the slime.
+		else:
+			segments[0].shoot_slime(get_global_mouse_position())
 	# Debug action... grow the worm on command.
 	if Globals.debug_keys and event is InputEventKey and event.is_action_pressed("grow"):
 		# Add a new segment, just behind the front segment.

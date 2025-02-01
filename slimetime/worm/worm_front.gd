@@ -108,22 +108,37 @@ func _predict_slime_location (x0: Vector2, angle: float, t: float) -> Vector2:
 func shoot_slime (t = null) -> void:
 		# Where the slime originates from (based on position of worm's mouth).
 		var slime_start: Vector2 = mouth_position.rotated($Sprites.global_rotation)
-		# Get the direction to shoot the slime.
-		# Check if any targets in range.
-		# Otherwise, shoot straight ahead.
+		# By default, if no viable targets, then shoot straight ahead.
 		var slime_direction: Vector2 = facing_direction
-		# Find first viable target (that isn't already slimed).
-		# Or, if a specific target is passed, then only consider that one.
-		var target_list: Array = targets
-		if t != null:
-			target_list = [t]
-		for target in target_list:
-			if not target.is_slimed:
-				var angle: float = _get_targeting_angle(global_position+slime_start, target)
-				# Only if angle is good (e.g. not shooting from back of head)
-				if abs(angle-facing_direction.angle()) < PI/2:
-					slime_direction = Vector2.from_angle(angle)
-					break
+		# Check if auto-target mode is on.
+		if Globals.auto_target:
+			# Get the direction to shoot the slime.
+			# Check if any targets in range.
+			# Find first viable target (that isn't already slimed).
+			# Or, if a specific target is passed, then only consider that one.
+			var target_list: Array = targets
+			if t != null:
+				target_list = [t]
+			for target in target_list:
+				if not target.is_slimed:
+					var angle: float = _get_targeting_angle(global_position+slime_start, target)
+					# Only if angle is good (e.g. not shooting from back of head)
+					if abs(angle-facing_direction.angle()) < PI/2:
+						slime_direction = Vector2.from_angle(angle)
+						break
+		# If not auto-target, then the input argument is the direction to shoot.
+		elif t != null:
+			slime_direction = (t-(global_position+slime_start)).normalized()
+			# If shooting in backwards direction, turn the head around first.
+			# It will turn around anyway after a split second because the walk action will
+			# be brielfly triggered, but then the slime starting location would be for the original
+			# mouth location before turning around.
+			if slime_direction.dot(facing_direction) < 0:
+				facing_direction *= -1
+				update_sprite()
+				# Refresh slime starting location.
+				slime_start = mouth_position.rotated($Sprites.global_rotation)
+
 		var slime = slime_scene.instantiate()
 		add_child(slime)
 		slime.global_position = global_position + slime_start

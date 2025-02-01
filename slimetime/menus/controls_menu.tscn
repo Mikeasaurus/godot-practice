@@ -60,7 +60,7 @@ text = "Movement"
 [node name="MovementText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Arrow keys, or 
+text = "W A S D or arrow keys, or 
 Hold mouse button / touch screen in direction of travel"
 
 [node name="ShootSlimeLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
@@ -69,6 +69,12 @@ theme_override_font_sizes/font_size = 48
 text = "Shoot slime"
 
 [node name="ShootSlimeText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Click / tap in target direction"
+
+[node name="ShootSlimeText_autotarget" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Space bar, or
