@@ -12,6 +12,11 @@ var segment_spacing: float = 30.0
 # For capturing jump events from _input, and handling them in _physics_process
 var _jump_triggered: bool = false
 
+# For capturing double-clicks / double-taps when the built-in detection fails.
+# For instance, playing from iOS via the html5 interface doesn't seem to trigger
+# either double_click or double_tap events!  Very annoying.
+var _recent_click: bool = false
+
 # Whether worm is alive or not.
 var _alive: bool = true
 
@@ -29,8 +34,15 @@ func _input(event: InputEvent) -> void:
 	if Globals.auto_target and event is InputEventKey and event.is_action_pressed("shoot_slime"):
 		# Tell head segment to shoot some slime.
 		segments[0].shoot_slime()
-	# Mouse event - user clicked / tapped on a bug within target range.
+	# Mouse / touch event
 	if event is InputEventMouseButton and event.pressed:
+		# This is a fallback for when automatic detection of double-click / double-tap fails.
+		if Globals.touchscreen_controls and _recent_click:
+			_jump_triggered = true
+			return
+		elif Globals.touchscreen_controls:
+			_recent_click = true
+			$DoubletapTimer.start()
 		# For auto-target mode, send the target that was clicked on.
 		if Globals.auto_target:
 			# Only trigger slime shot if a bug was targetted.
@@ -56,8 +68,11 @@ func _input(event: InputEvent) -> void:
 	# Capture jump from user input, wait for _physics_process to handle the details.
 	# Double-click detection is only available from an InputEvent (not Input), so
 	# this can't be detected directly in _physics_process.
-	if event is InputEventMouseButton and event.double_click:
-		_jump_triggered = true
+	#TODO: remove this, since the manual detection (using timer) is already working.
+	if Globals.touchscreen_controls:
+		if (event is InputEventScreenTouch and event.double_tap) \
+		  or (event is InputEventMouseButton and event.double_click):
+			_jump_triggered = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -229,7 +244,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_pressed("move_up"):
 		move_direction += Vector2(0,-1)
 	# Check for mouse / touchscreen input as well.
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+	if Globals.touchscreen_controls and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		var click_pos: Vector2 = get_global_mouse_position()
 		var worm_pos: Vector2 = segments[0].global_position
 		move_direction = (click_pos - worm_pos)
@@ -296,3 +311,8 @@ func explode () -> void:
 # Pass along signal when a bug is eaten.
 func _on_worm_front_ate_bug() -> void:
 	ate_bug.emit()
+
+# When user hasn't clicked/tapped in very recent past, then no longer waiting to
+# detect a double-click / double-tap event.
+func _on_doubletap_timer_timeout() -> void:
+	_recent_click = false

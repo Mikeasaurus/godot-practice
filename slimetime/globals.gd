@@ -48,6 +48,9 @@ var score: int = 0
 # Enable debug keys
 var debug_keys: bool = true
 
+# Use touchscreen interface?
+var touchscreen_controls: bool = DisplayServer.is_touchscreen_available()
+
 # Enable auto-target mode?
 # (will target a bug if it's within close enough range).
 var auto_target: bool = false

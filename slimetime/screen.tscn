@@ -155,11 +155,5 @@ Score: XXXX
 Press any key / click to restart"
 horizontal_alignment = 1
 
-[connection signal="body_entered" from="SpriteTileMapLayer/LadyBug" to="SpriteTileMapLayer/LadyBug" method="_on_body_entered"]
-[connection signal="body_entered" from="SpriteTileMapLayer/Beetle" to="SpriteTileMapLayer/Beetle" method="_on_body_entered"]
-[connection signal="body_entered" from="SpriteTileMapLayer/@RigidBody2D@47778" to="SpriteTileMapLayer/@RigidBody2D@47778" method="_on_body_entered"]
-[connection signal="body_entered" from="SpriteTileMapLayer/@RigidBody2D@47779" to="SpriteTileMapLayer/@RigidBody2D@47779" method="_on_body_entered"]
-[connection signal="body_entered" from="SpriteTileMapLayer/@RigidBody2D@47780" to="SpriteTileMapLayer/@RigidBody2D@47780" method="_on_body_entered"]
-[connection signal="body_entered" from="SpriteTileMapLayer/Bee" to="SpriteTileMapLayer/Bee" method="_on_body_entered"]
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
 [connection signal="quit" from="Overlay/PauseMenu" to="." method="restart"]

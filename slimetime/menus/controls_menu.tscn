@@ -46,61 +46,111 @@ layout_mode = 2
 theme_override_constants/separation = 5
 theme_override_styles/separator = SubResource("StyleBoxLine_5ajxi")
 
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+[node name="GridContainer_keyboard_controls" type="GridContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/h_separation = 48
 theme_override_constants/v_separation = 20
 columns = 2
 
-[node name="MovementLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+[node name="MovementLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Movement"
 
-[node name="MovementText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+[node name="MovementText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "W A S D or arrow keys, or 
-Hold mouse button / touch screen in direction of travel"
+theme_override_font_sizes/font_size = 36
+text = "W A S D or arrow keys"
 
-[node name="ShootSlimeLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+[node name="ShootSlimeLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Shoot slime"
 
-[node name="ShootSlimeText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+[node name="ShootSlimeText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Click / tap in target direction"
+theme_override_font_sizes/font_size = 36
+text = "Click in target direction"
 
-[node name="ShootSlimeText_autotarget" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+[node name="ShootSlimeText_autotarget" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 36
 text = "Space bar, or
-Click / tap on nearby bug"
+Click on nearby bug"
 
-[node name="JumpLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+[node name="JumpLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Jump"
 
-[node name="JumpText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+[node name="JumpText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Left-Ctrl key, or
-Double-click / double-tap on screen"
+theme_override_font_sizes/font_size = 36
+text = "Spacebar"
 
-[node name="PauseLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+[node name="PauseLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Pause"
 
-[node name="PauseText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
+[node name="PauseText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Escape key, or
-Pause button in top left corner of screen"
+theme_override_font_sizes/font_size = 36
+text = "Escape key"
+
+[node name="GridContainer_touchscreen" type="GridContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/h_separation = 48
+theme_override_constants/v_separation = 20
+columns = 2
+
+[node name="MovementLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Movement"
+
+[node name="MovementText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Press screen in direction of travel"
+
+[node name="ShootSlimeLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Shoot slime"
+
+[node name="ShootSlimeText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Tap in target direction"
+
+[node name="ShootSlimeText_autotarget" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Tap on nearby bug"
+
+[node name="JumpLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Jump"
+
+[node name="JumpText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Double-tap on screen"
+
+[node name="PauseLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Pause"
+
+[node name="PauseText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Pause button in top left corner"
 
 [node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
