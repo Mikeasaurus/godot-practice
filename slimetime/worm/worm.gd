@@ -1,6 +1,7 @@
 extends Node2D
 
 signal ate_bug
+signal hurt
 
 # Array to hold individual worm segments.
 var segments: Array[WormSegment] = []
@@ -26,6 +27,9 @@ func _ready() -> void:
 	# Note: When I tried to set this from within the declaration of "segments", the
 	# elements were all null.  Have to wait until runtime for these references to exist?
 	segments.append_array([$WormFront, $WormSegment3, $WormSegment2, $WormSegment1, $WormTail])
+	# Listen for damage taken by any of the segments.
+	for segment in segments:
+		segment.hurt.connect(_on_hurt)
 
 func _input(event: InputEvent) -> void:
 	if not _alive: return
@@ -316,3 +320,7 @@ func _on_worm_front_ate_bug() -> void:
 # detect a double-click / double-tap event.
 func _on_doubletap_timer_timeout() -> void:
 	_recent_click = false
+
+# This is called when a worm segment sends a signal saying it took damage.
+func _on_hurt() -> void:
+	hurt.emit()

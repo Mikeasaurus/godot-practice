@@ -7,6 +7,8 @@ func _ready() -> void:
 	# Connect the menu toggle key for pausing / unpausing the game.
 	MenuHandler.pause.connect(pause_game)
 	MenuHandler.done_submenus.connect(unpause_game)
+	# Connect worm damage signal directly to game over screen.
+	$Worm.hurt.connect(game_over)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -25,6 +27,7 @@ func _on_worm_ate_bug() -> void:
 
 # Trigger a game over screen.
 func game_over () -> void:
+	if is_game_over: return  # Game Over screen already initiated?
 	$Worm.explode()
 	$GameOverScreen/Label.text = "GAME OVER\nScore: %d\n\nPress any key / click to restart"%Globals.score
 	$GameOverScreen.visible = true

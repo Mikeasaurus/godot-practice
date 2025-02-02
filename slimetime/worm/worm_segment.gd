@@ -5,6 +5,9 @@ class_name WormSegment
 # Signal to indicate the segment has landed on a surface
 signal landed
 
+# Signal to indicate the segment just took some damage
+signal hurt
+
 # Remember contact direction of the last surface that was attached to.
 var last_surface_normal: Vector2
 # Remember a surface reference point (to help correct trajectory if starting to leave surface).
@@ -151,3 +154,6 @@ func release_from_surface () -> void:
 # Re-enables "sticking" to surfaces, for when worm lands from the jump.
 func _on_jump_timer_timeout() -> void:
 	sticky_feet = true
+
+func _on_damage_area_2d_body_entered(_body: Node2D) -> void:
+	hurt.emit()
