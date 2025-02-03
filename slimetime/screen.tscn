@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=15 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://buloqvk1emlul" path="res://bugs/fly.tscn" id="6_etxo6"]
 [ext_resource type="PackedScene" uid="uid://tohwherbpoe1" path="res://bugs/butterfly.tscn" id="7_uqsqx"]
 [ext_resource type="PackedScene" uid="uid://b4103dh1cjumw" path="res://menus/pause_menu.tscn" id="7_y7xe8"]
+[ext_resource type="Texture2D" uid="uid://b0ash4kuopfii" path="res://menus/pause.png" id="10_805ly"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
 texture = ExtResource("1_vx3mq")
@@ -150,6 +151,14 @@ horizontal_alignment = 2
 [node name="PauseMenu" parent="Overlay" instance=ExtResource("7_y7xe8")]
 process_mode = 2
 visible = false
+
+[node name="PauseButton" type="Button" parent="Overlay"]
+visible = false
+offset_right = 8.0
+offset_bottom = 8.0
+action_mode = 0
+icon = ExtResource("10_805ly")
+flat = true
 
 [node name="GameOverScreen" type="CanvasLayer" parent="."]
 visible = false
