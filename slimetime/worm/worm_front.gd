@@ -20,6 +20,7 @@ func flip_segment():
 	# Flip mouth position whenever head flips direction.
 	mouth_position.x *= -1
 	$Sprites/EatingArea/CollisionShape2D.position.x *= -1
+	$Sprites/HeadDamageArea2D/CollisionShape2D.position.x *= -1
 	# Flip the components.
 	$Sprites/Outline.flip_h = not $Sprites/Outline.flip_h
 	$Sprites/Body.flip_h = not $Sprites/Body.flip_h
