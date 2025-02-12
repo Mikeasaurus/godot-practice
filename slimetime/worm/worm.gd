@@ -1,6 +1,8 @@
 extends Node2D
 
+## Signal emitted when a bug has been eaten.  Allows things like score to be updated in parent scene.
 signal ate_bug
+## Signal emitted when damage is taken.  Parent scene could use this to update a health bar, or end the game.
 signal hurt
 
 # Array to hold individual worm segments.
@@ -188,12 +190,12 @@ func _physics_process(delta: float) -> void:
 				segment.release_from_surface()
 			# Limit the velocity (so things don't fly around the screen)
 			if vel > 2000.0: vel = 2000.0
-			segment.set_velocity_in_direction(to_other, vel)
+			segment.set_relative_velocity_in_direction(to_other, vel)
 
 		# If close enough to front segment, then turn off any further velocity
 		# in that particular direction.
 		if distance <= segment_spacing * 0.9:
-			segment.set_velocity_in_direction(to_other, 0.0)
+			segment.set_relative_velocity_in_direction(to_other, 0.0)
 
 	# Avoid moving in direction that would cause segments to jack-knife.
 	for i in range(2,len(segments)):
@@ -216,7 +218,7 @@ func _physics_process(delta: float) -> void:
 		# Check if segments are at a steep angle, and getting steeper.
 		if cosa > -0.5 and cosb > cosa:
 			# Turn off motion in that direction.
-			s1.set_velocity_in_direction(x3b-x1b,0)
+			s1.set_relative_velocity_in_direction(x3b-x1b,0)
 
 	# If disattached from a surface, but neighbouring segment(s) are attached,
 	# then apply an attachment force to this segment.
@@ -234,7 +236,7 @@ func _physics_process(delta: float) -> void:
 	# Keep segments from drifting away from surface.
 	for s in segments:
 		if s.on_surface and s.last_surface_reference != Vector2.ZERO:
-			s.set_velocity_in_direction(s.global_position-s.last_surface_reference,0.0)
+			s.set_relative_velocity_in_direction(s.global_position-s.last_surface_reference,0.0)
 
 	# Generate a force of motion in response to user input (front segment only)
 	# Determine direction to move in, based on direction specified by user.
@@ -268,7 +270,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		for i in range(len(segments)):
 			if segments[i].on_surface:
-				gd[i] -= segments[i].linear_velocity.normalized()
+				gd[i] -= (segments[i].relative_linear_velocity).normalized()
+				
 
 	# Do a jump
 	# Even though this is an "event" and may be more appropriately handled in _input,

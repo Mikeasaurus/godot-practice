@@ -18,6 +18,17 @@ var on_surface: bool
 # Indicates if the feet should "stick" strongly to a surface that it touches.
 var sticky_feet: bool
 
+# Optional - body to use as reference frame for maintaining velocity.
+# For example, a moving platform.
+var reference_body = null
+
+# Define a relative velocity based on reference body.
+var relative_linear_velocity: Vector2: get = get_relative_linear_velocity
+func get_relative_linear_velocity () -> Vector2:
+	if reference_body != null:
+		return linear_velocity - reference_body.linear_velocity
+	else:
+		return linear_velocity
 
 # Direction that the segment is pointing towards
 var facing_direction: Vector2
@@ -46,6 +57,8 @@ func _ready() -> void:
 	$Sprites/Animation/Frame1.show()
 	$Sprites/Animation/Frame2.hide()
 	$Sprites/Animation/Frame3.hide()
+	# Detect plaform touching
+	body_entered.connect(_on_body_entered)
 
 # Called when the worm's colour scheme needs to be updated.
 func refresh_colour_scheme () -> void:
@@ -120,26 +133,33 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		on_surface = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	# Check if moving, need to animate legs?
-	if on_surface and linear_velocity.length() > 10:
+	if on_surface and relative_linear_velocity.length() > 10:
 		$AnimationPlayer.play("walk")
 	else:
 		$AnimationPlayer.pause()
+	# Update surface reference?
+	# Should move with reference frame (e.g. platform).
+	# Otherwise, if the worm is almost landing on the moving platform (but front is not quite touching)
+	# then there's some piece of code that will make the front gravitate toward this reference point.
+	# If the reference point is not on the platform, then worm ends up stuck in mid-air.
+	if reference_body != null and last_surface_reference != null:
+		last_surface_reference += reference_body.linear_velocity * delta
 
 # Helper method - Set the velocity along the given direction.
 # Velocity in orthogonal direction is left untouched.
-func set_velocity_in_direction (direction: Vector2, vel: float) -> void:
+func set_relative_velocity_in_direction (direction: Vector2, vel: float) -> void:
 	# Normalized direction of effect
 	var v: Vector2 = direction.normalized()
 	# Target linear velocity
-	var lv: Vector2 = linear_velocity
+	var lv: Vector2 = relative_linear_velocity
 	# Strip out current velocity along that direction.
 	lv -= lv.dot(v) * v
 	# Add in desired velocity
 	lv += vel * v
 	# Adjust the velocity through an impulse.
-	apply_central_impulse(lv-linear_velocity)
+	apply_central_impulse(lv-relative_linear_velocity)
 
 # Helper function - release segment from a surface so it has time for reacting to
 # impulses or other forces (such as to initiate a jump).
@@ -147,6 +167,7 @@ func release_from_surface () -> void:
 	sticky_feet = false
 	on_surface = false
 	last_surface_reference = Vector2.ZERO
+	reference_body = null
 	# Re-enable a gravitational force
 	last_surface_normal = Vector2(0,1)
 	$JumpTimer.start()
@@ -157,3 +178,11 @@ func _on_jump_timer_timeout() -> void:
 
 func _on_damage_area_2d_body_entered(_body: Node2D) -> void:
 	hurt.emit()
+
+# If attaching to something (such as moving platform), then track with that thing's motion.
+func _on_body_entered(body: Node) -> void:
+	if sticky_feet:
+		if "linear_velocity" in body:
+			reference_body = body
+		else:
+			reference_body = null

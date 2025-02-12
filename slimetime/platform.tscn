@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://duh80b506tef8"]
+
+[ext_resource type="Script" path="res://platform.gd" id="1_50xxk"]
+[ext_resource type="Texture2D" uid="uid://bgqvdjueh23my" path="res://platform.png" id="2_1oed2"]
+
+[sub_resource type="Curve2D" id="Curve2D_xvd44"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_pr57c"]
+radius = 50.0
+height = 500.0
+
+[node name="Platform" type="Path2D"]
+modulate = Color(0.67451, 0.501961, 0, 1)
+curve = SubResource("Curve2D_xvd44")
+script = ExtResource("1_50xxk")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="."]
+rotates = false
+loop = false
+
+[node name="RigidBody2D" type="RigidBody2D" parent="PathFollow2D"]
+freeze = true
+freeze_mode = 1
+contact_monitor = true
+max_contacts_reported = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="PathFollow2D/RigidBody2D"]
+texture = ExtResource("2_1oed2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PathFollow2D/RigidBody2D"]
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_pr57c")
