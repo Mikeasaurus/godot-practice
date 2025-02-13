@@ -51,14 +51,3 @@ func _process(delta: float) -> void:
 			$AnimatedSprite2D.flip_h = true
 		else:
 			$AnimatedSprite2D.flip_h = false
-
-# Predict where the bug will be at the given time offset.
-# Helps with slime targeting.
-func predict_location (t: float) -> Vector2:
-	var x0: Vector2 = global_position
-	var v0: Vector2 = linear_velocity
-	var xc: Vector2 = starting_position
-	var a: Vector2 = Vector2(sqrt(springiness.x),sqrt(springiness.y))
-	var location_x: float = 1/a.x * sin(a.x*t) * v0.x + cos(a.x*t) * (x0.x-xc.x) + xc.x
-	var location_y: float = 1/a.y * sin(a.y*t) * v0.y + cos(a.y*t) * (x0.y-xc.y) + xc.y
-	return Vector2(location_x,location_y)

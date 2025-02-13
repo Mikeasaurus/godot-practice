@@ -72,13 +72,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Click in target direction"
 
-[node name="ShootSlimeText_autotarget" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Space bar, or
-Click on nearby bug"
-
 [node name="JumpLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
@@ -125,12 +118,6 @@ text = "Shoot slime"
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Tap in target direction"
-
-[node name="ShootSlimeText_autotarget" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Tap on nearby bug"
 
 [node name="JumpLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
 layout_mode = 2

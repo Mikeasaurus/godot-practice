@@ -5,14 +5,6 @@ func _ready() -> void:
 	if Globals.touchscreen_controls:
 		$MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls.hide()
 		$MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen.show()
-		if Globals.auto_target:
-			$MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen/ShootSlimeText.hide()
-			$MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen/ShootSlimeText_autotarget.show()
-	else:
-		# If auto-target is being used, display modified controls.
-		if Globals.auto_target:
-			$MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls/ShootSlimeText.hide()
-			$MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls/ShootSlimeText_autotarget.show()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
