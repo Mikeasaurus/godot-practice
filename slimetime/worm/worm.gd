@@ -246,14 +246,22 @@ func _physics_process(delta: float) -> void:
 			# If going in opposite direction to before, need to invert direction that we're facing.
 			if move_direction.dot(head.facing_direction) < 0:
 				head.facing_direction *= -1
-			gd[0] += head.facing_direction
+			# If less than top speed, then add a little oomf.
+			if head.relative_linear_velocity.dot(head.facing_direction.normalized()) < 400:
+				gd[0] += head.facing_direction.normalized()*5
+			else:
+				gd[0] += head.facing_direction.normalized()
 	# If no user-driven movement, then hit the brakes on momentum so the worm
 	# doesn't keep gliding forward.
 	else:
 		for i in range(len(segments)):
 			if segments[i].on_surface:
-				gd[i] -= (segments[i].relative_linear_velocity).normalized()
-				
+				# Add a little oomf to brakes if going fast.
+				if head.relative_linear_velocity.dot(head.facing_direction.normalized()) > 100:
+					gd[i] -= (segments[i].relative_linear_velocity).normalized()*5
+				# Otherwise, use normal braking force to avoid glitching out with too much counterforce.
+				else:
+					gd[i] -= (segments[i].relative_linear_velocity).normalized()
 
 	# Do a jump
 	# Even though this is an "event" and may be more appropriately handled in _input,
@@ -282,7 +290,7 @@ func _physics_process(delta: float) -> void:
 	
 	# Apply the force.
 	for i in range(len(segments)):
-		segments[i].apply_central_force(gd[i].normalized()*Globals.gravity)
+		segments[i].apply_central_force(gd[i]*Globals.gravity)
 		# Visual aid for centre of force, for debugging.
 		segments[i].get_node("GravityPoint").global_position = segments[i].global_position + gd[i]
 
