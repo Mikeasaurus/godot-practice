@@ -15,6 +15,12 @@ var segment_spacing: float = 30.0
 # For capturing jump events from _input, and handling them in _physics_process
 var _jump_triggered: bool = false
 
+# Remember movement key state, to maintain forward momentum when going around
+# corners.  E.g., if holding down right arrow key to move right, and worm then
+# turns a corner and up a wall, keep moving even though the proper key would now
+# be the "up" arrow.
+var _key_held: bool = false
+
 # For capturing double-clicks / double-taps when the built-in detection fails.
 # For instance, playing from iOS via the html5 interface doesn't seem to trigger
 # either double_click or double_tap events!  Very annoying.
@@ -231,6 +237,11 @@ func _physics_process(delta: float) -> void:
 		move_direction += Vector2(0,1)
 	if Input.is_action_pressed("move_up"):
 		move_direction += Vector2(0,-1)
+	# Quick hack for maintaining movement so long as a movement key is held down.
+	if move_direction == Vector2.ZERO:
+		_key_held = false
+	elif _key_held:
+		move_direction = segments[0].facing_direction
 	# Check for mouse / touchscreen input as well.
 	if Globals.touchscreen_controls and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		var click_pos: Vector2 = get_global_mouse_position()
@@ -243,6 +254,9 @@ func _physics_process(delta: float) -> void:
 	if move_direction != Vector2.ZERO:
 		var cos_angle: float = move_direction.normalized().dot(head.facing_direction)
 		if abs(cos_angle) >= 0.5 and head.on_surface:
+			# If moving, and not on touchscreen, then must be holding down a movement key?
+			if not Globals.touchscreen_controls:
+				_key_held = true
 			# If going in opposite direction to before, need to invert direction that we're facing.
 			if move_direction.dot(head.facing_direction) < 0:
 				head.facing_direction *= -1
