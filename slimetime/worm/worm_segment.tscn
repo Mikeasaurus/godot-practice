@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://b0rc5xm2pb8pk" path="res://worm/segment-body.png" id="6_iebpy"]
 [ext_resource type="Texture2D" uid="uid://bpn57cps3enrw" path="res://worm/segment-walk1-outline.png" id="6_n1dqk"]
 [ext_resource type="Texture2D" uid="uid://csxipffvdith0" path="res://worm/segment-top.png" id="7_uvbwv"]
-[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://effects/hit.png" id="8_c6u01"]
+[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://features/hit.png" id="8_c6u01"]
 [ext_resource type="Texture2D" uid="uid://qp7yiac75wlu" path="res://worm/segment-walk2-outline.png" id="8_fl8w0"]
 [ext_resource type="Texture2D" uid="uid://cp4qfmrnajif6" path="res://worm/segment-walk3-outline.png" id="10_xsyfv"]
 

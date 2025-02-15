@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://blls77duj641x" path="res://worm/tail-walk1.png" id="5_w4ufm"]
 [ext_resource type="Texture2D" uid="uid://du3tj8umvo4vo" path="res://worm/tail-walk1-outline.png" id="6_lq3kc"]
 [ext_resource type="Texture2D" uid="uid://tgpfeqvj6lv8" path="res://worm/tail-top.png" id="6_pw6xx"]
-[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://effects/hit.png" id="7_hw7jy"]
+[ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://features/hit.png" id="7_hw7jy"]
 [ext_resource type="Texture2D" uid="uid://c4dsadwsrp0qd" path="res://worm/tail-walk2.png" id="7_qgy4y"]
 [ext_resource type="Texture2D" uid="uid://c6pbtxd2rapfh" path="res://worm/tail-walk2-outline.png" id="8_jdxqr"]
 [ext_resource type="Texture2D" uid="uid://clepa24iv8d2a" path="res://worm/tail-walk3.png" id="9_xc0ei"]

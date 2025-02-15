@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://tohwherbpoe1" path="res://bugs/butterfly.tscn" id="7_uqsqx"]
 [ext_resource type="PackedScene" uid="uid://b4103dh1cjumw" path="res://menus/pause_menu.tscn" id="7_y7xe8"]
 [ext_resource type="Texture2D" uid="uid://b0ash4kuopfii" path="res://menus/pause.png" id="10_805ly"]
-[ext_resource type="PackedScene" uid="uid://duh80b506tef8" path="res://platform.tscn" id="11_5ahw7"]
+[ext_resource type="PackedScene" uid="uid://duh80b506tef8" path="res://features/platform.tscn" id="11_5ahw7"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
 texture = ExtResource("1_vx3mq")
