@@ -312,6 +312,9 @@ func _physics_process(delta: float) -> void:
 # Explode the worm.
 # (WHY???)
 func explode () -> void:
+	# Only explode if still alive... otherwise this could be called multiple times when
+	# each segment takes damage.
+	if not _alive: return
 	# Turn off all activity for the worm (slime shooting, walking, jumping, etc.)
 	_alive = false
 	# Detach the segments from any surface and add a random impulse to each segment.
