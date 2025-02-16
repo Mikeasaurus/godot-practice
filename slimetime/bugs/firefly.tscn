@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://b6wvdu21f1ewl"]
+
+[ext_resource type="PackedScene" uid="uid://d4kknx6p5slyq" path="res://bugs/flying_bug.tscn" id="1_gicft"]
+[ext_resource type="Texture2D" uid="uid://crpt6d3uj1tw" path="res://bugs/firefly1.png" id="2_rgn34"]
+[ext_resource type="Texture2D" uid="uid://dmc0hpllgwv0j" path="res://bugs/firefly2.png" id="3_hphi8"]
+[ext_resource type="Texture2D" uid="uid://c0kuk5e5j3yqs" path="res://bugs/firefly-slimed.png" id="4_rxcvx"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pribn"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_rgn34")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_hphi8")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_rxcvx")
+}],
+"loop": true,
+"name": &"slimed",
+"speed": 5.0
+}]
+
+[node name="Firefly" instance=ExtResource("1_gicft")]
+tilt_angle = -30.0
+
+[node name="AnimatedSprite2D" parent="." index="0"]
+sprite_frames = SubResource("SpriteFrames_pribn")

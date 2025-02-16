@@ -2,14 +2,17 @@ extends Bug
 
 class_name FlyingBug
 
-# How the bug turns when changing direction.
-# (either tilt in the direction, or flip entirely)
+## How the bug turns when changing direction.
+## (either tilt in the direction, or flip entirely)
 @export_enum("tilt","flip") var turn_style: String = "tilt"
 
-# Initial velocity of bug
+## Initial velocity of bug
 @export var starting_velocity: Vector2 = Vector2(200,0)
-# Springiness factor
+## Springiness factor
 @export var springiness: Vector2 = Vector2(1,1)
+
+## Amount to tilt in degrees (if using tilting motion)
+@export var tilt_angle: float = 60
 
 func _ready() -> void:
 	super()
@@ -38,9 +41,9 @@ func _process(delta: float) -> void:
 	if turn_style == "tilt":
 		var angle: float
 		if linear_velocity.x > 0:
-			angle = -60.0
+			angle = -tilt_angle
 		else:
-			angle = 60.0
+			angle = tilt_angle
 		# Smooth transition of angle near extremes of path.
 		if abs(linear_velocity.x) <= 20:
 			angle *= abs(linear_velocity.x)/20

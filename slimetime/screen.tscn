@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=19 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://buloqvk1emlul" path="res://bugs/fly.tscn" id="6_etxo6"]
 [ext_resource type="PackedScene" uid="uid://tohwherbpoe1" path="res://bugs/butterfly.tscn" id="7_uqsqx"]
 [ext_resource type="PackedScene" uid="uid://b4103dh1cjumw" path="res://menus/pause_menu.tscn" id="7_y7xe8"]
+[ext_resource type="PackedScene" uid="uid://b6wvdu21f1ewl" path="res://bugs/firefly.tscn" id="8_g1hl4"]
 [ext_resource type="Texture2D" uid="uid://b0ash4kuopfii" path="res://menus/pause.png" id="10_805ly"]
 [ext_resource type="PackedScene" uid="uid://duh80b506tef8" path="res://features/platform.tscn" id="11_5ahw7"]
 
@@ -148,6 +149,7 @@ scenes/2/scene = ExtResource("5_gp822")
 scenes/3/scene = ExtResource("6_d1ftp")
 scenes/4/scene = ExtResource("6_etxo6")
 scenes/5/scene = ExtResource("7_uqsqx")
+scenes/6/scene = ExtResource("8_g1hl4")
 
 [sub_resource type="TileSet" id="TileSet_kemkm"]
 tile_size = Vector2i(120, 120)
@@ -195,7 +197,7 @@ tile_set = SubResource("TileSet_6vxb5")
 
 [node name="SpriteTileMapLayer" type="TileMapLayer" parent="."]
 z_index = 10
-tile_map_data = PackedByteArray("AAD9/wIAAAAAAAAABAAEAAIAAAAAAAAABAADAPn/AAAAAAAAAQD///j/AAAAAAAAAQABAO7/AAAAAAAAAQAAAAAAAAAAAAAABAD6/+f/AAAAAAAABQACAOj/AAAAAAAAAgALAOv/AAAAAAAAAwD6/x0AAAAAAAAABAAXAPv/AAAAAAAABAAPAPj/AAAAAAAABAAGACAAAAAAAAAABAATACAAAAAAAAAABADi/x0AAAAAAAAABADi/xIAAAAAAAAABADk/w4AAAAAAAAABADl/+v/AAAAAAAAAgDy//r/AAAAAAAAAQDx/wAAAAAAAAAAAQD7/ygAAAAAAAAABAD3/ygAAAAAAAAAAQDy/ygAAAAAAAAAAQAHAC4AAAAAAAAABAD//zAAAAAAAAAAAQAQADAAAAAAAAAAAQALACcAAAAAAAAAAQATACcAAAAAAAAAAQDp/zMAAAAAAAAAAQD1/zMAAAAAAAAAAQDv/zMAAAAAAAAABAA=")
+tile_map_data = PackedByteArray("AAD9/wIAAAAAAAAABAAEAAIAAAAAAAAABAADAPn/AAAAAAAAAQD///j/AAAAAAAAAQABAO7/AAAAAAAAAQAAAAAAAAAAAAAABAD6/+f/AAAAAAAABQACAOj/AAAAAAAAAgALAOv/AAAAAAAAAwD6/x0AAAAAAAAABAAXAPv/AAAAAAAABAAPAPj/AAAAAAAABAAGACAAAAAAAAAABAATACAAAAAAAAAABADi/x0AAAAAAAAABADi/xIAAAAAAAAABADk/w4AAAAAAAAABADl/+v/AAAAAAAAAgDy//r/AAAAAAAAAQDx/wAAAAAAAAAAAQD7/ygAAAAAAAAABAD3/ygAAAAAAAAAAQDy/ygAAAAAAAAAAQAHAC4AAAAAAAAABgD//zAAAAAAAAAABgAQADAAAAAAAAAABgALACcAAAAAAAAABAATACcAAAAAAAAABADp/zIAAAAAAAAABgDv/zIAAAAAAAAABgD1/zIAAAAAAAAABgA=")
 tile_set = SubResource("TileSet_kemkm")
 
 [node name="Worm" parent="." instance=ExtResource("2_34v46")]
