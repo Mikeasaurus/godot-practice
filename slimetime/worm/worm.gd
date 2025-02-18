@@ -143,7 +143,7 @@ func _process(_delta: float) -> void:
 # The following code controls force of movement for the segments.
 func _physics_process(delta: float) -> void:
 	if not _alive:
-		# Only apply gravity force if not alive.
+		# Apply only gravity force if not alive.
 		for s in segments:
 			s.apply_central_force(Vector2(0,1)*Globals.gravity)
 		return
