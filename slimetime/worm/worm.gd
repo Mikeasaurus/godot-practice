@@ -152,7 +152,7 @@ func _physics_process(delta: float) -> void:
 	# Initialized with current attraction points, can be updated to include
 	# other forces further below.
 	var gd: Array[Vector2]
-	for s in segments: gd.append(s.last_surface_normal)
+	for s in segments: gd.append(Vector2.ZERO)
 
 	# Bring the segment to the correct distance to the front neighbour.
 	for i in range(1,len(segments)):
@@ -224,7 +224,10 @@ func _physics_process(delta: float) -> void:
 	# Keep segments from drifting away from surface.
 	for s in segments:
 		if s.on_surface and s.last_surface_reference != Vector2.ZERO:
-			s.set_relative_velocity_in_direction(s.global_position-s.last_surface_reference,0.0)
+			var towards_surface: Vector2 = s.last_surface_reference - s.global_position
+			# Only apply this if velocity is moving *away* from surface.  Towards is fine.
+			if towards_surface.dot(s.relative_linear_velocity) < 0:
+				s.set_relative_velocity_in_direction(-towards_surface,0.0)
 
 	# Generate a force of motion in response to user input (front segment only)
 	# Determine direction to move in, based on direction specified by user.
@@ -247,7 +250,7 @@ func _physics_process(delta: float) -> void:
 		var click_pos: Vector2 = get_global_mouse_position()
 		var worm_pos: Vector2 = segments[0].global_position
 		move_direction = (click_pos - worm_pos)
-	# Movement only applies to front segment (other segments follow passively)
+
 	var head: WormSegment = segments[0]
 	# Check if there's any user-driven movement, and if it's not orthogonal
 	# to surface.
@@ -261,21 +264,28 @@ func _physics_process(delta: float) -> void:
 			if move_direction.dot(head.facing_direction) < 0:
 				head.facing_direction *= -1
 			# If less than top speed, then add a little oomf.
+			var speedup: float = 1.0
 			if head.relative_linear_velocity.dot(head.facing_direction.normalized()) < 400:
-				gd[0] += head.facing_direction.normalized()*5
-			else:
-				gd[0] += head.facing_direction.normalized()
+				speedup = 5.0
+			# Apply the force to front segment and ones behind (if in same direction)
+			gd[0] += segments[0].facing_direction.normalized()*speedup
+			for i in range(1,len(segments)):
+				if segments[i].facing_direction.dot(segments[i-1].facing_direction) > 0 and \
+				   segments[i].facing_direction.dot(segments[i-1].global_position-segments[i].global_position) > 0:
+					gd[i] += segments[i].facing_direction.normalized()*speedup
+				else:
+					break
 	# If no user-driven movement, then hit the brakes on momentum so the worm
 	# doesn't keep gliding forward.
 	else:
+		# Add a little oomf to brakes if going fast.
+		var slowdown: float = 1.0
+		if head.relative_linear_velocity.dot(head.facing_direction.normalized()) > 100:
+			slowdown = 5.0
 		for i in range(len(segments)):
 			if segments[i].on_surface:
-				# Add a little oomf to brakes if going fast.
-				if head.relative_linear_velocity.dot(head.facing_direction.normalized()) > 100:
-					gd[i] -= (segments[i].relative_linear_velocity).normalized()*5
-				# Otherwise, use normal braking force to avoid glitching out with too much counterforce.
-				else:
-					gd[i] -= (segments[i].relative_linear_velocity).normalized()
+				var forward_motion: float = segments[i].relative_linear_velocity.normalized().dot(segments[i].facing_direction.normalized())
+				gd[i] -= segments[i].facing_direction.normalized()*forward_motion*slowdown
 
 	# Do a jump
 	# Even though this is an "event" and may be more appropriately handled in _input,
@@ -301,7 +311,10 @@ func _physics_process(delta: float) -> void:
 				# Turn worm around if on a steep surface (wall jumping).
 				if abs(s.facing_direction.x) <= 0.2:
 					s.feet_direction *= -1
-	
+	# If not jumping, then apply a force to keep the worm on the surface.
+	else:
+		for i in range(len(segments)):
+			gd[i] += segments[i].last_surface_normal
 	# Apply the force.
 	for i in range(len(segments)):
 		segments[i].apply_central_force(gd[i]*Globals.gravity)
