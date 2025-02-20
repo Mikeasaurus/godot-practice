@@ -11,6 +11,10 @@ func _process(_delta: float) -> void:
 func _on_new_game_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://screen.tscn")
 
+func _on_multiplayer_button_pressed() -> void:
+	$MarginContainer.hide()
+	MenuHandler.activate_menu($MultiplayerMenu)
+
 func _on_options_button_pressed() -> void:
 	$MarginContainer.hide()
 	MenuHandler.activate_menu($OptionsMenu)

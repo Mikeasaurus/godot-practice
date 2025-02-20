@@ -60,7 +60,18 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	pass
 
+# Multiplayer information.
+var server = null
+var client = null
+var is_multiplayer: bool = false
 
 # Reset global variables (when game restarts).
 func reset () -> void:
 	score = 0
+	if server != null:
+		server.close()
+	server = null
+	if client != null:
+		client.close()
+	client = null
+	is_multiplayer = false
