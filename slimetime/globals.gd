@@ -62,6 +62,7 @@ func _process(_delta: float) -> void:
 
 # Multiplayer information.
 var invite: String
+var handle: String
 
 # Reset global variables (when game restarts).
 func reset () -> void:

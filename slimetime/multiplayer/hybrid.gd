@@ -21,6 +21,4 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	if $ClientScreen.multiplayer.multiplayer_peer.get_connection_status() == 2:
-		$ClientScreen.say_hello.rpc_id(1)
 	pass

@@ -28,6 +28,7 @@ func _on_connect_button_pressed() -> void:
 		return
 	# Store connection info.
 	Globals.invite = _check_code(invite)
+	Globals.handle = handle
 	# Clear this menu off the stack.
 	MenuHandler.deactivate_menu()
 	# Start the main game screen, which should detect the client / server info above (held in global state).

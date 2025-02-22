@@ -35,6 +35,10 @@ func deactivate_menu () -> void:
 		done_submenus.emit()
 	menu.hide()
 
+# Called before scene is changed, to avoid holding onto invalid references.
+func clear_menus () -> void:
+	menu_stack = []
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Need to always be able to listen for escape key.
