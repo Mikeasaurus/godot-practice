@@ -17,18 +17,17 @@ func _on_back_button_pressed() -> void:
 
 func _on_connect_button_pressed() -> void:
 	var stderr: Label = $MarginContainer/CenterContainer/VBoxContainer/ErrorLabel
-	var code: String = $MarginContainer/CenterContainer/VBoxContainer/GridContainer/InviteCodeLineEdit.text
+	var invite: String = $MarginContainer/CenterContainer/VBoxContainer/GridContainer/InviteCodeLineEdit.text
 	var handle: String = $MarginContainer/CenterContainer/VBoxContainer/GridContainer/DisplayNameLineEdit.text
 	stderr.text = ""
-	if len(code) == 0:
+	if len(invite) == 0:
 		stderr.text = "Please enter an invite code"
 		return
 	if len(handle) == 0:
 		stderr.text = "Please enter a display name"
 		return
-	# Set up server and client together, for testing purposes.
-	_create_server()
-	_create_client(code)
+	# Store connection info.
+	Globals.invite = _check_code(invite)
 	# Clear this menu off the stack.
 	MenuHandler.deactivate_menu()
 	# Start the main game screen, which should detect the client / server info above (held in global state).
@@ -44,7 +43,6 @@ func _check_code (code: String) -> String:
 	var s: String = str(n%256)
 	for i in range(3):
 		n >>= 8
-		s += '.'
 		s = str(n%256) + '.' + s
 	return s
 

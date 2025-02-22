@@ -16,13 +16,11 @@ func _ready() -> void:
 	# Also disable the worm's camera
 	$ServerScreen/Worm/WormFront/Sprites/Camera2D.enabled = false
 	# Set up multiplayer stuff.
-	$ServerScreen.multiplayer.multiplayer_peer = Globals.server
-	$ClientScreen.multiplayer.multiplayer_peer = Globals.client
-	# test
-	print ($ServerScreen.multiplayer.multiplayer_peer.get_connection_status())
-	#$Server.send_message.rpc("test")	pass # Replace with function body.
-
+	$ServerScreen._make_server()
+	$ClientScreen._make_client(Globals.invite)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
+	if $ClientScreen.multiplayer.multiplayer_peer.get_connection_status() == 2:
+		$ClientScreen.say_hello.rpc_id(1)
 	pass

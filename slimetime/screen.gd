@@ -13,6 +13,19 @@ func _ready() -> void:
 	# Connect worm damage signal directly to game over screen.
 	$Worm.hurt.connect(game_over)
 
+# Make this screen a server process, listening for incoming connections.
+func _make_server () -> void:
+	multiplayer.multiplayer_peer = null
+	var peer := WebSocketMultiplayerPeer.new()
+	peer.create_server(1156)
+	multiplayer.multiplayer_peer = peer
+# Make this screen a client process, and connect to the specified server.
+func _make_client (server) -> void:
+	multiplayer.multiplayer_peer = null
+	var peer := WebSocketMultiplayerPeer.new()
+	peer.create_client("ws://"+server+":1156")
+	multiplayer.multiplayer_peer = peer
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	pass
@@ -61,3 +74,7 @@ func pause_game () -> void:
 
 func unpause_game () -> void:
 	get_tree().paused = false
+
+@rpc("any_peer","call_local")
+func say_hello () -> void:
+	print (multiplayer.get_unique_id(), ": ", multiplayer.get_remote_sender_id(), " says hi.")
