@@ -156,8 +156,8 @@ func _peer_worm_update (worm_info) -> void:
 	var id: int = multiplayer.get_remote_sender_id()
 	if id not in peer_worms:
 		var worm: Worm = PeerWormFactory.instantiate()
-		worm.passive()
 		$Peers.add_child(worm)
+		worm.passive()
 		worm.z_index = $Worm.z_index
 		peer_worms[id] = worm
 	peer_worms[id].deserialize(worm_info)

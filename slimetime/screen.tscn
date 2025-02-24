@@ -205,7 +205,7 @@ z_index = 5
 position = Vector2(8, 316)
 
 [node name="TransmitTimer" type="Timer" parent="."]
-wait_time = 0.2
+wait_time = 0.1
 
 [node name="Peers" type="Node2D" parent="."]
 
