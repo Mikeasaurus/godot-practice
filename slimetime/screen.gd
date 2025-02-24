@@ -155,9 +155,11 @@ func _send_worm_info () -> void:
 func _peer_worm_update (worm_info) -> void:
 	var id: int = multiplayer.get_remote_sender_id()
 	if id not in peer_worms:
-		peer_worms[id] = PeerWormFactory.instantiate()
-		peer_worms[id].passive()
-		$Peers.add_child(peer_worms[id])
+		var worm: Worm = PeerWormFactory.instantiate()
+		worm.passive()
+		$Peers.add_child(worm)
+		worm.z_index = $Worm.z_index
+		peer_worms[id] = worm
 	peer_worms[id].deserialize(worm_info)
 # Clean up when a peer leaves the game.
 @rpc("reliable")

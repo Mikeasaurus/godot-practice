@@ -50,18 +50,26 @@ func _ready() -> void:
 	super()
 
 # Called when the worm's colour scheme needs to be updated.
-func refresh_colour_scheme () -> void:
-	$Sprites/Body.modulate = Globals.worm_body_colour
-	$Sprites/Top.modulate = Globals.worm_back_colour
-	$Sprites/Belly.modulate = Globals.worm_front_colour
-	$Sprites/AppendageOutline.modulate = Globals.worm_outline_colour
-	$Sprites/Eyes.modulate = Globals.worm_outline_colour
-	$Sprites/Mouth.modulate = Globals.worm_body_colour
-	$Sprites/Outline.modulate = Globals.worm_outline_colour
+func refresh_colour_scheme (body = null, back = null, front = null, outline = null) -> void:
+	if body == null:
+		body = Globals.worm_body_colour
+	if back == null:
+		back = Globals.worm_back_colour
+	if front == null:
+		front = Globals.worm_front_colour
+	if outline == null:
+		outline = Globals.worm_outline_colour
+	$Sprites/Body.modulate = body
+	$Sprites/Top.modulate = back
+	$Sprites/Belly.modulate = front
+	$Sprites/AppendageOutline.modulate = outline
+	$Sprites/Eyes.modulate = outline
+	$Sprites/Mouth.modulate = outline
+	$Sprites/Outline.modulate = outline
 	for frame in $Sprites/Animation.get_children():
-		frame.get_node("Foreleg").modulate = Globals.worm_body_colour
-		frame.get_node("Backleg").modulate = Globals.worm_front_colour
-		frame.get_node("Outlines").modulate = Globals.worm_outline_colour
+		frame.get_node("Foreleg").modulate = body
+		frame.get_node("Backleg").modulate = front
+		frame.get_node("Outlines").modulate = outline
 
 func shoot_slime (t = null) -> void:
 		# Where the slime originates from (based on position of worm's mouth).
@@ -115,3 +123,14 @@ func _on_eating_area_body_entered(body: Node2D) -> void:
 
 func _on_landed() -> void:
 	$GroundSound.play()
+
+
+# Make the worm segment passive.
+# E.g., not listening for colour changes to player worm, not taking damage, not eating.
+func passive() -> void:
+	Globals.worm_colour_updated.disconnect(refresh_colour_scheme)
+	$DamageArea2D.collision_mask = 0
+	_passive = true
+	$Sprites/HeadDamageArea2D.collision_mask = 0
+	$Sprites/EatingArea.collision_mask = 0
+	$Sprites/Camera2D.enabled = false

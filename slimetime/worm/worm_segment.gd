@@ -22,6 +22,9 @@ var sticky_feet: bool
 # For example, a moving platform.
 var reference_body = null
 
+# Whether to turn off usual collision info stuff and let worm be controlled externally.
+var _passive: bool = false
+
 # Define a relative velocity based on reference body.
 var relative_linear_velocity: Vector2: get = get_relative_linear_velocity
 func get_relative_linear_velocity () -> Vector2:
@@ -61,13 +64,21 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 
 # Called when the worm's colour scheme needs to be updated.
-func refresh_colour_scheme () -> void:
-	$Sprites/Body.modulate = Globals.worm_body_colour
-	$Sprites/Top.modulate = Globals.worm_back_colour
-	$Sprites/Outline.modulate = Globals.worm_outline_colour
+func refresh_colour_scheme (body = null, back = null, front = null, outline = null) -> void:
+	if body == null:
+		body = Globals.worm_body_colour
+	if back == null:
+		back = Globals.worm_back_colour
+	if front == null:
+		front = Globals.worm_front_colour
+	if outline == null:
+		outline = Globals.worm_outline_colour
+	$Sprites/Body.modulate = body
+	$Sprites/Top.modulate = back
+	$Sprites/Outline.modulate = outline
 	for frame in $Sprites/Animation.get_children():
-		frame.get_node("Foreleg").modulate = Globals.worm_body_colour
-		frame.get_node("Outlines").modulate = Globals.worm_outline_colour
+		frame.get_node("Foreleg").modulate = body
+		frame.get_node("Outlines").modulate = outline
 
 
 # Helper method - flip the segment in the opposite direction.
@@ -112,6 +123,7 @@ func update_sprite() -> void:
 # Get normal to any surface that's contacted, align direction vectors accordingly.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if not sticky_feet: return
+	if _passive: return
 	var n = state.get_contact_count()
 	if n > 0:
 		# Sum up all contact normals.
@@ -193,8 +205,19 @@ func serialize() -> Array:
 
 # Update the segment with information from a serialized array.
 # For displaying peer worms.
+# Slightly different from serialize, in that we also receive colour info.
 func deserialize(segment_info: Array) -> void:
-	global_position = segment_info[0]
-	linear_velocity = segment_info[1]
-	facing_direction = segment_info[2]
-	feet_direction = segment_info[3]
+	var colours: Array = segment_info[0]
+	refresh_colour_scheme(colours[0],colours[1],colours[2],colours[3])
+	global_position = segment_info[1]
+	linear_velocity = segment_info[2]
+	facing_direction = segment_info[3]
+	feet_direction = segment_info[4]
+	update_sprite()
+
+# Make the worm segment passive.
+# E.g., not listening for colour changes to player worm, not taking damage.
+func passive() -> void:
+	Globals.worm_colour_updated.disconnect(refresh_colour_scheme)
+	$DamageArea2D.collision_mask = 0
+	_passive = true

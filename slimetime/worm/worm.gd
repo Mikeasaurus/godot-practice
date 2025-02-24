@@ -27,8 +27,12 @@ var _key_held: bool = false
 # either double_click or double_tap events!  Very annoying.
 var _recent_click: bool = false
 
-# Whether worm is alive or not.
-var _alive: bool = true
+# Whether to keep worm segments together, or let them roll around independently.
+var _coherent: bool = true
+# Whether to listen for keyboard controls.
+var _controllable: bool = true
+# Whether worm is locally managed.
+var _local: bool = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -41,7 +45,7 @@ func _ready() -> void:
 		segment.hurt.connect(_on_hurt)
 
 func _input(event: InputEvent) -> void:
-	if not _alive: return
+	if not _controllable: return
 	# Mouse / touch event
 	if event is InputEventMouseButton and event.pressed:
 		# This is a fallback for when automatic detection of double-click / double-tap fails.
@@ -71,7 +75,7 @@ func _input(event: InputEvent) -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	if not _alive: return
+	if not _coherent: return
 	# Modify rotation / flip of the segments
 
 	# Adjust the rotation of the segments so they're aligned w.r.t. to segment
@@ -143,7 +147,8 @@ func _process(_delta: float) -> void:
 
 # The following code controls force of movement for the segments.
 func _physics_process(delta: float) -> void:
-	if not _alive:
+	if not _local: return
+	if not _coherent:
 		# Apply only gravity force if not alive.
 		for s in segments:
 			s.apply_central_force(Vector2(0,1)*Globals.gravity)
@@ -328,9 +333,10 @@ func _physics_process(delta: float) -> void:
 func explode () -> void:
 	# Only explode if still alive... otherwise this could be called multiple times when
 	# each segment takes damage.
-	if not _alive: return
+	if not _coherent: return
 	# Turn off all activity for the worm (slime shooting, walking, jumping, etc.)
-	_alive = false
+	_coherent = false
+	_controllable = false
 	# Detach the segments from any surface and add a random impulse to each segment.
 	for s in segments:
 		s.release_from_surface()
@@ -363,18 +369,13 @@ func serialize() -> Array:
 func deserialize (worm_info: Array) -> void:
 	segments[0].get_node("Sprites/NameLabel").text = worm_info[0]
 	var colours: Array = worm_info[1]
-	Globals.worm_body_colour = colours[0]
-	Globals.worm_back_colour = colours[1]
-	Globals.worm_front_colour = colours[2]
-	Globals.worm_outline_colour = colours[3]
 	var segment_info: Array = worm_info[2]
 	for i in range(len(segment_info)):
-		segments[i].deserialize(segment_info[i])
+		segments[i].deserialize([colours]+segment_info[i])
 
 # Make worm passive background entity (no key capture, no camera focus, no eating or damage taking).
 func passive () -> void:
-	_alive = false
-	$WormFront/Sprites/Camera2D.enabled = false
-	$WormFront/Sprites/EatingArea.collision_mask = 0
-	$WormFront/DamageArea2D.collision_mask = 0
-	$WormFront/Sprites/HeadDamageArea2D.collision_mask = 0
+	_controllable = false
+	_local = false
+	for segment in segments:
+		segment.passive()
