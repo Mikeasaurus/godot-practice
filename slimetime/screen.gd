@@ -2,6 +2,10 @@ extends Node2D
 
 var is_game_over: bool = false
 
+# Keep track of peer worms (if in multiplayer game)
+var PeerWormFactory := preload("res://worm/worm.tscn")
+var peer_worms := {}
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Connect the menu toggle key for pausing / unpausing the game.
@@ -29,6 +33,12 @@ func _make_client (server) -> void:
 	var peer := WebSocketMultiplayerPeer.new()
 	peer.create_client("ws://"+server+":1156")
 	multiplayer.multiplayer_peer = peer
+	# Set up name label for worm (but make invisible so it's not displayed lcoally).
+	$Worm/WormFront/Sprites/NameLabel.text = Globals.handle
+	$Worm/WormFront/Sprites/NameLabel.hide()
+	# Transmit worm info at a regular interval to the server, so other peers can see current location.
+	$TransmitTimer.timeout.connect(_send_worm_info)
+	$TransmitTimer.start()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -105,6 +115,7 @@ func _on_client_connected (id) -> void:
 func _on_client_disconnected (id) -> void:
 	_log.rpc("%s has left the server."%players[id][0])
 	players.erase(id)
+	_remove_peer_worm.rpc(id)
 # Give new client all info needed to get started.
 @rpc("reliable")
 func _startup_package (chat_history):
@@ -137,3 +148,19 @@ func _send_chat (msg: String) -> void:
 	var sender := multiplayer.get_remote_sender_id()
 	# Encode bubble position, sender info.
 	chat.append([players[sender],msg])
+# Send worm info to others.
+func _send_worm_info () -> void:
+	_peer_worm_update.rpc($Worm.serialize())
+@rpc("any_peer")
+func _peer_worm_update (worm_info) -> void:
+	var id: int = multiplayer.get_remote_sender_id()
+	if id not in peer_worms:
+		peer_worms[id] = PeerWormFactory.instantiate()
+		peer_worms[id].passive()
+		$Peers.add_child(peer_worms[id])
+	peer_worms[id].deserialize(worm_info)
+# Clean up when a peer leaves the game.
+@rpc("reliable")
+func _remove_peer_worm (id) -> void:
+	peer_worms[id].queue_free()
+	peer_worms.erase(id)

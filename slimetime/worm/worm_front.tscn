@@ -141,6 +141,16 @@ libraries = {
 
 [node name="Sprites" type="Node2D" parent="."]
 
+[node name="NameLabel" type="Label" parent="Sprites"]
+offset_left = -93.0
+offset_top = -185.0
+offset_right = 95.0
+offset_bottom = -157.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
 [node name="HeadDamageArea2D" type="Area2D" parent="Sprites"]
 collision_layer = 0
 collision_mask = 8

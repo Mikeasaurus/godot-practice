@@ -13,9 +13,8 @@ func _process(_delta: float) -> void:
 
 func _on_back_button_pressed() -> void:
 	MenuHandler.deactivate_menu()
-
-
-func _on_connect_button_pressed() -> void:
+	
+func _store_connection_info() -> void:
 	var stderr: Label = $MarginContainer/CenterContainer/VBoxContainer/ErrorLabel
 	var invite: String = $MarginContainer/CenterContainer/VBoxContainer/GridContainer/InviteCodeLineEdit.text
 	var handle: String = $MarginContainer/CenterContainer/VBoxContainer/GridContainer/DisplayNameLineEdit.text
@@ -32,7 +31,14 @@ func _on_connect_button_pressed() -> void:
 	# Clear this menu off the stack.
 	MenuHandler.deactivate_menu()
 	# Start the main game screen, which should detect the client / server info above (held in global state).
+func _on_connect_button_pressed() -> void:
+	_store_connection_info()
+	get_tree().change_scene_to_file("res://multiplayer/client.tscn")
+func _on_hybrid_button_pressed() -> void:
+	_store_connection_info()
 	get_tree().change_scene_to_file("res://multiplayer/hybrid.tscn")
+
+
 func _check_code (code: String) -> String:
 	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	code = code.to_upper()

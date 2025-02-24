@@ -204,6 +204,11 @@ tile_set = SubResource("TileSet_kemkm")
 z_index = 5
 position = Vector2(8, 316)
 
+[node name="TransmitTimer" type="Timer" parent="."]
+wait_time = 0.2
+
+[node name="Peers" type="Node2D" parent="."]
+
 [node name="Overlay" type="CanvasLayer" parent="."]
 
 [node name="Score" type="Label" parent="Overlay"]

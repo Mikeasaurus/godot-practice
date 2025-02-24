@@ -186,3 +186,15 @@ func _on_body_entered(body: Node) -> void:
 			reference_body = body
 		else:
 			reference_body = null
+
+# Serialize the segment, so it can be passed to other peers in a multiplayer game.
+func serialize() -> Array:
+	return [global_position, linear_velocity, facing_direction, feet_direction]
+
+# Update the segment with information from a serialized array.
+# For displaying peer worms.
+func deserialize(segment_info: Array) -> void:
+	global_position = segment_info[0]
+	linear_velocity = segment_info[1]
+	facing_direction = segment_info[2]
+	feet_direction = segment_info[3]

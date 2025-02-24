@@ -1,4 +1,5 @@
 extends Node2D
+class_name Worm
 
 ## Signal emitted when a bug has been eaten.  Allows things like score to be updated in parent scene.
 signal ate_bug
@@ -347,3 +348,33 @@ func _on_doubletap_timer_timeout() -> void:
 # This is called when a worm segment sends a signal saying it took damage.
 func _on_hurt() -> void:
 	hurt.emit()
+
+# Serialize the worm info, for passing to peers in multiplayer sessions.
+func serialize() -> Array:
+	var handle: String = segments[0].get_node("Sprites/NameLabel").text
+	var colours: Array = [Globals.worm_body_colour, Globals.worm_back_colour, Globals.worm_front_colour, Globals.worm_outline_colour]
+	var segment_info: Array = []
+	for segment in segments:
+		segment_info.append(segment.serialize())
+	return [handle, colours, segment_info]
+
+# Update the worm from the given serialized information.
+# (for displaying peer worms in multiplayer games).
+func deserialize (worm_info: Array) -> void:
+	segments[0].get_node("Sprites/NameLabel").text = worm_info[0]
+	var colours: Array = worm_info[1]
+	Globals.worm_body_colour = colours[0]
+	Globals.worm_back_colour = colours[1]
+	Globals.worm_front_colour = colours[2]
+	Globals.worm_outline_colour = colours[3]
+	var segment_info: Array = worm_info[2]
+	for i in range(len(segment_info)):
+		segments[i].deserialize(segment_info[i])
+
+# Make worm passive background entity (no key capture, no camera focus, no eating or damage taking).
+func passive () -> void:
+	_alive = false
+	$WormFront/Sprites/Camera2D.enabled = false
+	$WormFront/Sprites/EatingArea.collision_mask = 0
+	$WormFront/DamageArea2D.collision_mask = 0
+	$WormFront/Sprites/HeadDamageArea2D.collision_mask = 0
