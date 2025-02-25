@@ -209,11 +209,15 @@ func serialize() -> Array:
 func deserialize(segment_info: Array) -> void:
 	var colours: Array = segment_info[0]
 	refresh_colour_scheme(colours[0],colours[1],colours[2],colours[3])
-	global_position = segment_info[1]
-	linear_velocity = segment_info[2]
+	# Stabilize worm by cutting off small changes?
+	if (global_position-segment_info[1]).length() > 10:
+		global_position = segment_info[1]
+	if segment_info[2].length() > 10:
+		linear_velocity = segment_info[2]
+	else:
+		linear_velocity = Vector2.ZERO
 	facing_direction = segment_info[3]
 	feet_direction = segment_info[4]
-	update_sprite()
 
 # Make the worm segment passive.
 # E.g., not listening for colour changes to player worm, not taking damage.
