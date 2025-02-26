@@ -64,7 +64,7 @@ func refresh_colour_scheme (body = null, back = null, front = null, outline = nu
 	$Sprites/Belly.modulate = front
 	$Sprites/AppendageOutline.modulate = outline
 	$Sprites/Eyes.modulate = outline
-	$Sprites/Mouth.modulate = outline
+	$Sprites/Mouth.modulate = body
 	$Sprites/Outline.modulate = outline
 	for frame in $Sprites/Animation.get_children():
 		frame.get_node("Foreleg").modulate = body
