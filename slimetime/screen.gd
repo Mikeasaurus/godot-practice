@@ -26,7 +26,11 @@ func _make_server () -> void:
 	var peer := WebSocketMultiplayerPeer.new()
 	peer.create_server(1156)
 	multiplayer.multiplayer_peer = peer
-# Make this screen a client process, and connect to the specified server.
+	# Don't trigger menus on server process.
+	MenuHandler.pause.disconnect(pause_game)
+	# Disable worm on server side (not needed, and don't want to process keyboard controls in here).
+	$Worm.passive()
+ # Make this screen a client process, and connect to the specified server.
 func _make_client (server) -> void:
 	multiplayer.multiplayer_peer = null
 	multiplayer.connected_to_server.connect(_on_connected_to_server)

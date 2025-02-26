@@ -11,8 +11,6 @@ func _exit_tree() -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# Disable worm on server side (not needed, and don't want to process keyboard controls in here).
-	$ServerScreen/Worm.passive()
 	# Set up multiplayer stuff.
 	$ServerScreen._make_server()
 	$ClientScreen._make_client(Globals.invite)
