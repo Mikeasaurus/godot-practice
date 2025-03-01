@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://duh80b506tef8"]
+[gd_scene load_steps=6 format=3 uid="uid://duh80b506tef8"]
 
 [ext_resource type="Script" path="res://features/platform.gd" id="1_50xxk"]
 [ext_resource type="Texture2D" uid="uid://bgqvdjueh23my" path="res://features/platform.png" id="2_1oed2"]
@@ -8,6 +8,11 @@
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_pr57c"]
 radius = 50.0
 height = 500.0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ldsvj"]
+properties/0/path = NodePath("PathFollow2D:progress")
+properties/0/spawn = true
+properties/0/replication_mode = 1
 
 [node name="Platform" type="Path2D"]
 modulate = Color(0.67451, 0.501961, 0, 1)
@@ -30,3 +35,6 @@ texture = ExtResource("2_1oed2")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PathFollow2D/RigidBody2D"]
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_pr57c")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_ldsvj")
