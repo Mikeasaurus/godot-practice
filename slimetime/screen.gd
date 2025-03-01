@@ -57,6 +57,12 @@ func _make_client () -> void:
 	# Transmit worm info at a regular interval to the server, so other peers can see current location.
 	$TransmitTimer.timeout.connect(_send_worm_info)
 	$TransmitTimer.start()
+	# Briefly pause then unpause the scene, which fixes a visual glitch with MultiplayerSynchronizer
+	# and the bug scenes from the sprite TileMapLayer.
+	# I don't know why this is needed, but it works, so... :GVHreedshrug:
+	get_tree().paused = true
+	await get_tree().create_timer(0.1).timeout
+	get_tree().paused = false
 func _check_invite (invite: String) -> String:
 	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	invite = invite.to_upper()
