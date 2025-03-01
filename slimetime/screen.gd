@@ -16,7 +16,11 @@ func _ready() -> void:
 		$Overlay/PauseButton.pressed.connect(pause_game)
 	# Connect worm damage signal directly to game over screen.
 	$Worm.hurt.connect(game_over)
-	$Overlay/LogTimer.timeout.connect(_next_log)
+	# If multiplayer mode, set up client or server instance (whichever is needed).
+	if Globals.is_client:
+		_make_client()
+	elif Globals.is_server:
+		_make_server()
 
 # Make this screen a server process, listening for incoming connections.
 func _make_server () -> void:
@@ -29,20 +33,35 @@ func _make_server () -> void:
 	# Don't trigger menus on server process.
 	MenuHandler.pause.disconnect(pause_game)
 	# Disable worm on server side (not needed, and don't want to process keyboard controls in here).
-	$Worm.passive()
+	$Worm.queue_free()
  # Make this screen a client process, and connect to the specified server.
-func _make_client (server) -> void:
+func _make_client () -> void:
 	multiplayer.multiplayer_peer = null
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	var peer := WebSocketMultiplayerPeer.new()
-	peer.create_client("ws://"+server+":1156")
+	peer.create_client("ws://"+_check_invite(Globals.invite)+":1156")
 	multiplayer.multiplayer_peer = peer
+	# Start displaying log messages from the server, rate limited.
+	$Overlay/LogTimer.timeout.connect(_next_log)
 	# Set up name label for worm (but make invisible so it's not displayed lcoally).
 	$Worm/WormFront/Sprites/NameLabel.text = Globals.handle
 	$Worm/WormFront/Sprites/NameLabel.hide()
 	# Transmit worm info at a regular interval to the server, so other peers can see current location.
 	$TransmitTimer.timeout.connect(_send_worm_info)
 	$TransmitTimer.start()
+func _check_invite (invite: String) -> String:
+	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	invite = invite.to_upper()
+	var n: int = 0
+	for i in range(len(invite)):
+		n = n * 36 + table.find(invite[i])
+	n = (n*1000000) % (36**8-19)
+	if (n >= 2**32): return ''
+	var s: String = str(n%256)
+	for i in range(3):
+		n >>= 8
+		s = str(n%256) + '.' + s
+	return s
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -162,7 +181,7 @@ func _peer_worm_update (worm_info) -> void:
 		var worm: Worm = PeerWormFactory.instantiate()
 		$Peers.add_child(worm)
 		worm.passive()
-		worm.z_index = $Worm.z_index
+		worm.z_index = 5  # Put far enough in front so it's visible.
 		peer_worms[id] = worm
 	peer_worms[id].deserialize(worm_info)
 # Clean up when a peer leaves the game.

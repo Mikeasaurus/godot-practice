@@ -105,11 +105,11 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 48
 text = "Connect"
 
-[node name="HybridButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="ServerButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 48
-text = "Hybrid"
+text = "Create Server"
 
 [node name="ErrorLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -118,4 +118,4 @@ theme_override_font_sizes/font_size = 36
 
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ConnectButton" to="." method="_on_connect_button_pressed"]
-[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/HybridButton" to="." method="_on_hybrid_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ServerButton" to="." method="_on_server_button_pressed"]
