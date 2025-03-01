@@ -69,3 +69,5 @@ var handle: String = ""
 # Reset global variables (when game restarts).
 func reset () -> void:
 	score = 0
+	is_client = false
+	is_server = false

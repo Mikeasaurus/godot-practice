@@ -101,6 +101,9 @@ func restart () -> void:
 	get_tree().paused = false  # Unpause the game.
 	Globals.reset()  # Reset global state (score, etc.)
 	MenuHandler.clear_menus()
+	# Disconnect from server.
+	multiplayer.multiplayer_peer.close()
+	# Go back to main menu.
 	get_tree().change_scene_to_file("res://menus/main_menu.tscn")
 
 # Bring up pause menu.
