@@ -21,6 +21,7 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	super(delta)
+	if is_eaten: return
 	if is_slimed: return
 	# Move the beetle
 	var dx: Vector2 = global_position - starting_position
