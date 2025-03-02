@@ -42,15 +42,13 @@ func _make_server () -> void:
 func _make_client () -> void:
 	multiplayer.multiplayer_peer = null
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	multiplayer.connection_failed.connect(_on_connection_failed)
 	var peer := WebSocketMultiplayerPeer.new()
 	peer.create_client("ws://"+_check_invite(Globals.invite)+":1156")
 	multiplayer.multiplayer_peer = peer
-	# Start displaying log messages from the server, rate limited.
-	$Overlay/LogTimer.timeout.connect(_next_log)
-	# Remove the local worm on client side, and instead spawn one in the "Worms" node.
-	# The "Worms" path is managed by MultiplayerSpawner so it should automatically get spawned on all
-	# peers as well.
-	$Worm.queue_free()
+	$Overlay/LogLabel.text = "Attempting to connect..."
+	# The rest of the setup will be done in _on_connected_to_server, once the
+	# connection is established.
 func _check_invite (invite: String) -> String:
 	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	invite = invite.to_upper()
@@ -131,6 +129,12 @@ var chat := []
 
 # Pass user information once connection is made.
 func _on_connected_to_server () -> void:
+	# Start displaying log messages from the server, rate limited.
+	$Overlay/LogTimer.timeout.connect(_next_log)
+	# Remove the local worm on client side, and instead spawn one in the "Worms" node.
+	# The "Worms" path is managed by MultiplayerSpawner so it should automatically get spawned on all
+	# peers as well.
+	$Worm.queue_free()
 	# Register the player on the server (store user handle and then spawn a worm).
 	_register_player.rpc_id(1,Globals.handle)
 	# Briefly pause then unpause the scene, which fixes a visual glitch with MultiplayerSynchronizer
@@ -146,6 +150,8 @@ func _on_connected_to_server () -> void:
 func _on_client_connected (id) -> void:
 	# When a client connects, synchronize their state.
 	_load_chat.rpc_id(id,chat)
+func _on_connection_failed() -> void:
+	$Overlay/LogLabel.text = "Connection failed.  Playing locally."
 func _on_client_disconnected (id) -> void:
 	_log.rpc("%s has left the server."%players[id][0])
 	var worm: Worm = players[id][1]
