@@ -2,10 +2,6 @@ extends Node2D
 
 var is_game_over: bool = false
 
-# Keep track of peer worms (if in multiplayer game)
-var PeerWormFactory := preload("res://worm/worm.tscn")
-var peer_worms := {}
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Connect the menu toggle key for pausing / unpausing the game.
@@ -42,7 +38,7 @@ func _make_server () -> void:
 	MenuHandler.pause.disconnect(pause_game)
 	# Disable worm on server side (not needed, and don't want to process keyboard controls in here).
 	$Worm.queue_free()
- # Make this screen a client process, and connect to the specified server.
+# Make this screen a client process, and connect to the specified server.
 func _make_client () -> void:
 	multiplayer.multiplayer_peer = null
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
@@ -51,18 +47,16 @@ func _make_client () -> void:
 	multiplayer.multiplayer_peer = peer
 	# Start displaying log messages from the server, rate limited.
 	$Overlay/LogTimer.timeout.connect(_next_log)
-	# Set up name label for worm (but make invisible so it's not displayed lcoally).
-	$Worm/WormFront/Sprites/NameLabel.text = Globals.handle
-	$Worm/WormFront/Sprites/NameLabel.hide()
-	# Transmit worm info at a regular interval to the server, so other peers can see current location.
-	$TransmitTimer.timeout.connect(_send_worm_info)
-	$TransmitTimer.start()
 	# Briefly pause then unpause the scene, which fixes a visual glitch with MultiplayerSynchronizer
 	# and the bug scenes from the sprite TileMapLayer.
 	# I don't know why this is needed, but it works, so... :GVHreedshrug:
 	get_tree().paused = true
 	await get_tree().create_timer(0.1).timeout
 	get_tree().paused = false
+	# Remove the local worm on client side, and instead spawn one in the "Worms" node.
+	# The "Worms" path is managed by MultiplayerSpawner so it should automatically get spawned on all
+	# peers as well.
+	$Worm.queue_free()
 func _check_invite (invite: String) -> String:
 	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	invite = invite.to_upper()
@@ -143,27 +137,55 @@ var chat := []
 
 # Pass user information once connection is made.
 func _on_connected_to_server () -> void:
-	# Send our player info to the server.
-	_send_player_info.rpc_id(1,Globals.handle,[Globals.worm_body_colour,Globals.worm_back_colour,Globals.worm_front_colour,Globals.worm_outline_colour])
+	# Register the player on the server (store user handle and then spawn a worm).
+	_register_player.rpc_id(1,Globals.handle)
 	# Start the log message display, after a short delay to wait for our own connection message.
 	await get_tree().create_timer(0.2).timeout
 	_next_log()
 	$Overlay/LogTimer.start()
 func _on_client_connected (id) -> void:
 	# When a client connects, synchronize their state.
-	_startup_package.rpc_id(id,chat)
+	_load_chat.rpc_id(id,chat)
 func _on_client_disconnected (id) -> void:
 	_log.rpc("%s has left the server."%players[id][0])
+	var worm: Worm = players[id][1]
+	$Worms.remove_child(worm)
+	worm.queue_free()
 	players.erase(id)
-	_remove_peer_worm.rpc(id)
 # Give new client all info needed to get started.
 @rpc("reliable")
-func _startup_package (chat_history):
-	chat.append_array(chat_history)
+func _load_chat (chat_history):
+	chat = chat_history
 @rpc("any_peer","reliable")
-func _send_player_info (handle,colours) -> void:
-	players[multiplayer.get_remote_sender_id()] = [handle,colours]
+func _register_player (handle) -> void:
+	# Create a worm for the player to control.
+	var worm := preload("res://worm/worm.tscn").instantiate()
+	# Set worm name to be consistent with peer id, so it can be synchronized.
+	var id := multiplayer.get_remote_sender_id()
+	worm.name = "worm"+str(id)
+	# Add a label to the worm.
+	worm.get_node("WormFront/Sprites/NameLabel").text = handle
+	# Spawn this worm on all peers.
+	$Worms.add_child(worm,true)
+	# Make the calling user the authority for moving the worm.
+	_setup_worm.rpc(worm.name,handle,id)
+	# Store player information.
+	players[multiplayer.get_remote_sender_id()] = [handle,worm]
+	# Send a log message, telling everyone that a new player has arrived.
 	_log.rpc("%s has joined the server."%handle)
+@rpc("call_local","reliable")
+func _setup_worm (worm_name,handle,id):
+	var worm := $Worms.get_node(NodePath(worm_name))
+	worm.set_multiplayer_authority(id)
+	var front := worm.get_node(NodePath("WormFront"))
+	front.set_multiplayer_authority(id)
+	if id == multiplayer.get_unique_id():
+		# If this is our worm, then we are responstible for setting its attributes.
+		# Set the label here, and it will show up on all peers.
+		worm.get_node(NodePath("WormFront/Sprites/NameLabel")).text = handle
+	else:
+		# If this isn't our worm, then make it passive so it isn't listen to our controls
+		worm.passive()
 # Send a system message to the clients.
 @rpc("call_local","reliable")
 func _log (msg: String) -> void:
@@ -187,22 +209,4 @@ func _next_log () -> void:
 func _send_chat (msg: String) -> void:
 	var sender := multiplayer.get_remote_sender_id()
 	# Encode bubble position, sender info.
-	chat.append([players[sender],msg])
-# Send worm info to others.
-func _send_worm_info () -> void:
-	_peer_worm_update.rpc($Worm.serialize())
-@rpc("any_peer")
-func _peer_worm_update (worm_info) -> void:
-	var id: int = multiplayer.get_remote_sender_id()
-	if id not in peer_worms:
-		var worm: Worm = PeerWormFactory.instantiate()
-		$Peers.add_child(worm)
-		worm.passive()
-		worm.z_index = 5  # Put far enough in front so it's visible.
-		peer_worms[id] = worm
-	peer_worms[id].deserialize(worm_info)
-# Clean up when a peer leaves the game.
-@rpc("reliable")
-func _remove_peer_worm (id) -> void:
-	peer_worms[id].queue_free()
-	peer_worms.erase(id)
+	chat.append([players[sender][0],msg])

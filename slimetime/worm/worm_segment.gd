@@ -14,7 +14,9 @@ var last_surface_normal: Vector2
 var last_surface_reference: Vector2
 # Indicates if currently standing on a surface (to determine if user can control
 # movement)
-var on_surface: bool
+# Exported so it can be managed by a MultiplayerSynchronizer (so other peers can
+# see the walking animation when it's moving on a surface).
+@export var on_surface: bool
 # Indicates if the feet should "stick" strongly to a surface that it touches.
 var sticky_feet: bool
 
@@ -34,10 +36,11 @@ func get_relative_linear_velocity () -> Vector2:
 		return linear_velocity
 
 # Direction that the segment is pointing towards
-var facing_direction: Vector2
+# This is exported so it can be managed by a MultiplayerSynchronizer.
+@export var facing_direction: Vector2
 # Direction that the segment's feet are in.
 # Only general direction of this is used.  facing_direction will determine exact angles.
-var feet_direction: Vector2
+@export var feet_direction: Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -198,26 +201,6 @@ func _on_body_entered(body: Node) -> void:
 			reference_body = body
 		else:
 			reference_body = null
-
-# Serialize the segment, so it can be passed to other peers in a multiplayer game.
-func serialize() -> Array:
-	return [global_position, linear_velocity, facing_direction, feet_direction]
-
-# Update the segment with information from a serialized array.
-# For displaying peer worms.
-# Slightly different from serialize, in that we also receive colour info.
-func deserialize(segment_info: Array) -> void:
-	var colours: Array = segment_info[0]
-	refresh_colour_scheme(colours[0],colours[1],colours[2],colours[3])
-	# Stabilize worm by cutting off small changes?
-	if (global_position-segment_info[1]).length() > 10:
-		global_position = segment_info[1]
-	if segment_info[2].length() > 10:
-		linear_velocity = segment_info[2]
-	else:
-		linear_velocity = Vector2.ZERO
-	facing_direction = segment_info[3]
-	feet_direction = segment_info[4]
 
 # Make the worm segment passive.
 # E.g., not listening for colour changes to player worm, not taking damage.

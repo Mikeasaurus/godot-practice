@@ -204,10 +204,13 @@ tile_set = SubResource("TileSet_kemkm")
 z_index = 5
 position = Vector2(8, 316)
 
-[node name="TransmitTimer" type="Timer" parent="."]
-wait_time = 0.1
+[node name="Worms" type="Node2D" parent="."]
+z_index = 5
+position = Vector2(9, 315)
 
-[node name="Peers" type="Node2D" parent="."]
+[node name="WormSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://worm/worm.tscn")
+spawn_path = NodePath("../Worms")
 
 [node name="Overlay" type="CanvasLayer" parent="."]
 
