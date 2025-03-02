@@ -47,12 +47,6 @@ func _make_client () -> void:
 	multiplayer.multiplayer_peer = peer
 	# Start displaying log messages from the server, rate limited.
 	$Overlay/LogTimer.timeout.connect(_next_log)
-	# Briefly pause then unpause the scene, which fixes a visual glitch with MultiplayerSynchronizer
-	# and the bug scenes from the sprite TileMapLayer.
-	# I don't know why this is needed, but it works, so... :GVHreedshrug:
-	get_tree().paused = true
-	await get_tree().create_timer(0.1).timeout
-	get_tree().paused = false
 	# Remove the local worm on client side, and instead spawn one in the "Worms" node.
 	# The "Worms" path is managed by MultiplayerSpawner so it should automatically get spawned on all
 	# peers as well.
@@ -139,8 +133,14 @@ var chat := []
 func _on_connected_to_server () -> void:
 	# Register the player on the server (store user handle and then spawn a worm).
 	_register_player.rpc_id(1,Globals.handle)
-	# Start the log message display, after a short delay to wait for our own connection message.
-	await get_tree().create_timer(0.2).timeout
+	# Briefly pause then unpause the scene, which fixes a visual glitch with MultiplayerSynchronizer
+	# and the bug scenes from the sprite TileMapLayer.
+	# I don't know why this is needed, but it works, so... :GVHreedshrug:
+	await get_tree().create_timer(0.1).timeout
+	get_tree().paused = true
+	await get_tree().create_timer(0.1).timeout
+	get_tree().paused = false
+	# Start the log message display, after a short delay (above) to wait for our own connection message.
 	_next_log()
 	$Overlay/LogTimer.start()
 func _on_client_connected (id) -> void:
