@@ -175,6 +175,13 @@ func _register_player (handle) -> void:
 	$Worms.add_child(worm,true)
 	# Make the calling user the authority for moving the worm.
 	_setup_worm.rpc(worm.name,handle,id)
+	# Tell this new client about the other worms, specifically need to clarify
+	# the multiplayer authorities for them, since the server isn't managing them.
+	for peer_id in players.keys():
+		if peer_id == id: continue  # Don't need to send new player's info to theirself!
+		var peer_handle: String = players[peer_id][0]
+		var peer_worm_name: String = players[peer_id][1].name
+		_setup_worm.rpc_id(id, peer_worm_name, peer_handle, peer_id)
 	# Store player information.
 	players[multiplayer.get_remote_sender_id()] = [handle,worm]
 	# Send a log message, telling everyone that a new player has arrived.
