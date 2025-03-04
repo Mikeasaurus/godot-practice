@@ -44,6 +44,15 @@ func get_relative_linear_velocity () -> Vector2:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# Show the first frame of the walking sprites.
+	$Sprites/Animation/Frame1.show()
+	$Sprites/Animation/Frame2.hide()
+	$Sprites/Animation/Frame3.hide()
+	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
+	if Globals.is_client and get_multiplayer_authority() != multiplayer.get_unique_id():
+		$DamageArea2D.collision_mask = 0
+		_passive = true
+		return
 	# Initialize the colour scheme of the worm.
 	refresh_colour_scheme()
 	# Listen for any further updates to colour scheme, and update accordingly.
@@ -59,10 +68,6 @@ func _ready() -> void:
 	# Ready to land and stick to a surface.
 	on_surface = false
 	sticky_feet = true
-	# Show the first frame of the walking sprites.
-	$Sprites/Animation/Frame1.show()
-	$Sprites/Animation/Frame2.hide()
-	$Sprites/Animation/Frame3.hide()
 	# Detect plaform touching
 	body_entered.connect(_on_body_entered)
 
@@ -201,10 +206,3 @@ func _on_body_entered(body: Node) -> void:
 			reference_body = body
 		else:
 			reference_body = null
-
-# Make the worm segment passive.
-# E.g., not listening for colour changes to player worm, not taking damage.
-func passive() -> void:
-	Globals.worm_colour_updated.disconnect(refresh_colour_scheme)
-	$DamageArea2D.collision_mask = 0
-	_passive = true

@@ -48,6 +48,14 @@ func _ready() -> void:
 	mouth_position = $Sprites/SlimeSource.position
 	# Continue setting up other properties of the segment.
 	super()
+	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
+	if Globals.is_client and get_multiplayer_authority() != multiplayer.get_unique_id():
+		$DamageArea2D.collision_mask = 0
+		_passive = true
+		$Sprites/HeadDamageArea2D.collision_mask = 0
+		$Sprites/EatingArea.collision_mask = 0
+		$Sprites/Camera2D.enabled = false
+		return
 
 # Called when the worm's colour scheme needs to be updated.
 func refresh_colour_scheme (body = null, back = null, front = null, outline = null) -> void:
@@ -123,14 +131,3 @@ func _on_eating_area_body_entered(body: Node2D) -> void:
 
 func _on_landed() -> void:
 	$GroundSound.play()
-
-
-# Make the worm segment passive.
-# E.g., not listening for colour changes to player worm, not taking damage, not eating.
-func passive() -> void:
-	Globals.worm_colour_updated.disconnect(refresh_colour_scheme)
-	$DamageArea2D.collision_mask = 0
-	_passive = true
-	$Sprites/HeadDamageArea2D.collision_mask = 0
-	$Sprites/EatingArea.collision_mask = 0
-	$Sprites/Camera2D.enabled = false

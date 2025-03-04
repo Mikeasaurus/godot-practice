@@ -40,6 +40,11 @@ func _ready() -> void:
 	# Note: When I tried to set this from within the declaration of "segments", the
 	# elements were all null.  Have to wait until runtime for these references to exist?
 	segments.append_array([$WormFront, $WormSegment3, $WormSegment2, $WormSegment1, $WormTail])
+	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
+	if Globals.is_client and get_multiplayer_authority() != multiplayer.get_unique_id():
+		_controllable = false
+		_local = false
+		return
 	# Listen for damage taken by any of the segments.
 	for segment in segments:
 		segment.hurt.connect(_on_hurt)
@@ -354,10 +359,3 @@ func _on_doubletap_timer_timeout() -> void:
 # This is called when a worm segment sends a signal saying it took damage.
 func _on_hurt() -> void:
 	hurt.emit()
-
-# Make worm passive background entity (no key capture, no camera focus, no eating or damage taking).
-func passive () -> void:
-	_controllable = false
-	_local = false
-	for segment in segments:
-		segment.passive()

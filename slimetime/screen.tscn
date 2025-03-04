@@ -209,7 +209,6 @@ z_index = 5
 position = Vector2(9, 315)
 
 [node name="WormSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://worm/worm.tscn")
 spawn_path = NodePath("../Worms")
 
 [node name="Overlay" type="CanvasLayer" parent="."]

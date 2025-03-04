@@ -21,6 +21,7 @@ func _ready() -> void:
 	for c in $SpriteTileMapLayer.get_children():
 		c.name = c.scene_file_path.split('/')[-1].split('.')[0]+"_"+str(c.position.x)+"_"+str(c.position.y)
 	# If multiplayer mode, set up client or server instance (whichever is needed).
+	$WormSpawner.spawn_function = _spawn_worm
 	if Globals.is_client:
 		_make_client()
 	elif Globals.is_server:
@@ -165,40 +166,25 @@ func _load_chat (chat_history):
 @rpc("any_peer","reliable")
 func _register_player (handle) -> void:
 	# Create a worm for the player to control.
+	var id: int = multiplayer.get_remote_sender_id()
+	var worm: Worm = $WormSpawner.spawn([id,handle])
+	# Store player information.
+	players[id] = [handle,worm]
+	# Send a log message, telling everyone that a new player has arrived.
+	_log.rpc("%s has joined the server."%handle)
+# Custom spawner for worms, to set up the multiplayer authority properly.
+func _spawn_worm (data):
+	var id: int = data[0]
+	var handle: String = data[1]
 	var worm := preload("res://worm/worm.tscn").instantiate()
 	# Set worm name to be consistent with peer id, so it can be synchronized.
-	var id := multiplayer.get_remote_sender_id()
 	worm.name = "worm"+str(id)
 	# Add a label to the worm.
 	worm.get_node("WormFront/Sprites/NameLabel").text = handle
-	# Spawn this worm on all peers.
-	$Worms.add_child(worm,true)
-	# Make the calling user the authority for moving the worm.
-	_setup_worm.rpc(worm.name,handle,id)
-	# Tell this new client about the other worms, specifically need to clarify
-	# the multiplayer authorities for them, since the server isn't managing them.
-	for peer_id in players.keys():
-		if peer_id == id: continue  # Don't need to send new player's info to theirself!
-		var peer_handle: String = players[peer_id][0]
-		var peer_worm_name: String = players[peer_id][1].name
-		_setup_worm.rpc_id(id, peer_worm_name, peer_handle, peer_id)
-	# Store player information.
-	players[multiplayer.get_remote_sender_id()] = [handle,worm]
-	# Send a log message, telling everyone that a new player has arrived.
-	_log.rpc("%s has joined the server."%handle)
-@rpc("call_local","reliable")
-func _setup_worm (worm_name,handle,id):
-	var worm := $Worms.get_node(NodePath(worm_name))
+	# Set the multiplayer authority for this worm.
+	# (the client that will control the worm movement).
 	worm.set_multiplayer_authority(id)
-	var front := worm.get_node(NodePath("WormFront"))
-	front.set_multiplayer_authority(id)
-	if id == multiplayer.get_unique_id():
-		# If this is our worm, then we are responstible for setting its attributes.
-		# Set the label here, and it will show up on all peers.
-		worm.get_node(NodePath("WormFront/Sprites/NameLabel")).text = handle
-	else:
-		# If this isn't our worm, then make it passive so it isn't listen to our controls
-		worm.passive()
+	return worm
 # Send a system message to the clients.
 @rpc("call_local","reliable")
 func _log (msg: String) -> void:
