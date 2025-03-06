@@ -41,7 +41,7 @@ func _ready() -> void:
 	# elements were all null.  Have to wait until runtime for these references to exist?
 	segments.append_array([$WormFront, $WormSegment3, $WormSegment2, $WormSegment1, $WormTail])
 	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
-	if Globals.is_client and get_multiplayer_authority() != multiplayer.get_unique_id():
+	if (Globals.is_client or Globals.is_server) and get_multiplayer_authority() != multiplayer.get_unique_id():
 		_controllable = false
 		_local = false
 		return

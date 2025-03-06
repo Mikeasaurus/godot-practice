@@ -49,7 +49,7 @@ func _ready() -> void:
 	# Continue setting up other properties of the segment.
 	super()
 	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
-	if Globals.is_client and get_multiplayer_authority() != multiplayer.get_unique_id():
+	if (Globals.is_client or Globals.is_server) and get_multiplayer_authority() != multiplayer.get_unique_id():
 		$DamageArea2D.collision_mask = 0
 		_passive = true
 		$Sprites/HeadDamageArea2D.collision_mask = 0

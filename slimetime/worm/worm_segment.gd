@@ -49,7 +49,7 @@ func _ready() -> void:
 	$Sprites/Animation/Frame2.hide()
 	$Sprites/Animation/Frame3.hide()
 	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
-	if Globals.is_client and get_multiplayer_authority() != multiplayer.get_unique_id():
+	if (Globals.is_client or Globals.is_server) and get_multiplayer_authority() != multiplayer.get_unique_id():
 		$DamageArea2D.collision_mask = 0
 		_passive = true
 		return
