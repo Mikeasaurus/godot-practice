@@ -109,6 +109,7 @@ func __process(_delta: float) -> void:
 	pass
 
 # Helper function - spawn particles when chewing food.
+@rpc("authority","call_local","reliable")
 func _chew_food () -> void:
 	$EatSound.play()
 	for i in range(5):
@@ -125,7 +126,7 @@ func _chew_food () -> void:
 
 func _on_eating_area_body_entered(body: Node2D) -> void:
 	if "eat" in body:
-		_chew_food()
+		_chew_food.rpc()
 		body.eat()
 		ate_bug.emit()
 
