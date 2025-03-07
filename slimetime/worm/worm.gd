@@ -307,7 +307,7 @@ func _physics_process(delta: float) -> void:
 		_jump_triggered = false  # _jump_triggered is a flag to capture double-clicks from _input.
 		if segments[0].on_surface:
 			# Apply jump sound.  Only once.
-			$JumpSound.play()
+			_jump_sound.rpc()
 			# Define the direction of jump, based on front segment.
 			# All segments should be jumping in the same direction.
 			var jump_impulse: Vector2 = (segments[0].facing_direction - segments[0].feet_direction) * 300
@@ -332,6 +332,11 @@ func _physics_process(delta: float) -> void:
 		# Visual aid for centre of force, for debugging.
 		segments[i].get_node("GravityPoint").global_position = segments[i].global_position + gd[i]
 
+# Play jump sound.
+# Done through rpc framework so it can play on remote peers as well.
+@rpc("authority","call_local","reliable")
+func _jump_sound () -> void:
+	$WormFront/JumpSound.play()
 
 # Explode the worm.
 # (WHY???)
