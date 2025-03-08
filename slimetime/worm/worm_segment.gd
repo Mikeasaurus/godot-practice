@@ -27,6 +27,10 @@ var reference_body = null
 # Whether to turn off usual collision info stuff and let worm be controlled externally.
 var _passive: bool = false
 
+# Remember starting position, so we can "respawn" there later in multiplayer.
+@onready
+var _spawn_position: Vector2 = global_position
+
 # Define a relative velocity based on reference body.
 var relative_linear_velocity: Vector2: get = get_relative_linear_velocity
 func get_relative_linear_velocity () -> Vector2:
@@ -198,6 +202,10 @@ func _on_jump_timer_timeout() -> void:
 
 func _on_damage_area_2d_body_entered(_body: Node2D) -> void:
 	hurt.emit()
+
+# Respawn to starting position.
+func respawn () -> void:
+	set_deferred("global_position",_spawn_position)
 
 # If attaching to something (such as moving platform), then track with that thing's motion.
 func _on_body_entered(body: Node) -> void:

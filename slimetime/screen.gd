@@ -1,6 +1,7 @@
 extends Node2D
 
 var is_game_over: bool = false
+var is_dead_multiplayer: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -75,6 +76,10 @@ func _input(event: InputEvent) -> void:
 		game_over()
 	elif is_game_over == true and (event is InputEventKey or event is InputEventMouseButton) and event.pressed:
 		restart()
+	elif is_dead_multiplayer == true and (event is InputEventKey or event is InputEventMouseButton) and event.pressed:
+		respawn()
+		is_dead_multiplayer = false
+		_is_dying_multiplayer = false
 		
 func _on_worm_ate_bug() -> void:
 	Globals.score += 100
@@ -97,6 +102,36 @@ func game_over () -> void:
 	# "await" idea copied from ProjectEruption.
 	await get_tree().create_timer(2.0).timeout
 	is_game_over = true
+# Similar, but in multiplayer context.
+var _is_dying_multiplayer: bool = false
+func multiplayer_death () -> void:
+	if _is_dying_multiplayer: return  # Overlay screen already initiated?
+	_is_dying_multiplayer = true
+	var worm: Worm = $Worms.get_node("worm"+str(multiplayer.get_unique_id()))
+	worm.explode()
+	_death_message.rpc_id(1)
+	if Globals.touchscreen_controls:
+		$GameOverScreen/Label.text = "YOU DIED\n\nTap screen to respawn"
+	else:
+		$GameOverScreen/Label.text = "YOU DIED\n\nPress any key / click to respawn"
+	$GameOverScreen.visible = true
+	# Fade in the "GAME OVER" text.
+	var tween: Tween = get_tree().create_tween()
+	tween.tween_interval(1.0)
+	tween.tween_property($GameOverScreen/Label, "theme_override_colors/font_color", Color.WHITE, 1.0)
+	# Delay before waiting for a key press to restart.
+	# "await" idea copied from ProjectEruption.
+	await get_tree().create_timer(2.0).timeout
+	is_dead_multiplayer = true
+@rpc("any_peer","reliable")
+func _death_message ():
+	var id: int = multiplayer.get_remote_sender_id()
+	var handle: String = players[id][0]
+	_log.rpc("%s has died."%handle)
+func respawn () -> void:
+	var worm: Worm = $Worms.get_node("worm"+str(multiplayer.get_unique_id()))
+	worm.respawn()
+	$GameOverScreen.visible = false
 
 # Restart the game after a game over screen.
 func restart () -> void:
@@ -230,3 +265,4 @@ func _send_chat (msg: String) -> void:
 func _on_worm_spawner_spawned(worm: Worm) -> void:
 	if worm.name == "worm"+str(multiplayer.get_unique_id()):
 		worm.slime_shot.connect(shoot_slime)
+		worm.hurt.connect(multiplayer_death)

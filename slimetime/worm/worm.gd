@@ -353,6 +353,12 @@ func explode () -> void:
 	for s in segments:
 		s.release_from_surface()
 		s.apply_central_impulse(Vector2((randf()-0.5)*1000,(randf()-0.5)*1000))
+# Reconstitute the worm and respawn at starting location (for multiplayer).
+func respawn () -> void:
+	for s in segments:
+		s.respawn()
+	_coherent = true
+	_controllable = true
 
 # Pass along signal when a bug is eaten.
 func _on_worm_front_ate_bug() -> void:
