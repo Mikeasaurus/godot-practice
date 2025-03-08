@@ -187,6 +187,8 @@ func _on_connected_to_server () -> void:
 	# The "Worms" path is managed by MultiplayerSpawner so it should automatically get spawned on all
 	# peers as well.
 	$Worm.queue_free()
+	# Hide the score, not used for multiplayer.
+	$Overlay/Score.visible = false
 	# Register the player on the server (store user handle and then spawn a worm).
 	_register_player.rpc_id(1,Globals.handle)
 	# Briefly pause then unpause the scene, which fixes a visual glitch with MultiplayerSynchronizer
