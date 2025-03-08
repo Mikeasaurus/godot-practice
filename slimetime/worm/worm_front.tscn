@@ -341,7 +341,7 @@ stream = ExtResource("21_b0sip")
 [node name="GroundSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("11_04yj1")
 
-[node name="SpitSound" type="AudioStreamPlayer" parent="."]
+[node name="SpitSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("12_wkfij")
 
 [node name="EatSound" type="AudioStreamPlayer2D" parent="."]

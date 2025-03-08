@@ -1,6 +1,7 @@
 extends WormSegment
 
 signal ate_bug
+signal slime_shot (pos: Vector2, vel: Vector2)
 
 # Use these PackedScenes to instansiate these effects at runtime.
 # Alternatively, could use "preload" on the scene files.
@@ -97,12 +98,12 @@ func shoot_slime (t = null) -> void:
 				# Refresh slime starting location.
 				slime_start = mouth_position.rotated($Sprites.global_rotation)
 
-		var slime = slime_scene.instantiate()
-		add_child(slime)
-		slime.global_position = global_position + slime_start
-		slime.linear_velocity = slime_direction * Globals.slime_speed
+		# Send a signal to parent scene requesting a slime be created.
+		# Can't create it directly in this scene because the ownership isn't right
+		# for working with multiplayer sessions.
+		slime_shot.emit(global_position + slime_start, slime_direction * Globals.slime_speed)
 		# Play a sound when shooting slime.
-		$SpitSound.play()
+		_spit_sound.rpc()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func __process(_delta: float) -> void:
@@ -138,3 +139,7 @@ func _on_body_entered(body: Node) -> void:
 @rpc("authority","call_local","reliable")
 func _ground_sound () -> void:
 	$GroundSound.play()
+
+@rpc("authority","call_local","reliable")
+func _spit_sound () -> void:
+	$SpitSound.play()

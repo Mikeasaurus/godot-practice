@@ -22,6 +22,7 @@ func _ready() -> void:
 		c.name = c.scene_file_path.split('/')[-1].split('.')[0]+"_"+str(c.position.x)+"_"+str(c.position.y)
 	# If multiplayer mode, set up client or server instance (whichever is needed).
 	$WormSpawner.spawn_function = _spawn_worm
+	$SlimeSpawner.spawn_function = _spawn_slime
 	if Globals.is_client:
 		_make_client()
 	elif Globals.is_server:
@@ -117,6 +118,21 @@ func pause_game () -> void:
 func unpause_game () -> void:
 	get_tree().paused = false
 
+# Handle slime shooting.
+func shoot_slime (pos: Vector2, vel: Vector2):
+	# Invoke on server.
+	_shoot_slime.rpc_id(1, pos, vel)
+@rpc("any_peer","call_local","reliable")
+func _shoot_slime (pos: Vector2, vel: Vector2):
+	var slime = $SlimeSpawner.spawn()
+	slime.global_position = pos
+	slime.linear_velocity = vel
+func _spawn_slime (_data):
+	var slime := preload("res://features/slime.tscn").instantiate()
+	# Only enable collision detection on server copy of slime.
+	if Globals.is_client:
+		slime.collision_mask = 0
+	return slime
 
 # Multiplayer functionality
 
@@ -209,3 +225,8 @@ func _send_chat (msg: String) -> void:
 	var sender := multiplayer.get_remote_sender_id()
 	# Encode bubble position, sender info.
 	chat.append([players[sender][0],msg])
+
+# Connect signals for our worm.
+func _on_worm_spawner_spawned(worm: Worm) -> void:
+	if worm.name == "worm"+str(multiplayer.get_unique_id()):
+		worm.slime_shot.connect(shoot_slime)

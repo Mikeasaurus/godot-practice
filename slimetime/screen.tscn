@@ -211,6 +211,11 @@ position = Vector2(9, 315)
 [node name="WormSpawner" type="MultiplayerSpawner" parent="."]
 spawn_path = NodePath("../Worms")
 
+[node name="Slimes" type="Node2D" parent="."]
+
+[node name="SlimeSpawner" type="MultiplayerSpawner" parent="."]
+spawn_path = NodePath("../Slimes")
+
 [node name="Overlay" type="CanvasLayer" parent="."]
 
 [node name="Score" type="Label" parent="Overlay"]
@@ -279,4 +284,6 @@ position = Vector2(416, 4025)
 curve = SubResource("Curve2D_reswt")
 
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
+[connection signal="slime_shot" from="Worm" to="." method="shoot_slime"]
+[connection signal="spawned" from="WormSpawner" to="." method="_on_worm_spawner_spawned"]
 [connection signal="quit" from="Overlay/PauseMenu" to="." method="restart"]
