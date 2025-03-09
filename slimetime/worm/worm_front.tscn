@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://dd7mpa5anwn06"]
+[gd_scene load_steps=32 format=3 uid="uid://dd7mpa5anwn06"]
 
 [ext_resource type="Script" path="res://worm/worm_front.gd" id="1_7ixcj"]
 [ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://features/slime.tscn" id="2_4874p"]
@@ -8,7 +8,6 @@
 [ext_resource type="Texture2D" uid="uid://crr3r5rv3umqa" path="res://worm/front-top.png" id="9_30gi8"]
 [ext_resource type="Texture2D" uid="uid://cr0qwifpt6t1j" path="res://worm/front-belly.png" id="10_rocqg"]
 [ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://features/hit.png" id="10_v1jwa"]
-[ext_resource type="AudioStream" uid="uid://4r8shsnsbali" path="res://audio/215162__otisjames__thud.wav" id="11_04yj1"]
 [ext_resource type="Texture2D" uid="uid://dd0cj52iyque2" path="res://worm/front-walk1-a.png" id="11_dta1g"]
 [ext_resource type="Texture2D" uid="uid://c535h1swtnata" path="res://worm/front-appendage-outline.png" id="11_huslo"]
 [ext_resource type="Texture2D" uid="uid://x083pbqc5yr5" path="res://worm/front-eyes.png" id="11_kb3c4"]
@@ -337,9 +336,6 @@ one_shot = true
 
 [node name="JumpSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("21_b0sip")
-
-[node name="GroundSound" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("11_04yj1")
 
 [node name="SpitSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("12_wkfij")

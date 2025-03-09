@@ -134,11 +134,6 @@ func _on_eating_area_body_entered(body: Node2D) -> void:
 # Play sound when landing on a surface, only for front segment.
 func _on_body_entered(body: Node) -> void:
 	super(body)  # Perform other actions (like sticking to moving platforms, etc.)
-	_ground_sound.rpc()
-
-@rpc("authority","call_local","reliable")
-func _ground_sound () -> void:
-	$GroundSound.play()
 
 @rpc("authority","call_local","reliable")
 func _spit_sound () -> void:

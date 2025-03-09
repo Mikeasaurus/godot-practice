@@ -376,3 +376,10 @@ func _on_hurt() -> void:
 # This is called when the worm front is shooting out slime.
 func _on_worm_front_slime_shot(pos: Vector2, vel: Vector2) -> void:
 	slime_shot.emit(pos, vel)
+
+# Play sound when the worm lands on a surface.
+@rpc("authority","call_local","reliable")
+func _ground_sound () -> void:
+	$GroundSound.play()
+func _on_worm_front_landed() -> void:
+	_ground_sound.rpc()
