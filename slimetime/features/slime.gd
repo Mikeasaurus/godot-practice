@@ -27,6 +27,8 @@ func _create_splatter (pos: Vector2, direction: Vector2) -> void:
 
 # Get normal to any surface that's contacted, align direction vectors accordingly.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	# Only check for contacts if this is the server or a local game.
+	if multiplayer.get_unique_id() != 1: return
 	# Only splat if a surface is hit, and only splat once.
 	if state.get_contact_count() > 0 and $Sprite2D.visible:
 		var n: Vector2 = state.get_contact_local_normal(0)

@@ -44,6 +44,8 @@ func _eat () -> void:
 	is_eaten = true
 	visible = false
 func _on_body_entered(body: Node) -> void:
+	# Only check collisions for server / local game.
+	if multiplayer.get_unique_id() != 1: return
 	# Check if getting slimed.
 	if "get_collision_layer" in body:
 		if body.get_collision_layer() == 2 and not is_slimed:
