@@ -11,6 +11,35 @@ var starting_position: Vector2
 # Mainly useful for multiplayer mode, to keep the bug in the scene tree but disable it.
 @export var is_eaten: bool = false
 
+# Manage multiplayer synchronization of location/position.
+# These custom variables will be managed by MultiplayerSynchronizer, and
+# they will be connected to the physics via _integrate_forces.
+# This will safely sync the position and velocity without physics freaking out.
+# See: https://www.reddit.com/r/godot/comments/180ywzs/multiplayersynchronizer_and_rigidbody/
+# This should also help with the glitching when "teleporting" rigid bodies to a new location.
+@export var synced_position: Vector2
+@export var synced_linear_velocity: Vector2
+@export var synced_rotation: float
+@export var synced_angular_velocity: float
+@export var _resync: bool = false
+func _integrate_forces(_state: PhysicsDirectBodyState2D) -> void:
+	if _resync:
+		position = synced_position
+		linear_velocity = synced_linear_velocity
+		rotation = synced_rotation
+		angular_velocity = synced_angular_velocity
+		_resync = false
+	elif is_multiplayer_authority():
+		synced_position = position
+		synced_linear_velocity = linear_velocity
+		synced_rotation = rotation
+		synced_angular_velocity = angular_velocity
+	else:
+		position = synced_position
+		linear_velocity = synced_linear_velocity
+		rotation = synced_rotation
+		angular_velocity = synced_angular_velocity
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	$AnimatedSprite2D.play()
@@ -27,6 +56,10 @@ func _process(_delta: float) -> void:
 func get_slimed () -> void:
 	is_slimed = true
 	$AnimatedSprite2D.play("slimed")
+	# In multiplayer, set a timer to automatically respawn the bug after being slimed for some
+	# amount of time... so we don't run out of bugs to play with.
+	if Globals.is_server:
+		$RespawnTimer.start()
 
 # Get eaten.
 func eat () -> void:
@@ -43,6 +76,21 @@ func _eat () -> void:
 	angular_velocity = 0
 	is_eaten = true
 	visible = false
+	if $RespawnTimer.is_stopped():
+		$RespawnTimer.start()
+# Automatic respaning of bug after getting slimed and/or eaten.
+func _on_respawn_timer_timeout() -> void:
+	synced_position = starting_position
+	synced_linear_velocity = Vector2.ZERO
+	synced_rotation = 0
+	synced_angular_velocity = 0
+	_resync = true
+	$AnimatedSprite2D.play("default")
+	$CollisionShape2D.set_deferred("disabled",false)
+	is_slimed = false
+	is_eaten = false
+	visible = true
+
 func _on_body_entered(body: Node) -> void:
 	# Only check collisions for server / local game.
 	if multiplayer.get_unique_id() != 1: return

@@ -55,3 +55,7 @@ func _process(delta: float) -> void:
 			$AnimatedSprite2D.flip_h = true
 		else:
 			$AnimatedSprite2D.flip_h = false
+
+func _on_respawn_timer_timeout() -> void:
+	super()
+	synced_linear_velocity = starting_velocity
