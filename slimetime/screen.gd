@@ -191,13 +191,6 @@ func _on_connected_to_server () -> void:
 	$Overlay/Score.visible = false
 	# Register the player on the server (store user handle and then spawn a worm).
 	_register_player.rpc_id(1,Globals.handle)
-	# Briefly pause then unpause the scene, which fixes a visual glitch with MultiplayerSynchronizer
-	# and the bug scenes from the sprite TileMapLayer.
-	# I don't know why this is needed, but it works, so... :GVHreedshrug:
-	await get_tree().create_timer(0.1).timeout
-	get_tree().paused = true
-	await get_tree().create_timer(0.1).timeout
-	get_tree().paused = false
 	# Start the log message display, after a short delay (above) to wait for our own connection message.
 	_next_log()
 	$Overlay/LogTimer.start()
