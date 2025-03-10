@@ -46,6 +46,7 @@ func _make_client () -> void:
 	multiplayer.multiplayer_peer = null
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
+	multiplayer.server_disconnected.connect(_on_server_disconnected)
 	var peer := WebSocketMultiplayerPeer.new()
 	peer.create_client("ws://"+Globals.check_invite(Globals.invite)+":1156")
 	multiplayer.multiplayer_peer = peer
@@ -181,6 +182,12 @@ func _on_connected_to_server () -> void:
 	# Start the log message display, after a short delay (above) to wait for our own connection message.
 	_next_log()
 	$Overlay/LogTimer.start()
+# If server disconnects unexpectedly, return to main menu.
+func _on_server_disconnected () -> void:
+	# Note: this seems to get called on a client after a disconnect, so in that
+	# case ignore this signal.
+	if not Globals.is_client: return  # Already in the process of shutting down client and restarting.
+	restart()
 func _on_client_connected (id) -> void:
 	# When a client connects, synchronize their state.
 	_load_chat.rpc_id(id,chat)
