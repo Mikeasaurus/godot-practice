@@ -22,16 +22,38 @@ func _on_connect_button_pressed() -> void:
 	if len(invite) == 0:
 		stderr.text = "Please enter an invite code"
 		return
+	var server: String = Globals.check_invite(invite)
+	if server == "":
+		stderr.text = "Invalid invite code"
+		return
 	if len(handle) == 0:
 		stderr.text = "Please enter a display name"
 		return
 	# Store connection info.
 	Globals.invite = invite
 	Globals.handle = handle
+	# Establish a connection to the server.
+	multiplayer.multiplayer_peer = null
+	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	multiplayer.connection_failed.connect(_on_connection_failed)
+	var peer := WebSocketMultiplayerPeer.new()
+	peer.create_client("ws://"+Globals.check_invite(Globals.invite)+":1156")
+	multiplayer.multiplayer_peer = peer
+	# Stop user from trying to connect while establishing a connection.
+	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ConnectButton.disabled = true
+func _on_connection_failed():
+	var stderr: Label = $MarginContainer/CenterContainer/VBoxContainer/ErrorLabel
+	stderr.text = "Connection failed"
+	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ConnectButton.disabled = false
+# This is called when the server connection is tested, and is a working server.
+func _on_connected_to_server():
 	# Clear this menu off the stack.
 	MenuHandler.deactivate_menu()
 	# Start the main game screen, which should detect the client / server info above (held in global state).
 	Globals.is_client = true
+	# Disconnect this test connection, start main screen to establish full connection.
+	multiplayer.multiplayer_peer.close()
+	multiplayer.multiplayer_peer = null
 	get_tree().change_scene_to_file("res://screen.tscn")
 func _on_server_button_pressed() -> void:
 	Globals.is_server = true

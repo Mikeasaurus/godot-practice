@@ -47,24 +47,11 @@ func _make_client () -> void:
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	var peer := WebSocketMultiplayerPeer.new()
-	peer.create_client("ws://"+_check_invite(Globals.invite)+":1156")
+	peer.create_client("ws://"+Globals.check_invite(Globals.invite)+":1156")
 	multiplayer.multiplayer_peer = peer
 	$Overlay/LogLabel.text = "Attempting to connect..."
 	# The rest of the setup will be done in _on_connected_to_server, once the
 	# connection is established.
-func _check_invite (invite: String) -> String:
-	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	invite = invite.to_upper()
-	var n: int = 0
-	for i in range(len(invite)):
-		n = n * 36 + table.find(invite[i])
-	n = (n*1000000) % (36**8-19)
-	if (n >= 2**32): return ''
-	var s: String = str(n%256)
-	for i in range(3):
-		n >>= 8
-		s = str(n%256) + '.' + s
-	return s
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -200,6 +187,7 @@ func _on_client_connected (id) -> void:
 func _on_connection_failed() -> void:
 	$Overlay/LogLabel.text = "Connection failed.  Playing locally."
 func _on_client_disconnected (id) -> void:
+	if id not in players: return  # Ignore test coonections (before player fully connected)
 	_log.rpc("%s has left the server."%players[id][0])
 	var worm: Worm = players[id][1]
 	$Worms.remove_child(worm)
