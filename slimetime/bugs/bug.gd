@@ -29,7 +29,7 @@ func _integrate_forces(_state: PhysicsDirectBodyState2D) -> void:
 		rotation = synced_rotation
 		angular_velocity = synced_angular_velocity
 		_resync = false
-	elif is_multiplayer_authority():
+	elif not Globals.is_client:
 		synced_position = position
 		synced_linear_velocity = linear_velocity
 		synced_rotation = rotation
