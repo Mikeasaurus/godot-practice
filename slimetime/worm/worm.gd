@@ -1,9 +1,12 @@
 extends Node2D
+class_name Worm
 
 ## Signal emitted when a bug has been eaten.  Allows things like score to be updated in parent scene.
 signal ate_bug
 ## Signal emitted when damage is taken.  Parent scene could use this to update a health bar, or end the game.
 signal hurt
+## Signal emitted when a slime is being shot.
+signal slime_shot (pos: Vector2, vel: Vector2)
 
 # Array to hold individual worm segments.
 var segments: Array[WormSegment] = []
@@ -26,8 +29,12 @@ var _key_held: bool = false
 # either double_click or double_tap events!  Very annoying.
 var _recent_click: bool = false
 
-# Whether worm is alive or not.
-var _alive: bool = true
+# Whether to keep worm segments together, or let them roll around independently.
+var _coherent: bool = true
+# Whether to listen for keyboard controls.
+var _controllable: bool = true
+# Whether worm is locally managed.
+var _local: bool = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -35,12 +42,17 @@ func _ready() -> void:
 	# Note: When I tried to set this from within the declaration of "segments", the
 	# elements were all null.  Have to wait until runtime for these references to exist?
 	segments.append_array([$WormFront, $WormSegment3, $WormSegment2, $WormSegment1, $WormTail])
+	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
+	if (Globals.is_client or Globals.is_server) and get_multiplayer_authority() != multiplayer.get_unique_id():
+		_controllable = false
+		_local = false
+		return
 	# Listen for damage taken by any of the segments.
 	for segment in segments:
 		segment.hurt.connect(_on_hurt)
 
 func _input(event: InputEvent) -> void:
-	if not _alive: return
+	if not _controllable: return
 	# Mouse / touch event
 	if event is InputEventMouseButton and event.pressed:
 		# This is a fallback for when automatic detection of double-click / double-tap fails.
@@ -70,7 +82,7 @@ func _input(event: InputEvent) -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	if not _alive: return
+	if not _coherent: return
 	# Modify rotation / flip of the segments
 
 	# Adjust the rotation of the segments so they're aligned w.r.t. to segment
@@ -142,7 +154,8 @@ func _process(_delta: float) -> void:
 
 # The following code controls force of movement for the segments.
 func _physics_process(delta: float) -> void:
-	if not _alive:
+	if not _local: return
+	if not _coherent:
 		# Apply only gravity force if not alive.
 		for s in segments:
 			s.apply_central_force(Vector2(0,1)*Globals.gravity)
@@ -296,7 +309,7 @@ func _physics_process(delta: float) -> void:
 		_jump_triggered = false  # _jump_triggered is a flag to capture double-clicks from _input.
 		if segments[0].on_surface:
 			# Apply jump sound.  Only once.
-			$JumpSound.play()
+			_jump_sound.rpc()
 			# Define the direction of jump, based on front segment.
 			# All segments should be jumping in the same direction.
 			var jump_impulse: Vector2 = (segments[0].facing_direction - segments[0].feet_direction) * 300
@@ -321,19 +334,31 @@ func _physics_process(delta: float) -> void:
 		# Visual aid for centre of force, for debugging.
 		segments[i].get_node("GravityPoint").global_position = segments[i].global_position + gd[i]
 
+# Play jump sound.
+# Done through rpc framework so it can play on remote peers as well.
+@rpc("authority","call_local","reliable")
+func _jump_sound () -> void:
+	$WormFront/JumpSound.play()
 
 # Explode the worm.
 # (WHY???)
 func explode () -> void:
 	# Only explode if still alive... otherwise this could be called multiple times when
 	# each segment takes damage.
-	if not _alive: return
+	if not _coherent: return
 	# Turn off all activity for the worm (slime shooting, walking, jumping, etc.)
-	_alive = false
+	_coherent = false
+	_controllable = false
 	# Detach the segments from any surface and add a random impulse to each segment.
 	for s in segments:
 		s.release_from_surface()
 		s.apply_central_impulse(Vector2((randf()-0.5)*1000,(randf()-0.5)*1000))
+# Reconstitute the worm and respawn at starting location (for multiplayer).
+func respawn () -> void:
+	for s in segments:
+		s.respawn()
+	_coherent = true
+	_controllable = true
 
 # Pass along signal when a bug is eaten.
 func _on_worm_front_ate_bug() -> void:
@@ -347,3 +372,14 @@ func _on_doubletap_timer_timeout() -> void:
 # This is called when a worm segment sends a signal saying it took damage.
 func _on_hurt() -> void:
 	hurt.emit()
+
+# This is called when the worm front is shooting out slime.
+func _on_worm_front_slime_shot(pos: Vector2, vel: Vector2) -> void:
+	slime_shot.emit(pos, vel)
+
+# Play sound when the worm lands on a surface.
+@rpc("authority","call_local","reliable")
+func _ground_sound () -> void:
+	$GroundSound.play()
+func _on_worm_front_landed() -> void:
+	_ground_sound.rpc()

@@ -21,6 +21,7 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	super(delta)
+	if is_eaten: return
 	if is_slimed: return
 	# Move the beetle
 	var dx: Vector2 = global_position - starting_position
@@ -54,3 +55,7 @@ func _process(delta: float) -> void:
 			$AnimatedSprite2D.flip_h = true
 		else:
 			$AnimatedSprite2D.flip_h = false
+
+func _on_respawn_timer_timeout() -> void:
+	super()
+	synced_linear_velocity = starting_velocity

@@ -1,10 +1,39 @@
-[gd_scene load_steps=4 format=3 uid="uid://lnqgkkyiw03c"]
+[gd_scene load_steps=5 format=3 uid="uid://lnqgkkyiw03c"]
 
 [ext_resource type="Script" path="res://bugs/bug.gd" id="1_07pwg"]
 [ext_resource type="AudioStream" uid="uid://4r8shsnsbali" path="res://audio/215162__otisjames__thud.wav" id="5_sk5ud"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_51bm2"]
 radius = 31.257
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_sdh0r"]
+properties/0/path = NodePath(".:visible")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath("CollisionShape2D:disabled")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:is_slimed")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:is_eaten")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("AnimatedSprite2D:animation")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath(".:synced_position")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath(".:synced_linear_velocity")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath(".:synced_rotation")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath(".:synced_angular_velocity")
+properties/8/spawn = true
+properties/8/replication_mode = 2
 
 [node name="Bug" type="RigidBody2D"]
 collision_layer = 4
@@ -22,4 +51,13 @@ shape = SubResource("CircleShape2D_51bm2")
 [node name="GroundSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_sk5ud")
 
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_sdh0r")
+
+[node name="RespawnTimer" type="Timer" parent="."]
+process_mode = 3
+wait_time = 60.0
+one_shot = true
+
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="RespawnTimer" to="." method="_on_respawn_timer_timeout"]

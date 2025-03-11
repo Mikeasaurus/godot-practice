@@ -12,10 +12,8 @@ func _process(_delta: float) -> void:
 	# Apply gravity force.
 	apply_central_force(Vector2(0,Globals.gravity))
 
-func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
-	queue_free()
-
 # Spawn some splatter particles based around the given direction.
+@rpc("authority","call_local","reliable")
 func _create_splatter (pos: Vector2, direction: Vector2) -> void:
 	for i in range(10):
 		var p: Node2D = particle_scene.instantiate()
@@ -29,17 +27,31 @@ func _create_splatter (pos: Vector2, direction: Vector2) -> void:
 
 # Get normal to any surface that's contacted, align direction vectors accordingly.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	# Only check for contacts if this is the server or a local game.
+	if multiplayer.get_unique_id() != 1: return
 	# Only splat if a surface is hit, and only splat once.
 	if state.get_contact_count() > 0 and $Sprite2D.visible:
 		var n: Vector2 = state.get_contact_local_normal(0)
-		_create_splatter (position, n)
+		_create_splatter.rpc (position, n)
 		# Play a sound.
-		$SplatSound.play()
+		_splat_sound.rpc()
 		# Turn slime invisible until gets cleaned up.
 		$Sprite2D.visible = false
 		# Also stop it from colliding, so bugs don't get hit by stray, invisible slimes.
 		collision_layer = 0
 
+@rpc("authority","call_local","reliable")
+func _splat_sound () -> void:
+	$SplatSound.play()
+
 func _on_splat_sound_finished() -> void:
-	queue_free()
-	pass # Replace with function body.
+	# Only clean up from server or single player.
+	# Remote clients will have the scene managed by a MultiplayerSpawner.
+	if multiplayer.get_unique_id() == 1:
+		queue_free()
+
+# Clean up slime if it's been around for a long time and still hasn't hit anything.
+# Probably went out of bounds.
+func _on_timer_timeout() -> void:
+	if multiplayer.get_unique_id() == 1:
+		queue_free()

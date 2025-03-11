@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://dd7mpa5anwn06"]
+[gd_scene load_steps=32 format=3 uid="uid://dd7mpa5anwn06"]
 
 [ext_resource type="Script" path="res://worm/worm_front.gd" id="1_7ixcj"]
 [ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://features/slime.tscn" id="2_4874p"]
@@ -8,7 +8,6 @@
 [ext_resource type="Texture2D" uid="uid://crr3r5rv3umqa" path="res://worm/front-top.png" id="9_30gi8"]
 [ext_resource type="Texture2D" uid="uid://cr0qwifpt6t1j" path="res://worm/front-belly.png" id="10_rocqg"]
 [ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://features/hit.png" id="10_v1jwa"]
-[ext_resource type="AudioStream" uid="uid://4r8shsnsbali" path="res://audio/215162__otisjames__thud.wav" id="11_04yj1"]
 [ext_resource type="Texture2D" uid="uid://dd0cj52iyque2" path="res://worm/front-walk1-a.png" id="11_dta1g"]
 [ext_resource type="Texture2D" uid="uid://c535h1swtnata" path="res://worm/front-appendage-outline.png" id="11_huslo"]
 [ext_resource type="Texture2D" uid="uid://x083pbqc5yr5" path="res://worm/front-eyes.png" id="11_kb3c4"]
@@ -23,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://bn2y2ix652wss" path="res://worm/front-walk3-a.png" id="17_gfuqo"]
 [ext_resource type="Texture2D" uid="uid://f68d36lu1gt6" path="res://worm/front-walk3-b.png" id="18_uqcba"]
 [ext_resource type="Texture2D" uid="uid://dgkpe5oeqayv1" path="res://worm/front-walk3-outline.png" id="19_38db1"]
+[ext_resource type="AudioStream" uid="uid://bytvlsxnxc076" path="res://audio/349182__natty23__whoosh.wav" id="21_b0sip"]
 
 [sub_resource type="Animation" id="Animation_4q7xl"]
 length = 0.001
@@ -123,6 +123,74 @@ radius = 39.0128
 [sub_resource type="CircleShape2D" id="CircleShape2D_1fyxy"]
 radius = 38.0132
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_svuih"]
+properties/0/path = NodePath("Sprites/NameLabel:text")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:facing_direction")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:on_surface")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath(".:linear_velocity")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath("Sprites/Outline:modulate")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath("Sprites/Body:modulate")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath("Sprites/Top:modulate")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath("Sprites/Belly:modulate")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+properties/9/path = NodePath("Sprites/AppendageOutline:modulate")
+properties/9/spawn = true
+properties/9/replication_mode = 2
+properties/10/path = NodePath("Sprites/Eyes:modulate")
+properties/10/spawn = true
+properties/10/replication_mode = 2
+properties/11/path = NodePath("Sprites/Mouth:modulate")
+properties/11/spawn = true
+properties/11/replication_mode = 2
+properties/12/path = NodePath("Sprites/Animation/Frame1/Foreleg:modulate")
+properties/12/spawn = true
+properties/12/replication_mode = 2
+properties/13/path = NodePath("Sprites/Animation/Frame1/Backleg:modulate")
+properties/13/spawn = true
+properties/13/replication_mode = 2
+properties/14/path = NodePath("Sprites/Animation/Frame1/Outlines:modulate")
+properties/14/spawn = true
+properties/14/replication_mode = 2
+properties/15/path = NodePath("Sprites/Animation/Frame2/Foreleg:modulate")
+properties/15/spawn = true
+properties/15/replication_mode = 2
+properties/16/path = NodePath("Sprites/Animation/Frame2/Backleg:modulate")
+properties/16/spawn = true
+properties/16/replication_mode = 2
+properties/17/path = NodePath("Sprites/Animation/Frame2/Outlines:modulate")
+properties/17/spawn = true
+properties/17/replication_mode = 2
+properties/18/path = NodePath("Sprites/Animation/Frame3/Foreleg:modulate")
+properties/18/spawn = true
+properties/18/replication_mode = 2
+properties/19/path = NodePath("Sprites/Animation/Frame3/Backleg:modulate")
+properties/19/spawn = true
+properties/19/replication_mode = 2
+properties/20/path = NodePath("Sprites/Animation/Frame3/Outlines:modulate")
+properties/20/spawn = true
+properties/20/replication_mode = 2
+properties/21/path = NodePath(".:feet_direction")
+properties/21/spawn = true
+properties/21/replication_mode = 2
+
 [node name="WormFront" type="RigidBody2D"]
 position = Vector2(29, -52)
 collision_layer = 0
@@ -140,6 +208,16 @@ libraries = {
 }
 
 [node name="Sprites" type="Node2D" parent="."]
+
+[node name="NameLabel" type="Label" parent="Sprites"]
+offset_left = -93.0
+offset_top = -185.0
+offset_right = 95.0
+offset_bottom = -157.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
 
 [node name="HeadDamageArea2D" type="Area2D" parent="Sprites"]
 collision_layer = 0
@@ -256,13 +334,13 @@ texture = ExtResource("10_v1jwa")
 wait_time = 0.1
 one_shot = true
 
-[node name="GroundSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("11_04yj1")
+[node name="JumpSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("21_b0sip")
 
-[node name="SpitSound" type="AudioStreamPlayer" parent="."]
+[node name="SpitSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("12_wkfij")
 
-[node name="EatSound" type="AudioStreamPlayer" parent="."]
+[node name="EatSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("13_hk801")
 
 [node name="DamageArea2D" type="Area2D" parent="."]
@@ -271,6 +349,9 @@ collision_mask = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea2D"]
 shape = SubResource("CircleShape2D_1fyxy")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_svuih")
 
 [connection signal="body_entered" from="Sprites/HeadDamageArea2D" to="." method="_on_damage_area_2d_body_entered"]
 [connection signal="body_entered" from="Sprites/EatingArea" to="." method="_on_eating_area_body_entered"]

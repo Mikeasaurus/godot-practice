@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://ss2xikvy6bt7"]
+[gd_scene load_steps=18 format=3 uid="uid://ss2xikvy6bt7"]
 
 [ext_resource type="Script" path="res://worm/worm_segment.gd" id="1_uf7xy"]
 [ext_resource type="Texture2D" uid="uid://dca0wcvf7auln" path="res://worm/segment-walk1.png" id="2_a5yre"]
@@ -105,6 +105,44 @@ radius = 39.0128
 [sub_resource type="CircleShape2D" id="CircleShape2D_wx6jg"]
 radius = 38.1182
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_j8vll"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:linear_velocity")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:on_surface")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("Sprites/Outline:modulate")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("Sprites/Body:modulate")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath("Sprites/Top:modulate")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath("Sprites/Animation/Frame1/Foreleg:modulate")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath("Sprites/Animation/Frame1/Outlines:modulate")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath("Sprites/Animation/Frame2/Foreleg:modulate")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+properties/9/path = NodePath("Sprites/Animation/Frame2/Outlines:modulate")
+properties/9/spawn = true
+properties/9/replication_mode = 2
+properties/10/path = NodePath("Sprites/Animation/Frame3/Foreleg:modulate")
+properties/10/spawn = true
+properties/10/replication_mode = 2
+properties/11/path = NodePath("Sprites/Animation/Frame3/Outlines:modulate")
+properties/11/spawn = true
+properties/11/replication_mode = 2
+
 [node name="WormSegment" type="RigidBody2D"]
 collision_layer = 0
 collision_mask = 9
@@ -179,6 +217,9 @@ collision_mask = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DamageArea2D"]
 shape = SubResource("CircleShape2D_wx6jg")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_j8vll")
 
 [connection signal="timeout" from="JumpTimer" to="." method="_on_jump_timer_timeout"]
 [connection signal="body_entered" from="DamageArea2D" to="." method="_on_damage_area_2d_body_entered"]

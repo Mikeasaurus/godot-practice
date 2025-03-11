@@ -1,6 +1,7 @@
 extends WormSegment
 
 signal ate_bug
+signal slime_shot (pos: Vector2, vel: Vector2)
 
 # Use these PackedScenes to instansiate these effects at runtime.
 # Alternatively, could use "preload" on the scene files.
@@ -48,20 +49,36 @@ func _ready() -> void:
 	mouth_position = $Sprites/SlimeSource.position
 	# Continue setting up other properties of the segment.
 	super()
+	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
+	if (Globals.is_client or Globals.is_server) and get_multiplayer_authority() != multiplayer.get_unique_id():
+		$DamageArea2D.collision_mask = 0
+		_passive = true
+		$Sprites/HeadDamageArea2D.collision_mask = 0
+		$Sprites/EatingArea.collision_mask = 0
+		$Sprites/Camera2D.enabled = false
+		return
 
 # Called when the worm's colour scheme needs to be updated.
-func refresh_colour_scheme () -> void:
-	$Sprites/Body.modulate = Globals.worm_body_colour
-	$Sprites/Top.modulate = Globals.worm_back_colour
-	$Sprites/Belly.modulate = Globals.worm_front_colour
-	$Sprites/AppendageOutline.modulate = Globals.worm_outline_colour
-	$Sprites/Eyes.modulate = Globals.worm_outline_colour
-	$Sprites/Mouth.modulate = Globals.worm_body_colour
-	$Sprites/Outline.modulate = Globals.worm_outline_colour
+func refresh_colour_scheme (body = null, back = null, front = null, outline = null) -> void:
+	if body == null:
+		body = Globals.worm_body_colour
+	if back == null:
+		back = Globals.worm_back_colour
+	if front == null:
+		front = Globals.worm_front_colour
+	if outline == null:
+		outline = Globals.worm_outline_colour
+	$Sprites/Body.modulate = body
+	$Sprites/Top.modulate = back
+	$Sprites/Belly.modulate = front
+	$Sprites/AppendageOutline.modulate = outline
+	$Sprites/Eyes.modulate = outline
+	$Sprites/Mouth.modulate = body
+	$Sprites/Outline.modulate = outline
 	for frame in $Sprites/Animation.get_children():
-		frame.get_node("Foreleg").modulate = Globals.worm_body_colour
-		frame.get_node("Backleg").modulate = Globals.worm_front_colour
-		frame.get_node("Outlines").modulate = Globals.worm_outline_colour
+		frame.get_node("Foreleg").modulate = body
+		frame.get_node("Backleg").modulate = front
+		frame.get_node("Outlines").modulate = outline
 
 func shoot_slime (t = null) -> void:
 		# Where the slime originates from (based on position of worm's mouth).
@@ -81,18 +98,19 @@ func shoot_slime (t = null) -> void:
 				# Refresh slime starting location.
 				slime_start = mouth_position.rotated($Sprites.global_rotation)
 
-		var slime = slime_scene.instantiate()
-		add_child(slime)
-		slime.global_position = global_position + slime_start
-		slime.linear_velocity = slime_direction * Globals.slime_speed
+		# Send a signal to parent scene requesting a slime be created.
+		# Can't create it directly in this scene because the ownership isn't right
+		# for working with multiplayer sessions.
+		slime_shot.emit(global_position + slime_start, slime_direction * Globals.slime_speed)
 		# Play a sound when shooting slime.
-		$SpitSound.play()
+		_spit_sound.rpc()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func __process(_delta: float) -> void:
 	pass
 
 # Helper function - spawn particles when chewing food.
+@rpc("authority","call_local","reliable")
 func _chew_food () -> void:
 	$EatSound.play()
 	for i in range(5):
@@ -109,9 +127,14 @@ func _chew_food () -> void:
 
 func _on_eating_area_body_entered(body: Node2D) -> void:
 	if "eat" in body:
-		_chew_food()
+		_chew_food.rpc()
 		body.eat()
 		ate_bug.emit()
 
-func _on_landed() -> void:
-	$GroundSound.play()
+# Play sound when landing on a surface, only for front segment.
+func _on_body_entered(body: Node) -> void:
+	super(body)  # Perform other actions (like sticking to moving platforms, etc.)
+
+@rpc("authority","call_local","reliable")
+func _spit_sound () -> void:
+	$SpitSound.play()

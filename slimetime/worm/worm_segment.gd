@@ -14,13 +14,22 @@ var last_surface_normal: Vector2
 var last_surface_reference: Vector2
 # Indicates if currently standing on a surface (to determine if user can control
 # movement)
-var on_surface: bool
+# Exported so it can be managed by a MultiplayerSynchronizer (so other peers can
+# see the walking animation when it's moving on a surface).
+@export var on_surface: bool
 # Indicates if the feet should "stick" strongly to a surface that it touches.
 var sticky_feet: bool
 
 # Optional - body to use as reference frame for maintaining velocity.
 # For example, a moving platform.
 var reference_body = null
+
+# Whether to turn off usual collision info stuff and let worm be controlled externally.
+var _passive: bool = false
+
+# Remember starting position, so we can "respawn" there later in multiplayer.
+@onready
+var _spawn_position: Vector2 = global_position
 
 # Define a relative velocity based on reference body.
 var relative_linear_velocity: Vector2: get = get_relative_linear_velocity
@@ -31,13 +40,23 @@ func get_relative_linear_velocity () -> Vector2:
 		return linear_velocity
 
 # Direction that the segment is pointing towards
-var facing_direction: Vector2
+# This is exported so it can be managed by a MultiplayerSynchronizer.
+@export var facing_direction: Vector2
 # Direction that the segment's feet are in.
 # Only general direction of this is used.  facing_direction will determine exact angles.
-var feet_direction: Vector2
+@export var feet_direction: Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# Show the first frame of the walking sprites.
+	$Sprites/Animation/Frame1.show()
+	$Sprites/Animation/Frame2.hide()
+	$Sprites/Animation/Frame3.hide()
+	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
+	if (Globals.is_client or Globals.is_server) and get_multiplayer_authority() != multiplayer.get_unique_id():
+		$DamageArea2D.collision_mask = 0
+		_passive = true
+		return
 	# Initialize the colour scheme of the worm.
 	refresh_colour_scheme()
 	# Listen for any further updates to colour scheme, and update accordingly.
@@ -53,21 +72,25 @@ func _ready() -> void:
 	# Ready to land and stick to a surface.
 	on_surface = false
 	sticky_feet = true
-	# Show the first frame of the walking sprites.
-	$Sprites/Animation/Frame1.show()
-	$Sprites/Animation/Frame2.hide()
-	$Sprites/Animation/Frame3.hide()
 	# Detect plaform touching
 	body_entered.connect(_on_body_entered)
 
 # Called when the worm's colour scheme needs to be updated.
-func refresh_colour_scheme () -> void:
-	$Sprites/Body.modulate = Globals.worm_body_colour
-	$Sprites/Top.modulate = Globals.worm_back_colour
-	$Sprites/Outline.modulate = Globals.worm_outline_colour
+func refresh_colour_scheme (body = null, back = null, front = null, outline = null) -> void:
+	if body == null:
+		body = Globals.worm_body_colour
+	if back == null:
+		back = Globals.worm_back_colour
+	if front == null:
+		front = Globals.worm_front_colour
+	if outline == null:
+		outline = Globals.worm_outline_colour
+	$Sprites/Body.modulate = body
+	$Sprites/Top.modulate = back
+	$Sprites/Outline.modulate = outline
 	for frame in $Sprites/Animation.get_children():
-		frame.get_node("Foreleg").modulate = Globals.worm_body_colour
-		frame.get_node("Outlines").modulate = Globals.worm_outline_colour
+		frame.get_node("Foreleg").modulate = body
+		frame.get_node("Outlines").modulate = outline
 
 
 # Helper method - flip the segment in the opposite direction.
@@ -112,6 +135,7 @@ func update_sprite() -> void:
 # Get normal to any surface that's contacted, align direction vectors accordingly.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if not sticky_feet: return
+	if _passive: return
 	var n = state.get_contact_count()
 	if n > 0:
 		# Sum up all contact normals.
@@ -178,6 +202,10 @@ func _on_jump_timer_timeout() -> void:
 
 func _on_damage_area_2d_body_entered(_body: Node2D) -> void:
 	hurt.emit()
+
+# Respawn to starting position.
+func respawn () -> void:
+	set_deferred("global_position",_spawn_position)
 
 # If attaching to something (such as moving platform), then track with that thing's motion.
 func _on_body_entered(body: Node) -> void:

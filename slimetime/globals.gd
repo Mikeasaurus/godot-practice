@@ -60,7 +60,29 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	pass
 
+# Multiplayer information.
+var is_client: bool = false
+var is_server: bool = false
+var invite: String = ""
+var handle: String = ""
+func check_invite (code: String) -> String:
+	if len(code) != 8: return ''
+	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	code = code.to_upper()
+	var n: int = 0
+	for i in range(len(code)):
+		n = n * 36 + table.find(code[i])
+	n = (n*1000000) % (36**8-19)
+	if (n >= 2**32): return ''
+	if n < 0: return ''
+	var s: String = str(n%256)
+	for i in range(3):
+		n >>= 8
+		s = str(n%256) + '.' + s
+	return s
 
 # Reset global variables (when game restarts).
 func reset () -> void:
 	score = 0
+	is_client = false
+	is_server = false
