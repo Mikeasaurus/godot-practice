@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3 uid="uid://dg81msdx5nimm"]
+
+[ext_resource type="PackedScene" uid="uid://mm5w2ifcivrb" path="res://wormchat/text.tscn" id="1_bmtoi"]
+
+[node name="OwnText" instance=ExtResource("1_bmtoi")]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+grow_horizontal = 0
+
+[node name="UpperLeft" parent="LeftVBox" index="0"]
+modulate = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Left" parent="LeftVBox" index="1"]
+modulate = Color(0.2, 0.2, 0.2, 1)
+
+[node name="LowerLeft" parent="LeftVBox" index="2"]
+modulate = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Upper" parent="CenterVBox" index="0"]
+modulate = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Label" parent="CenterVBox/Center" index="0"]
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+
+[node name="ColorRect" parent="CenterVBox/Center/Label" index="0"]
+modulate = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Lower" parent="CenterVBox" index="2"]
+modulate = Color(0.2, 0.2, 0.2, 1)
+
+[node name="UpperRight" parent="RightVBox" index="0"]
+modulate = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Right" parent="RightVBox" index="1"]
+modulate = Color(0.2, 0.2, 0.2, 1)
+
+[node name="LowerRight" parent="RightVBox" index="2"]
+modulate = Color(0.2, 0.2, 0.2, 1)

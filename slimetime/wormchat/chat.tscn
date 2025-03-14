@@ -1,0 +1,179 @@
+[gd_scene load_steps=6 format=3 uid="uid://1fdldwucvxju"]
+
+[ext_resource type="PackedScene" uid="uid://csjewo2nqeufg" path="res://wormchat/title.tscn" id="2_kniyt"]
+[ext_resource type="Texture2D" uid="uid://dnwslu4hiovni" path="res://wormchat/to-bottom-button-bg.png" id="2_yr72g"]
+[ext_resource type="Texture2D" uid="uid://b1oo5b0yq33pw" path="res://wormchat/to-bottom-button-arrow.png" id="3_jsmi6"]
+[ext_resource type="Texture2D" uid="uid://ddxpyu1c5piy8" path="res://wormchat/to-bottom-button-notify.png" id="4_37x1g"]
+
+[sub_resource type="GDScript" id="GDScript_y20m8"]
+script/source = "extends Control
+
+@onready var dialogue := $MarginContainer/ScrollContainer/CenterContainer/VBoxContainer
+var peer_message_scene := preload(\"res://wormchat/peer_messages.tscn\")
+var own_message_scene := preload(\"res://wormchat/own_message.tscn\")
+
+# Size of scroll area
+# Has to be derived based on values of vertical scroll bar and current scroll value?
+var scroll_size: float
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	var s: VScrollBar = $MarginContainer/ScrollContainer.get_v_scroll_bar()
+	s.value_changed.connect(_on_scrolled)
+	s.changed.connect(_on_content_added)
+	# Add a sample conversation.
+	var convo: PeerMessages = peer_message_scene.instantiate()
+	convo.peer_name = \"Really should get their name\"
+	dialogue.add_child(convo)
+	convo.add_message(\"Of course I've seen a mango. Seen all kinds of fruits, man. Oh, a worm? I didn't know mango worms were a thing. I'll keep an eye out next time I'm in the grocery store though.\")
+	convo.add_message(\"Reeve? Seen him all over, man. He goes to our school. Wait. Do YOU even go here?\")
+	var convo2: PeerMessages = peer_message_scene.instantiate()
+	convo2.peer_name = \"Someone else\"
+	dialogue.add_child(convo2)
+	convo2.add_message(\"This is someone else talking now.\")
+	var mine: OwnMessage = own_message_scene.instantiate()
+	mine.text = \"This is my own text, with multiple lines.\"
+	dialogue.add_child(mine)
+	var mine2: OwnMessage = own_message_scene.instantiate()
+	mine2.text = \"This is another of my own texts.\"
+	dialogue.add_child(mine2)
+	# Scroll to bottom.
+	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
+	await get_tree().process_frame
+	scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
+	scroll_size = scroll.get_v_scroll_bar().max_value - scroll.scroll_vertical
+
+# Called when the local user adds a new chat message.
+func _on_text_edit_text_submitted(new_text: String) -> void:
+	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
+	# Add the text to the chat
+	var mine: OwnMessage = own_message_scene.instantiate()
+	mine.text = new_text
+	dialogue.add_child(mine)
+	# Clear the text entry box.
+	$TextEdit.clear()
+	# If at bottom, then keep scrolling to bottom.
+	if scroll.scroll_vertical == scroll.get_v_scroll_bar().max_value - scroll_size:
+		await get_tree().process_frame
+		scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
+
+# Modify appearance of bottom button based on scroll position
+func _on_scrolled (value: float) -> void:
+	# Only if we're fully initialized.
+	if scroll_size == 0: return
+	# If already scrolled to the bottom, then hide the button.
+	# Also reset any notification about new messages.
+	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
+	if scroll.scroll_vertical == scroll.get_v_scroll_bar().max_value - scroll_size:
+		$ToBottom.hide()
+		$ToBottom/Notifier.hide()
+	# Otherwise, show the button.
+	else:
+		$ToBottom.show()
+
+# Update appearance of bottom button when new content is available.
+func _on_content_added () -> void:
+	# Only if we're fully initialized.
+	if scroll_size == 0: return
+	# If not at bottom of scrolling window, then turn on notification icon.
+	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
+	if scroll.scroll_vertical != scroll.get_v_scroll_bar().max_value - scroll_size:
+		$ToBottom/Notifier.show()
+
+# Highlight bottom button when it's hovered.
+func _on_to_bottom_mouse_entered() -> void:
+	$ToBottom/Arrow.modulate = Color.WHITE
+func _on_to_bottom_mouse_exited() -> void:
+	$ToBottom/Arrow.modulate = Color.hex(0x777777ff)
+
+# Scroll to bottom when the button is clicked.
+func _on_to_bottom_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			var scroll: ScrollContainer = $MarginContainer/ScrollContainer
+			scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
+"
+
+[node name="Chat" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_y20m8")
+
+[node name="Title" parent="." instance=ExtResource("2_kniyt")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -127.0
+offset_top = 50.0
+offset_right = 127.0
+offset_bottom = 56.0
+grow_horizontal = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 150
+theme_override_constants/margin_bottom = 200
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="TextEdit" type="LineEdit" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -274.0
+offset_top = -143.0
+offset_right = 275.0
+offset_bottom = -74.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 30
+max_length = 255
+
+[node name="ToBottom" type="TextureRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 1339.0
+offset_top = 805.0
+offset_right = 1439.0
+offset_bottom = 905.0
+texture = ExtResource("2_yr72g")
+metadata/_edit_group_ = true
+
+[node name="Arrow" type="TextureRect" parent="ToBottom"]
+modulate = Color(0.466667, 0.466667, 0.466667, 1)
+layout_mode = 0
+texture = ExtResource("3_jsmi6")
+
+[node name="Notifier" type="TextureRect" parent="ToBottom"]
+visible = false
+layout_mode = 0
+texture = ExtResource("4_37x1g")
+
+[connection signal="text_submitted" from="TextEdit" to="." method="_on_text_edit_text_submitted"]
+[connection signal="gui_input" from="ToBottom" to="." method="_on_to_bottom_gui_input"]
+[connection signal="mouse_entered" from="ToBottom" to="." method="_on_to_bottom_mouse_entered"]
+[connection signal="mouse_exited" from="ToBottom" to="." method="_on_to_bottom_mouse_exited"]
