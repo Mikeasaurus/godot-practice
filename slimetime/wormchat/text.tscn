@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://mm5w2ifcivrb"]
+[gd_scene load_steps=7 format=3 uid="uid://mm5w2ifcivrb"]
 
 [ext_resource type="Texture2D" uid="uid://ckqysw7v7gbjw" path="res://wormchat/upperleftwhitebubble.png" id="1_8i1k3"]
 [ext_resource type="Script" path="res://wormchat/text.gd" id="1_xse5n"]
 [ext_resource type="Texture2D" uid="uid://j021gr82iq5q" path="res://wormchat/lowerleftwhitebubble.png" id="2_iohd7"]
 [ext_resource type="Texture2D" uid="uid://c60x1nbng8n7g" path="res://wormchat/upperrightwhitebubble.png" id="3_vqxnr"]
 [ext_resource type="Texture2D" uid="uid://8rqta8hgf5e6" path="res://wormchat/lowerrightwhitebubble.png" id="4_c4epr"]
+[ext_resource type="FontFile" uid="uid://drlm1tywrqgeh" path="res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf" id="4_l2mfq"]
 
 [node name="Text" type="HBoxContainer"]
 theme_override_constants/separation = 0
@@ -42,6 +43,7 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.2, 0.2, 1)
 theme_override_constants/line_spacing = -10
+theme_override_fonts/font = ExtResource("4_l2mfq")
 theme_override_font_sizes/font_size = 30
 
 [node name="ColorRect" type="ColorRect" parent="CenterVBox/Center/Label"]
