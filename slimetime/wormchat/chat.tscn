@@ -15,10 +15,6 @@ script/source = "extends Control
 var peer_message_scene := preload(\"res://wormchat/peer_messages.tscn\")
 var own_message_scene := preload(\"res://wormchat/own_message.tscn\")
 
-# Size of scroll area
-# Has to be derived based on values of vertical scroll bar and current scroll value?
-var scroll_size: float
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var s: VScrollBar = $MarginContainer/ScrollContainer.get_v_scroll_bar()
@@ -52,7 +48,7 @@ func _on_text_edit_text_submitted(new_text: String) -> void:
 	# Clear the text entry box.
 	$TextEdit.clear()
 	# If at bottom, then keep scrolling to bottom.
-	if scroll.scroll_vertical == scroll.get_v_scroll_bar().max_value - scroll_size:
+	if scroll.scroll_vertical >= scroll.get_v_scroll_bar().max_value - scroll.size.y:
 		await get_tree().process_frame
 		scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
 
@@ -61,23 +57,15 @@ func _scroll_to_bottom() -> void:
 	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
 	await get_tree().process_frame
 	scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
+	# Update state of the scroll button (it should turn itself off at this point.)
 	_update_scroll_button()
-
-# Calculate size of scroll area on screen.
-# Needed for doing some math on scroll position.
-func _get_scroll_size () -> void:
-	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
-	scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
-	scroll_size = scroll.get_v_scroll_bar().max_value - scroll.scroll_vertical
 
 # Modify appearance of bottom button based on scroll position
 func _update_scroll_button () -> void:
-	# Calculate scroll size if we just got initialized.
-	if scroll_size == 0: _get_scroll_size()
 	# If already scrolled to the bottom, then hide the button.
 	# Also reset any notification about new messages.
 	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
-	if scroll.scroll_vertical == scroll.get_v_scroll_bar().max_value - scroll_size:
+	if scroll.scroll_vertical >= scroll.get_v_scroll_bar().max_value - scroll.size.y:
 		$ToBottom.hide()
 		$ToBottom/Notifier.hide()
 	# Otherwise, show the button.
@@ -90,11 +78,9 @@ func _on_visibility_changed() -> void:
 
 # Update appearance of bottom button when new content is available.
 func _on_content_added () -> void:
-	# Only if we're fully initialized.
-	if scroll_size == 0: return
 	# If not at bottom of scrolling window, then turn on notification icon.
 	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
-	if scroll.scroll_vertical != scroll.get_v_scroll_bar().max_value - scroll_size:
+	if scroll.scroll_vertical < scroll.get_v_scroll_bar().max_value - scroll.size.y:
 		$ToBottom/Notifier.show()
 
 # Highlight bottom button when it's hovered.
