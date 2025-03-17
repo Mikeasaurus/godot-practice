@@ -231,6 +231,14 @@ text = "Score:
 0"
 horizontal_alignment = 2
 
+[node name="ClickableArea" type="Control" parent="Overlay"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="Shortcuts" type="HBoxContainer" parent="Overlay"]
 offset_right = 100.0
 offset_bottom = 100.0
@@ -309,6 +317,7 @@ curve = SubResource("Curve2D_reswt")
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
 [connection signal="slime_shot" from="Worm" to="." method="shoot_slime"]
 [connection signal="spawned" from="WormSpawner" to="." method="_on_worm_spawner_spawned"]
+[connection signal="gui_input" from="Overlay/ClickableArea" to="." method="_on_clickable_area_gui_input"]
 [connection signal="gui_input" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_gui_input"]
 [connection signal="mouse_entered" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_entered"]
 [connection signal="mouse_exited" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_exited"]

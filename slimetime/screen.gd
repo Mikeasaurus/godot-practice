@@ -142,6 +142,24 @@ func unpause_game () -> void:
 	get_tree().paused = false
 
 # Handle slime shooting.
+# Note: this is kind of a roundabout approach right now.
+# - Click action is captured by ClickableArea,
+# - which calls shoot_slime on the Worm,
+# - which calls shoot_slime on the WormFront,
+# - which emits a slime_shot signal back to the Worm,
+# - which emis a slime_shot signal back to the Screen,
+# - which invokes shoot_slime on the Screen,
+# - which invokes rpc method _shoot_slime
+# It wasn't always like this... slime used to be handled entirely within WormFront.
+# However, with the addition of multiplayer, needed to bring the slime spawning
+# to the Screen level in order for it to be handled by the server authority.
+# I think I will refactor this very soon!
+func _on_clickable_area_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			var worm: Worm = $Worm
+			if worm == null: worm = $Worms.get_node("worm"+str(multiplayer.get_unique_id()))
+			worm.shoot_slime(get_global_mouse_position())
 func shoot_slime (pos: Vector2, vel: Vector2):
 	# Invoke on server.
 	_shoot_slime.rpc_id(1, pos, vel)
