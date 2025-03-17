@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=22 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
@@ -12,6 +12,9 @@
 [ext_resource type="PackedScene" uid="uid://b6wvdu21f1ewl" path="res://bugs/firefly.tscn" id="8_g1hl4"]
 [ext_resource type="Texture2D" uid="uid://b0ash4kuopfii" path="res://menus/pause.png" id="10_805ly"]
 [ext_resource type="PackedScene" uid="uid://duh80b506tef8" path="res://features/platform.tscn" id="11_5ahw7"]
+[ext_resource type="PackedScene" uid="uid://1fdldwucvxju" path="res://wormchat/chat.tscn" id="11_icvtr"]
+[ext_resource type="Texture2D" uid="uid://cfqifiggbljne" path="res://menus/chat.png" id="12_61u0q"]
+[ext_resource type="Texture2D" uid="uid://wqv66c4474hh" path="res://menus/chat-notifier.png" id="13_r8qe4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
 texture = ExtResource("1_vx3mq")
@@ -228,17 +231,37 @@ text = "Score:
 0"
 horizontal_alignment = 2
 
+[node name="Shortcuts" type="HBoxContainer" parent="Overlay"]
+offset_right = 100.0
+offset_bottom = 100.0
+theme_override_constants/separation = 20
+
+[node name="PauseButton" type="Button" parent="Overlay/Shortcuts"]
+visible = false
+layout_mode = 2
+action_mode = 0
+icon = ExtResource("10_805ly")
+flat = true
+
+[node name="ChatButton" type="TextureRect" parent="Overlay/Shortcuts"]
+self_modulate = Color(1, 1, 1, 0.466667)
+layout_mode = 2
+tooltip_text = "Open chat window."
+texture = ExtResource("12_61u0q")
+
+[node name="Notifier" type="TextureRect" parent="Overlay/Shortcuts/ChatButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("13_r8qe4")
+
 [node name="PauseMenu" parent="Overlay" instance=ExtResource("7_y7xe8")]
 process_mode = 2
 visible = false
 
-[node name="PauseButton" type="Button" parent="Overlay"]
+[node name="Chat" parent="Overlay" instance=ExtResource("11_icvtr")]
+process_mode = 2
 visible = false
-offset_right = 8.0
-offset_bottom = 8.0
-action_mode = 0
-icon = ExtResource("10_805ly")
-flat = true
 
 [node name="LogLabel" type="Label" parent="Overlay"]
 offset_left = 126.0
@@ -286,4 +309,7 @@ curve = SubResource("Curve2D_reswt")
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
 [connection signal="slime_shot" from="Worm" to="." method="shoot_slime"]
 [connection signal="spawned" from="WormSpawner" to="." method="_on_worm_spawner_spawned"]
+[connection signal="gui_input" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_gui_input"]
+[connection signal="mouse_entered" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_entered"]
+[connection signal="mouse_exited" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_exited"]
 [connection signal="quit" from="Overlay/PauseMenu" to="." method="restart"]

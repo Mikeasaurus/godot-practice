@@ -9,8 +9,8 @@ func _ready() -> void:
 	MenuHandler.pause.connect(pause_game)
 	MenuHandler.done_submenus.connect(unpause_game)
 	if Globals.touchscreen_controls:
-		$Overlay/PauseButton.show()
-		$Overlay/PauseButton.pressed.connect(pause_game)
+		$Overlay/Shortcuts/PauseButton.show()
+		$Overlay/Shrotcuts/PauseButton.pressed.connect(pause_game)
 	# Connect worm damage signal directly to game over screen.
 	$Worm.hurt.connect(game_over)
 	# Use better names for the sprites generated from SpriteTileMapLayer.
@@ -256,3 +256,17 @@ func _on_worm_spawner_spawned(worm: Worm) -> void:
 	if worm.name == "worm"+str(multiplayer.get_unique_id()):
 		worm.slime_shot.connect(shoot_slime)
 		worm.hurt.connect(multiplayer_death)
+
+# Highlight chat button when hovered.
+func _on_chat_button_mouse_entered() -> void:
+	$Overlay/Shortcuts/ChatButton.self_modulate = Color.WHITE
+func _on_chat_button_mouse_exited() -> void:
+	$Overlay/Shortcuts/ChatButton.self_modulate = Color.hex(0xffffff77)
+# Open chat window with button pressed.
+func _on_chat_button_gui_input(event: InputEvent) -> void:
+	# Ignore the chat functionality if in a game over state.
+	if is_game_over: return
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			get_tree().paused = true
+			MenuHandler.activate_menu($Overlay/Chat)
