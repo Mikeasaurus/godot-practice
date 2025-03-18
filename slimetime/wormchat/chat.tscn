@@ -36,11 +36,23 @@ func _ready() -> void:
 	var mine2: OwnMessage = own_message_scene.instantiate()
 	mine2.text = \"This is another of my own texts.\"
 	dialogue.add_child(mine2)
-	_scroll_to_bottom()
+	to_bottom()
+
+# Check if scrolled to bottom of messages.
+func at_bottom () -> bool:
+	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
+	return scroll.scroll_vertical >= scroll.get_v_scroll_bar().max_value - scroll.size.y
+# Scroll to bottom of messages.
+func to_bottom () -> void:
+	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
+	# Need to wait until next frame, in case new content was just added to ScrollContainer.
+	await get_tree().process_frame
+	scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
+	# Update state of the scroll button (it should turn itself off at this point.)
+	_update_scroll_button()
 
 # Called when the local user adds a new chat message.
 func _on_text_edit_text_submitted(new_text: String) -> void:
-	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
 	# Add the text to the chat
 	var mine: OwnMessage = own_message_scene.instantiate()
 	mine.text = new_text
@@ -48,24 +60,14 @@ func _on_text_edit_text_submitted(new_text: String) -> void:
 	# Clear the text entry box.
 	$TextEdit.clear()
 	# If at bottom, then keep scrolling to bottom.
-	if scroll.scroll_vertical >= scroll.get_v_scroll_bar().max_value - scroll.size.y:
-		await get_tree().process_frame
-		scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
-
-# Scroll to bottom of the texts.
-func _scroll_to_bottom() -> void:
-	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
-	await get_tree().process_frame
-	scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
-	# Update state of the scroll button (it should turn itself off at this point.)
-	_update_scroll_button()
+	if at_bottom():
+		to_bottom()
 
 # Modify appearance of bottom button based on scroll position
 func _update_scroll_button () -> void:
 	# If already scrolled to the bottom, then hide the button.
 	# Also reset any notification about new messages.
-	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
-	if scroll.scroll_vertical >= scroll.get_v_scroll_bar().max_value - scroll.size.y:
+	if at_bottom():
 		$ToBottom.hide()
 		$ToBottom/Notifier.hide()
 	# Otherwise, show the button.
@@ -74,13 +76,12 @@ func _update_scroll_button () -> void:
 func _on_scrolled (_value: float) -> void:
 	_update_scroll_button()
 func _on_visibility_changed() -> void:
-	if visible: _scroll_to_bottom()
+	if visible: to_bottom()
 
 # Update appearance of bottom button when new content is available.
 func _on_content_added () -> void:
 	# If not at bottom of scrolling window, then turn on notification icon.
-	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
-	if scroll.scroll_vertical < scroll.get_v_scroll_bar().max_value - scroll.size.y:
+	if not at_bottom():
 		$ToBottom/Notifier.show()
 
 # Highlight bottom button when it's hovered.
@@ -93,8 +94,7 @@ func _on_to_bottom_mouse_exited() -> void:
 func _on_to_bottom_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			var scroll: ScrollContainer = $MarginContainer/ScrollContainer
-			scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
+			to_bottom()
 
 # Logic for \"close\" button.
 func _on_close_mouse_entered() -> void:
