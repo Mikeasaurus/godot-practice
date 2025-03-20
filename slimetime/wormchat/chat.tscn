@@ -15,28 +15,93 @@ script/source = "extends Control
 var peer_message_scene := preload(\"res://wormchat/peer_messages.tscn\")
 var own_message_scene := preload(\"res://wormchat/own_message.tscn\")
 
+## Notification for when new messages are in chat.
+signal new_message_notifier
+## Indicates that all new messages have been read.
+signal all_messages_read
+
+###############################################################################
+# Server-side bookkeeping.
+# Keep track of how much history has been sent to each peer.
+var peer_chat_index: Dictionary = {}
+
+# Remember who the last peer message was from, in case we're continuing
+# with more messages from that peer.
+var current_peer_messages: PeerMessages = null
+
+# Chat history
+var chat := []
+
+# Initialize client bookkeeping when they join.
+func _register(id) -> void:
+	if multiplayer.get_unique_id() != 1: return
+	# Peer hasn't received any messages yet, so start at the beginning.
+	peer_chat_index[id] = 0
+	# Now that there's at least one peer listening for messages, start the synchronizer.
+	if $ChatSyncTimer.is_stopped():
+		$ChatSyncTimer.start()
+
+func _unregister(id) -> void:
+	if multiplayer.get_unique_id() != 1: return
+	peer_chat_index.erase(id)
+
+# Server-side function to send the chat history to a peer.
+func _on_chat_sync_timer_timeout() -> void:
+	var n: int = len(chat)
+	for id in peer_chat_index.keys():
+		var start: int = peer_chat_index[id]
+		if start < n:
+			_new_messages.rpc_id(id,chat.slice(start))
+			peer_chat_index[id] = n
+
+# Receive a new message from a client, to be distributed.
+@rpc(\"call_local\",\"any_peer\",\"reliable\")
+func _send_msg (msg: Array) -> void:
+	chat.append(msg)
+	return
+#
+###############################################################################
+
+# Receive new messages from the server.
+@rpc(\"reliable\")
+func _new_messages (msgs) -> void:
+	for msg in msgs:
+		var sender: String = msg[0]
+		var text: String = msg[1]
+		# Message from this own peer.
+		if sender == Globals.handle:
+			# Done the last peer messages.
+			current_peer_messages = null
+			var my_message: OwnMessage = own_message_scene.instantiate()
+			my_message.text = text
+			dialogue.add_child(my_message)
+		# Message from a peer.
+		else:
+			# Starting a new set of messages?
+			if current_peer_messages == null or sender != current_peer_messages.peer_name:
+				current_peer_messages = peer_message_scene.instantiate()
+				current_peer_messages.peer_name = sender
+				dialogue.add_child(current_peer_messages)
+			current_peer_messages.add_message(text)
+	# Send new message notification, if it wasn't immediately displayed.
+	if not visible: new_message_notifier.emit()
+	if not at_bottom():
+		new_message_notifier.emit()
+	# If at bottom, then keep scrolling to bottom.
+	if at_bottom():
+		to_bottom()
+
+# Send a message to the chat.
+func send_msg (text: String) -> void:
+	_send_msg.rpc_id(1,[Globals.handle,text])
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var s: VScrollBar = $MarginContainer/ScrollContainer.get_v_scroll_bar()
+	multiplayer.peer_connected.connect(_register)
+	multiplayer.peer_disconnected.connect(_unregister)
 	s.value_changed.connect(_on_scrolled)
 	s.changed.connect(_on_content_added)
-	# Add a sample conversation.
-	var convo: PeerMessages = peer_message_scene.instantiate()
-	convo.peer_name = \"Really should get their name\"
-	dialogue.add_child(convo)
-	convo.add_message(\"Of course I've seen a mango. Seen all kinds of fruits, man. Oh, a worm? I didn't know mango worms were a thing. I'll keep an eye out next time I'm in the grocery store though.\")
-	convo.add_message(\"Reeve? Seen him all over, man. He goes to our school. Wait. Do YOU even go here?\")
-	var convo2: PeerMessages = peer_message_scene.instantiate()
-	convo2.peer_name = \"Someone else\"
-	dialogue.add_child(convo2)
-	convo2.add_message(\"This is someone else talking now.\")
-	var mine: OwnMessage = own_message_scene.instantiate()
-	mine.text = \"This is my own text, with multiple lines.\"
-	dialogue.add_child(mine)
-	var mine2: OwnMessage = own_message_scene.instantiate()
-	mine2.text = \"This is another of my own texts.\"
-	dialogue.add_child(mine2)
-	to_bottom()
 
 # Check if scrolled to bottom of messages.
 func at_bottom () -> bool:
@@ -53,15 +118,9 @@ func to_bottom () -> void:
 
 # Called when the local user adds a new chat message.
 func _on_text_edit_text_submitted(new_text: String) -> void:
-	# Add the text to the chat
-	var mine: OwnMessage = own_message_scene.instantiate()
-	mine.text = new_text
-	dialogue.add_child(mine)
+	send_msg(new_text)
 	# Clear the text entry box.
 	$TextEdit.clear()
-	# If at bottom, then keep scrolling to bottom.
-	if at_bottom():
-		to_bottom()
 
 # Modify appearance of bottom button based on scroll position
 func _update_scroll_button () -> void:
@@ -213,6 +272,8 @@ offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("7_43f7p")
 
+[node name="ChatSyncTimer" type="Timer" parent="."]
+
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="text_submitted" from="TextEdit" to="." method="_on_text_edit_text_submitted"]
 [connection signal="gui_input" from="ToBottom" to="." method="_on_to_bottom_gui_input"]
@@ -221,3 +282,4 @@ texture = ExtResource("7_43f7p")
 [connection signal="gui_input" from="Close" to="." method="_on_close_gui_input"]
 [connection signal="mouse_entered" from="Close" to="." method="_on_close_mouse_entered"]
 [connection signal="mouse_exited" from="Close" to="." method="_on_close_mouse_exited"]
+[connection signal="timeout" from="ChatSyncTimer" to="." method="_on_chat_sync_timer_timeout"]

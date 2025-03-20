@@ -32,7 +32,6 @@ func _ready() -> void:
 # Make this screen a server process, listening for incoming connections.
 func _make_server () -> void:
 	multiplayer.multiplayer_peer = null
-	multiplayer.peer_connected.connect(_on_client_connected)
 	multiplayer.peer_disconnected.connect(_on_client_disconnected)
 	var peer := WebSocketMultiplayerPeer.new()
 	peer.create_server(1156)
@@ -182,8 +181,6 @@ var players := {}
 # Messages that appear on the top of the screen.
 var logs := []
 var next_log : int = 0
-# Chat history
-var chat := []
 
 # Pass user information once connection is made.
 func _on_connected_to_server () -> void:
@@ -206,9 +203,6 @@ func _on_server_disconnected () -> void:
 	# case ignore this signal.
 	if not Globals.is_client: return  # Already in the process of shutting down client and restarting.
 	restart()
-func _on_client_connected (id) -> void:
-	# When a client connects, synchronize their state.
-	_load_chat.rpc_id(id,chat)
 func _on_connection_failed() -> void:
 	$Overlay/LogLabel.text = "Connection failed.  Playing locally."
 func _on_client_disconnected (id) -> void:
@@ -219,9 +213,6 @@ func _on_client_disconnected (id) -> void:
 	worm.queue_free()
 	players.erase(id)
 # Give new client all info needed to get started.
-@rpc("reliable")
-func _load_chat (chat_history):
-	chat = chat_history
 @rpc("any_peer","reliable")
 func _register_player (handle) -> void:
 	# Create a worm for the player to control.
@@ -262,12 +253,6 @@ func _next_log () -> void:
 		var tween: Tween = get_tree().create_tween()
 		tween.tween_property($Overlay/LogLabel, "theme_override_colors/font_color", Color(0,1,0,0), 1)
 		tween.parallel().tween_property($Overlay/LogLabel, "theme_override_colors/font_outline_color", Color(0,0,0,0), 1)
-# Send a message to the chat.
-@rpc("any_peer","call_local","reliable")
-func _send_chat (msg: String) -> void:
-	var sender := multiplayer.get_remote_sender_id()
-	# Encode bubble position, sender info.
-	chat.append([players[sender][0],msg])
 
 # Connect signals for our worm.
 func _on_worm_spawner_spawned(worm: Worm) -> void:

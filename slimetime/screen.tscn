@@ -268,7 +268,7 @@ process_mode = 2
 visible = false
 
 [node name="Chat" parent="Overlay" instance=ExtResource("11_icvtr")]
-process_mode = 2
+process_mode = 3
 visible = false
 
 [node name="LogLabel" type="Label" parent="Overlay"]
