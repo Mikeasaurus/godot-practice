@@ -260,6 +260,10 @@ func _on_worm_spawner_spawned(worm: Worm) -> void:
 		worm.slime_shot.connect(shoot_slime)
 		worm.hurt.connect(multiplayer_death)
 
+####################
+# Chat integration
+####################
+
 # Highlight chat button when hovered.
 func _on_chat_button_mouse_entered() -> void:
 	$Overlay/Shortcuts/ChatButton.self_modulate = Color.WHITE
@@ -273,3 +277,8 @@ func _on_chat_button_gui_input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			get_tree().paused = true
 			MenuHandler.activate_menu($Overlay/Chat)
+# Show a little indicator when the chat has more messages available to read.
+func _on_chat_new_message_notifier() -> void:
+	$Overlay/Shortcuts/ChatButton/Notifier.show()
+func _on_chat_all_messages_read() -> void:
+	$Overlay/Shortcuts/ChatButton/Notifier.hide()

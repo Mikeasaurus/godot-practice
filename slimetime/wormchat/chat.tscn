@@ -129,6 +129,8 @@ func _update_scroll_button () -> void:
 	if at_bottom():
 		$ToBottom.hide()
 		$ToBottom/Notifier.hide()
+		# If the user is seeing the bottom messages, clear the notification signal.
+		if visible: all_messages_read.emit()
 	# Otherwise, show the button.
 	else:
 		$ToBottom.show()
@@ -273,6 +275,7 @@ offset_bottom = 40.0
 texture = ExtResource("7_43f7p")
 
 [node name="ChatSyncTimer" type="Timer" parent="."]
+wait_time = 0.5
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="text_submitted" from="TextEdit" to="." method="_on_text_edit_text_submitted"]

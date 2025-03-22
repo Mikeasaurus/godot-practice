@@ -258,6 +258,7 @@ tooltip_text = "Open chat window."
 texture = ExtResource("12_61u0q")
 
 [node name="Notifier" type="TextureRect" parent="Overlay/Shortcuts/ChatButton"]
+visible = false
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -322,3 +323,5 @@ curve = SubResource("Curve2D_reswt")
 [connection signal="mouse_entered" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_entered"]
 [connection signal="mouse_exited" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_exited"]
 [connection signal="quit" from="Overlay/PauseMenu" to="." method="restart"]
+[connection signal="all_messages_read" from="Overlay/Chat" to="." method="_on_chat_all_messages_read"]
+[connection signal="new_message_notifier" from="Overlay/Chat" to="." method="_on_chat_new_message_notifier"]
