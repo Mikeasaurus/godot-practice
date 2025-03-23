@@ -20,8 +20,29 @@ signal new_message_notifier
 ## Indicates that all new messages have been read.
 signal all_messages_read
 
+# A switch to call to_bottom on the next frame of processing.
+# Can't change the scroll position from the RPC call where we receive the
+# message(s); it immediately forgets the scroll value we set there.
+# So, instead ask _process to do it for us on the next cycle.
+var do_scroll_to_bottom: bool = false
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	var s: VScrollBar = $MarginContainer/ScrollContainer.get_v_scroll_bar()
+	multiplayer.peer_connected.connect(_register)
+	multiplayer.peer_disconnected.connect(_unregister)
+	s.value_changed.connect(_on_scrolled)
+	s.changed.connect(_on_content_added)
+# Handle scroll actions requested from outside of normal processing mode.
+func _process(_delta: float) -> void:
+	if do_scroll_to_bottom:
+		to_bottom()
+		do_scroll_to_bottom = false
+
 ###############################################################################
-# Server-side bookkeeping.
+# Server-side processing.
+###############################################################################
+
 # Keep track of how much history has been sent to each peer.
 var peer_chat_index: Dictionary = {}
 
@@ -59,7 +80,10 @@ func _on_chat_sync_timer_timeout() -> void:
 func _send_msg (msg: Array) -> void:
 	chat.append(msg)
 	return
-#
+
+
+###############################################################################
+# Client-side processing.
 ###############################################################################
 
 # Receive new messages from the server.
@@ -89,19 +113,11 @@ func _new_messages (msgs) -> void:
 		new_message_notifier.emit()
 	# If at bottom, then keep scrolling to bottom.
 	if at_bottom():
-		to_bottom()
+		do_scroll_to_bottom = true
 
 # Send a message to the chat.
 func send_msg (text: String) -> void:
 	_send_msg.rpc_id(1,[Globals.handle,text])
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	var s: VScrollBar = $MarginContainer/ScrollContainer.get_v_scroll_bar()
-	multiplayer.peer_connected.connect(_register)
-	multiplayer.peer_disconnected.connect(_unregister)
-	s.value_changed.connect(_on_scrolled)
-	s.changed.connect(_on_content_added)
 
 # Check if scrolled to bottom of messages.
 func at_bottom () -> bool:
