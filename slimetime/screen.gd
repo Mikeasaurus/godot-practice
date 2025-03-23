@@ -10,7 +10,9 @@ func _ready() -> void:
 	MenuHandler.done_submenus.connect(unpause_game)
 	if Globals.touchscreen_controls:
 		$Overlay/Shortcuts/PauseButton.show()
-		$Overlay/Shrotcuts/PauseButton.pressed.connect(pause_game)
+		$Overlay/Shortcuts/PauseButton.pressed.connect(pause_game)
+	if Globals.is_client:
+		$Overlay/Shortcuts/ChatButton.show()
 	# Connect worm damage signal directly to game over screen.
 	$Worm.hurt.connect(game_over)
 	# Use better names for the sprites generated from SpriteTileMapLayer.
@@ -67,6 +69,10 @@ func _input(event: InputEvent) -> void:
 		respawn()
 		is_dead_multiplayer = false
 		_is_dying_multiplayer = false
+	elif event.is_action_pressed("open_chat") and Globals.is_client:
+		# Do on next frame, to ingore the "c" character press in the chat window.
+		await get_tree().process_frame
+		open_chat()
 		
 func _on_worm_ate_bug() -> void:
 	Globals.score += 100
@@ -270,13 +276,15 @@ func _on_chat_button_mouse_entered() -> void:
 func _on_chat_button_mouse_exited() -> void:
 	$Overlay/Shortcuts/ChatButton.self_modulate = Color.hex(0xffffff77)
 # Open chat window with button pressed.
+func open_chat() -> void:
+	get_tree().paused = true
+	MenuHandler.activate_menu($Overlay/Chat)
 func _on_chat_button_gui_input(event: InputEvent) -> void:
 	# Ignore the chat functionality if in a game over state.
 	if is_game_over: return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			get_tree().paused = true
-			MenuHandler.activate_menu($Overlay/Chat)
+			open_chat()
 # Show a little indicator when the chat has more messages available to read.
 func _on_chat_new_message_notifier() -> void:
 	$Overlay/Shortcuts/ChatButton/Notifier.show()
