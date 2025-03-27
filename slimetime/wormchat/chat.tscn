@@ -29,8 +29,10 @@ var do_scroll_to_bottom: bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var s: VScrollBar = $MarginContainer/ScrollContainer.get_v_scroll_bar()
+	# Chat connect / disconnect signals
 	multiplayer.peer_connected.connect(_register)
 	multiplayer.peer_disconnected.connect(_unregister)
+	# ScrollContainer signals
 	s.value_changed.connect(_on_scrolled)
 	s.changed.connect(_on_content_added)
 # Handle scroll actions requested from outside of normal processing mode.
@@ -153,12 +155,28 @@ func _update_scroll_button () -> void:
 func _on_scrolled (_value: float) -> void:
 	_update_scroll_button()
 func _on_visibility_changed() -> void:
-	if visible:
-		to_bottom()
-		# Start focus on the text input box, so user can start typing immediately.
-		# https://www.reddit.com/r/godot/comments/kun5r7/is_there_a_way_to_set_a_node_as_focused_upon_game/?rdt=54934
-		# https://docs.godotengine.org/en/stable/tutorials/ui/gui_navigation.html#necessary-code
-		$TextEdit.grab_focus()
+	if not visible: return
+	to_bottom()
+	# Start focus on the text input box, so user can start typing immediately.
+	# https://www.reddit.com/r/godot/comments/kun5r7/is_there_a_way_to_set_a_node_as_focused_upon_game/?rdt=54934
+	# https://docs.godotengine.org/en/stable/tutorials/ui/gui_navigation.html#necessary-code
+	$TextEdit.grab_focus()
+	# Before displaying the first message, set horizontal spacing for the chat.
+	# Use a dummy chat message from a peer, long enough for line wrapping.
+	# This gives the maxiumum amount of horizontal space that would be used for a mesage.
+	if dialogue.custom_minimum_size.x == 0:
+		var sample: PeerMessages = peer_message_scene.instantiate()
+		sample.modulate = Color.TRANSPARENT
+		dialogue.add_child(sample)
+		sample.add_message(\"This is a really long message to cause wrapping.\")
+		# Need to wait 2 frames before the size of the dummy message gets updated.
+		await get_tree().process_frame
+		await get_tree().process_frame
+		# Enforce this size for the chat.
+		dialogue.custom_minimum_size.x = sample.size.x
+		# Clean out the dummy message (taking up vertical space).
+		dialogue.remove_child(sample)
+
 
 # Update appearance of bottom button when new content is available.
 func _on_content_added () -> void:
