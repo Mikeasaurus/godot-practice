@@ -4,6 +4,8 @@ extends Control
 var peer_message_scene := preload("res://wormchat/peer_messages.tscn")
 var own_message_scene := preload("res://wormchat/own_message.tscn")
 
+var icon_bg_colour: Color
+
 ## Notification for when new messages are in chat.
 signal new_message_notifier
 ## Indicates that all new messages have been read.
@@ -24,6 +26,13 @@ func _ready() -> void:
 	# ScrollContainer signals
 	s.value_changed.connect(_on_scrolled)
 	s.changed.connect(_on_content_added)
+	# Choose a background colour for the user.
+	# Pseudo-randomly chosen, based on hash of handle.
+	icon_bg_colour = Color.hex(0xffffffff)
+	var h: int = hash(Globals.handle)
+	icon_bg_colour.r8 -= (h%196); h /= 196
+	icon_bg_colour.g8 -= (h%196); h /= 196
+	icon_bg_colour.b8 -= (h%196); h /= 196
 # Handle scroll actions requested from outside of normal processing mode.
 func _process(_delta: float) -> void:
 	if do_scroll_to_bottom:
@@ -83,6 +92,7 @@ func _new_messages (msgs) -> void:
 	for msg in msgs:
 		var sender: String = msg[0]
 		var text: String = msg[1]
+		var icon_colours: Array[Color] = msg[2]
 		# Message from this own peer.
 		if sender == Globals.handle:
 			# Done the last peer messages.
@@ -97,7 +107,7 @@ func _new_messages (msgs) -> void:
 				current_peer_messages = peer_message_scene.instantiate()
 				current_peer_messages.peer_name = sender
 				dialogue.add_child(current_peer_messages)
-			current_peer_messages.add_message(text)
+			current_peer_messages.add_message(text, icon_colours)
 	# Send new message notification, if it wasn't immediately displayed.
 	if not visible: new_message_notifier.emit()
 	if not at_bottom():
@@ -108,7 +118,14 @@ func _new_messages (msgs) -> void:
 
 # Send a message to the chat.
 func send_msg (text: String) -> void:
-	_send_msg.rpc_id(1,[Globals.handle,text])
+	var icon_colours: Array[Color] = [
+		Globals.worm_body_colour,
+		Globals.worm_back_colour,
+		Globals.worm_front_colour,
+		Globals.worm_outline_colour,
+		icon_bg_colour
+	]
+	_send_msg.rpc_id(1,[Globals.handle,text,icon_colours])
 
 # Check if scrolled to bottom of messages.
 func at_bottom () -> bool:
@@ -119,7 +136,7 @@ func to_bottom () -> void:
 	var scroll: ScrollContainer = $MarginContainer/ScrollContainer
 	# Need to wait until next frame, in case new content was just added to ScrollContainer.
 	await get_tree().process_frame
-	scroll.scroll_vertical = scroll.get_v_scroll_bar().max_value
+	scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
 	# Update state of the scroll button (it should turn itself off at this point.)
 	_update_scroll_button()
 

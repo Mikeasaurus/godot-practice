@@ -13,15 +13,17 @@ func _ready() -> void:
 	$GridContainer/Label.text = "     " + peer_name
 
 # Add a chat message from the peer.
-func add_message (text: String) -> void:
+func add_message (text: String, icon_colours: Array[Color] = []) -> void:
 	var icon: Icon
 	# If first message, add new icon.
 	if $GridContainer.get_child_count() == 2:
 		icon = preload("res://wormchat/icon.tscn").instantiate()
-		icon.body = Globals.worm_body_colour
-		icon.back = Globals.worm_back_colour
-		icon.front = Globals.worm_front_colour
-		icon.outline = Globals.worm_outline_colour
+		if len(icon_colours) > 0:
+			icon.body = icon_colours[0]
+			icon.back = icon_colours[1]
+			icon.front = icon_colours[2]
+			icon.outline = icon_colours[3]
+			icon.bg = icon_colours[4]
 		$GridContainer.add_child(icon)
 	# Otherwise, need to move icon down to the next message.
 	else:

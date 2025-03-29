@@ -6,6 +6,7 @@ var body: Color
 var back: Color
 var front: Color
 var outline: Color
+var bg: Color
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -16,3 +17,4 @@ func _ready() -> void:
 	$Eyes.modulate = outline
 	$Mouth.modulate = body
 	$Outline.modulate = outline
+	$Background.modulate = bg
