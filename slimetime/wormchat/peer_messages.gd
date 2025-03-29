@@ -9,6 +9,7 @@ class_name PeerMessages
 var peer_name: String
 
 var icon_scene := preload("res://wormchat/icon.tscn")
+var text_scene := preload("res://wormchat/text.tscn")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -29,7 +30,7 @@ func add_message (text: String, icon_colours: Array[Color] = []) -> void:
 		$GridContainer.move_child(icon,-1)
 	# Update colours of the icon, in case the user recently changed them.
 	icon.update_colours(icon_colours)
-	var textbox: Text = preload("res://wormchat/text.tscn").instantiate()
+	var textbox: Text = text_scene.instantiate()
 	textbox.text = text # text
 	$GridContainer.add_child(textbox)
 	# Add a spacer between messages.
