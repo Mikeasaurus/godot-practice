@@ -46,6 +46,10 @@ func _process(_delta: float) -> void:
 # Keep track of how much history has been sent to each peer.
 var peer_chat_index: Dictionary = {}
 
+# Keep track of who is currently typing.
+# Key is handle, value is time of last typing activity.
+var last_typed: Dictionary = {}
+
 # Remember who the last peer message was from, in case we're continuing
 # with more messages from that peer.
 var current_peer_messages: PeerMessages = null
@@ -74,12 +78,32 @@ func _on_chat_sync_timer_timeout() -> void:
 		if start < n:
 			_new_messages.rpc_id(id,chat.slice(start))
 			peer_chat_index[id] = n
+	# Also send list of users who are currently typing.
+	var typers: Array[String] = []
+	var current_time: int = Time.get_ticks_msec()
+	for handle in last_typed.keys():
+		var duration: int = current_time - last_typed[handle]
+		# Include anyone that showed typing activity within the last N milliseconds.
+		if duration < 5000:
+			typers.append(handle)
+		# If no such recent activity, then clear them out.
+		# Not really needed, but this keeps the dictionary clean.
+		else:
+			last_typed.erase(handle)
+	_who_is_typing.rpc(typers)
 
+# Receive an update that a client is currently typing.
+@rpc("any_peer","reliable")
+func _peer_typing (handle: String):
+	last_typed[handle] = Time.get_ticks_msec()
 # Receive a new message from a client, to be distributed.
 @rpc("call_local","any_peer","reliable")
 func _send_msg (msg: Array) -> void:
 	chat.append(msg)
-	return
+	# If a client just sent a message, then clear their "typing" status.
+	var handle: String = msg[0]
+	if handle in last_typed:
+		last_typed.erase(handle)
 
 
 ###############################################################################
@@ -116,6 +140,21 @@ func _new_messages (msgs) -> void:
 	if at_bottom():
 		do_scroll_to_bottom = true
 
+# Receive updates about who is currently typing.
+@rpc("reliable")
+func _who_is_typing (peers: Array[String]) -> void:
+	if Globals.handle in peers:
+		peers.erase(Globals.handle)
+	if len(peers) == 0:
+		$PeerTypingLabel.text = ""
+	elif len(peers) == 1:
+		$PeerTypingLabel.text = peers[0] + " is typing..."
+	elif len(peers) == 2:
+		$PeerTypingLabel.text = peers[0] + " and " + peers[1] + " are typing..."
+	else:
+		$PeerTypingLabel.text = "Several worms are typing..."
+
+
 # Send a message to the chat.
 func send_msg (text: String) -> void:
 	var icon_colours: Array[Color] = [
@@ -140,6 +179,11 @@ func to_bottom () -> void:
 	# Update state of the scroll button (it should turn itself off at this point.)
 	_update_scroll_button()
 
+# Called when the local user is typing into the text input box.
+func _on_text_edit_text_changed(new_text: String) -> void:
+	# If the text box is non-empty, then send a "typing" status.
+	if new_text != "":
+		_peer_typing.rpc_id(1,Globals.handle)
 # Called when the local user adds a new chat message.
 func _on_text_edit_text_submitted(new_text: String) -> void:
 	send_msg(new_text)
