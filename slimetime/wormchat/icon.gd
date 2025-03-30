@@ -9,9 +9,19 @@ func _ready() -> void:
 		Globals.original_worm_back_colour,
 		Globals.original_worm_front_colour,
 		Globals.original_worm_outline_colour,
-		Color.WHITE
+		Globals.original_worm_icon_bg_colour
 	]
 	update_colours(default_colours)
+
+# Use the current user's colours for the worm.
+func use_local_colours() -> void:
+	update_colours([
+		Globals.worm_body_colour,
+		Globals.worm_back_colour,
+		Globals.worm_front_colour,
+		Globals.worm_outline_colour,
+		Globals.worm_icon_bg_colour
+	])
 
 # Update colours of the icon.
 func update_colours (icon_colours: Array[Color]) -> void:

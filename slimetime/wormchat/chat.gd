@@ -4,8 +4,6 @@ extends Control
 var peer_message_scene := preload("res://wormchat/peer_messages.tscn")
 var own_message_scene := preload("res://wormchat/own_message.tscn")
 
-var icon_bg_colour: Color
-
 ## Notification for when new messages are in chat.
 signal new_message_notifier
 ## Indicates that all new messages have been read.
@@ -26,13 +24,6 @@ func _ready() -> void:
 	# ScrollContainer signals
 	s.value_changed.connect(_on_scrolled)
 	s.changed.connect(_on_content_added)
-	# Choose a background colour for the user.
-	# Pseudo-randomly chosen, based on hash of handle.
-	icon_bg_colour = Color.hex(0xffffffff)
-	var h: int = hash(Globals.handle)
-	icon_bg_colour.r8 -= (h%196); h /= 196
-	icon_bg_colour.g8 -= (h%196); h /= 196
-	icon_bg_colour.b8 -= (h%196); h /= 196
 # Handle scroll actions requested from outside of normal processing mode.
 func _process(_delta: float) -> void:
 	if do_scroll_to_bottom:
@@ -162,7 +153,7 @@ func send_msg (text: String) -> void:
 		Globals.worm_back_colour,
 		Globals.worm_front_colour,
 		Globals.worm_outline_colour,
-		icon_bg_colour
+		Globals.worm_icon_bg_colour,
 	]
 	_send_msg.rpc_id(1,[Globals.handle,text,icon_colours])
 
