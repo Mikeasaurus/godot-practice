@@ -15,6 +15,9 @@ signal all_messages_read
 # So, instead ask _process to do it for us on the next cycle.
 var do_scroll_to_bottom: bool = false
 
+# Miscellaneous stuff
+var _ad_shown: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var s: VScrollBar = $MarginContainer/ScrollContainer.get_v_scroll_bar()
@@ -24,6 +27,9 @@ func _ready() -> void:
 	# ScrollContainer signals
 	s.value_changed.connect(_on_scrolled)
 	s.changed.connect(_on_content_added)
+	# Miscellaneous stuff
+	$SlimeNetAd/VBoxContainer/HBoxContainer/Button.pressed.connect(MenuHandler.deactivate_menu)
+	$SlimeNetAd/VBoxContainer/HBoxContainer/Button2.pressed.connect(MenuHandler.deactivate_menu)
 # Handle scroll actions requested from outside of normal processing mode.
 func _process(_delta: float) -> void:
 	if do_scroll_to_bottom:
@@ -205,7 +211,7 @@ func _on_visibility_changed() -> void:
 	# Before displaying the first message, set horizontal spacing for the chat.
 	# Use a dummy chat message from a peer, long enough for line wrapping.
 	# This gives the maxiumum amount of horizontal space that would be used for a mesage.
-	if dialogue.custom_minimum_size.x == 0:
+	if dialogue != null and dialogue.custom_minimum_size.x == 0:
 		var sample: PeerMessages = peer_message_scene.instantiate()
 		sample.modulate = Color.TRANSPARENT
 		dialogue.add_child(sample)
@@ -217,6 +223,11 @@ func _on_visibility_changed() -> void:
 		dialogue.custom_minimum_size.x = sample.size.x
 		# Clean out the dummy message (taking up vertical space).
 		dialogue.remove_child(sample)
+	# Small chance to display the SlimeNet ad when chat is opened.
+	if not _ad_shown and (randi() % 20) == 0:
+		await get_tree().create_timer(3).timeout
+		MenuHandler.activate_menu($SlimeNetAd)
+		_ad_shown = true
 
 
 # Update appearance of bottom button when new content is available.

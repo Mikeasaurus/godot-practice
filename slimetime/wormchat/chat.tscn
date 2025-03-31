@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://1fdldwucvxju"]
+[gd_scene load_steps=15 format=3 uid="uid://1fdldwucvxju"]
 
 [ext_resource type="Script" path="res://wormchat/chat.gd" id="1_e0o74"]
 [ext_resource type="PackedScene" uid="uid://csjewo2nqeufg" path="res://wormchat/title.tscn" id="2_kniyt"]
@@ -8,6 +8,28 @@
 [ext_resource type="Texture2D" uid="uid://ddxpyu1c5piy8" path="res://wormchat/to-bottom-button-notify.png" id="4_37x1g"]
 [ext_resource type="Texture2D" uid="uid://b4y1a6pmlxeht" path="res://wormchat/close-button-bg.png" id="6_ygs5f"]
 [ext_resource type="Texture2D" uid="uid://bglmtqsmv3q1x" path="res://wormchat/close-button-X.png" id="7_43f7p"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t5xt0"]
+bg_color = Color(0, 0.333333, 0.866667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_73o0f"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pujq2"]
+bg_color = Color(0, 0.333333, 0.866667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o2ffw"]
+bg_color = Color(0.0666667, 0.4, 0.933333, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1i7sp"]
+bg_color = Color(0, 0.333333, 0.866667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mekqn"]
+bg_color = Color(0, 0.333333, 0.866667, 1)
 
 [node name="Chat" type="Control"]
 layout_mode = 3
@@ -133,6 +155,72 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("7_43f7p")
+
+[node name="SlimeNetAd" type="CenterContainer" parent="."]
+visible = false
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect2" type="ColorRect" parent="SlimeNetAd"]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 2
+color = Color(0, 0, 0, 0.768627)
+
+[node name="ColorRect" type="ColorRect" parent="SlimeNetAd"]
+custom_minimum_size = Vector2(700, 550)
+layout_mode = 2
+color = Color(0.201527, 0.201527, 0.201527, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SlimeNetAd"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="SlimeNetAd/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_t5xt0")
+text = "    Sign up for SlimeNet Premium    "
+
+[node name="RichTextLabel" type="RichTextLabel" parent="SlimeNetAd/VBoxContainer"]
+custom_minimum_size = Vector2(0, 350)
+layout_mode = 2
+theme_override_font_sizes/italics_font_size = 24
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "
+[center][i]Special offer! [s]$39.99[/s] $29.99 / month![/i][/center]
+
+Receive the following perks with your membership:
+
+[ul] More slime emotes to choose from. [/ul]
+[ul] Increase your standing in the social hierarchy. [/ul]
+[ul] 10 new AI-generated friends. [/ul]
+[ul] Animated profile backgrounds. [/ul]"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SlimeNetAd/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 50
+
+[node name="Button" type="Button" parent="SlimeNetAd/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = " No Thanks "
+
+[node name="Button2" type="Button" parent="SlimeNetAd/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+theme_override_styles/focus = SubResource("StyleBoxFlat_73o0f")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_pujq2")
+theme_override_styles/hover = SubResource("StyleBoxFlat_o2ffw")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_1i7sp")
+theme_override_styles/normal = SubResource("StyleBoxFlat_mekqn")
+text = " I Have No Money "
 
 [node name="ChatSyncTimer" type="Timer" parent="."]
 wait_time = 0.5
