@@ -50,7 +50,10 @@ func _make_client () -> void:
 	var peer := WebSocketMultiplayerPeer.new()
 	peer.create_client("ws://"+Globals.check_invite(Globals.invite)+":1156")
 	multiplayer.multiplayer_peer = peer
-	$Overlay/LogLabel.text = "Attempting to connect..."
+	# Hide the screen until setup is complete.
+	# Need the sprites to be properly synced with server.  Before then, things
+	# are glitching out a bit.
+	hide()
 	# The rest of the setup will be done in _on_connected_to_server, once the
 	# connection is established.
 
@@ -181,6 +184,8 @@ func _on_connected_to_server () -> void:
 	_register_player.rpc_id(1,Globals.handle)
 	# Start the log message display, after a short delay (above) to wait for our own connection message.
 	_next_log()
+	await get_tree().create_timer(0.1).timeout
+	show()
 	$Overlay/LogTimer.start()
 # If server disconnects unexpectedly, return to main menu.
 func _on_server_disconnected () -> void:
