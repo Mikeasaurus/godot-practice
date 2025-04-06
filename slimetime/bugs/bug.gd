@@ -11,6 +11,10 @@ var starting_position: Vector2
 # Mainly useful for multiplayer mode, to keep the bug in the scene tree but disable it.
 @export var is_eaten: bool = false
 
+# Reference for sticking to moving platforms.
+var stuck_surface = null
+var stuck_offset: Vector2
+
 # Manage multiplayer synchronization of location/position.
 # These custom variables will be managed by MultiplayerSynchronizer, and
 # they will be connected to the physics via _integrate_forces.
@@ -22,7 +26,7 @@ var starting_position: Vector2
 @export var synced_rotation: float
 @export var synced_angular_velocity: float
 @export var _resync: bool = false
-func _integrate_forces(_state: PhysicsDirectBodyState2D) -> void:
+func _sync_properties() -> void:
 	if _resync:
 		position = synced_position
 		linear_velocity = synced_linear_velocity
@@ -39,6 +43,8 @@ func _integrate_forces(_state: PhysicsDirectBodyState2D) -> void:
 		linear_velocity = synced_linear_velocity
 		rotation = synced_rotation
 		angular_velocity = synced_angular_velocity
+func _integrate_forces(_state: PhysicsDirectBodyState2D) -> void:
+	_sync_properties ()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -48,9 +54,13 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	if is_eaten: return  # Don't react eaten bugs with any forces.. they just need to exist somewhere.
-	if is_slimed:
+	if is_slimed and not freeze:
 		apply_central_force(Vector2(0,Globals.gravity))
 		return
+	if freeze and stuck_surface != null and multiplayer.get_unique_id() == 1:
+		position = stuck_surface.global_position + stuck_offset
+		# If frozen, _integrate_forces not called.  So need to call sync from here.
+		_sync_properties()
 
 # Change state of the bug so it's in a dormant, slimed state.
 func get_slimed () -> void:
@@ -89,6 +99,8 @@ func _on_respawn_timer_timeout() -> void:
 	$CollisionShape2D.set_deferred("disabled",false)
 	is_slimed = false
 	is_eaten = false
+	set_deferred("freeze",false)
+	stuck_surface = null
 	visible = true
 
 func _on_body_entered(body: Node) -> void:
@@ -98,6 +110,15 @@ func _on_body_entered(body: Node) -> void:
 	if "get_collision_layer" in body:
 		if body.get_collision_layer() == 2 and not is_slimed:
 			get_slimed()
-	# Otherwise, hitting something solid, so make a thud.
+		# Check if already slimed, and hitting moving platform.
+		elif body.get_collision_layer() == 1 and is_slimed:
+			set_deferred("freeze",true)
+			stuck_surface = body
+			stuck_offset = position - body.global_position
+			$GroundSound.play()
+	# Otherwise, hitting stationary body.
 	else:
 		$GroundSound.play()
+		# If hitting something solid and already slimed, then stick to the surface.
+		set_deferred("freeze",true)
+		stuck_surface = null
