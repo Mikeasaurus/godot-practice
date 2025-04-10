@@ -32,15 +32,20 @@ func set_worm_front_colour(c: Color):
 func set_worm_outline_colour(c: Color):
 	worm_outline_colour = c
 	worm_colour_updated.emit()
+func set_worm_icon_bg_colour(c: Color):
+	worm_icon_bg_colour = c
+	worm_colour_updated.emit()
 var worm_body_colour: Color = Color.hex(0xff8e5bff): set = set_worm_body_colour
 var worm_back_colour: Color = Color.hex(0xf15c61ff): set = set_worm_back_colour
 var worm_front_colour: Color = Color.hex(0xfef0ccff): set = set_worm_front_colour
-var worm_outline_colour: Color = Color.hex(0x000000ff): set = set_worm_outline_colour
+var worm_outline_colour: Color = Color.BLACK: set = set_worm_outline_colour
+var worm_icon_bg_colour: Color = Color.WHITE: set = set_worm_icon_bg_colour
 # Remember original colour values, in case they need to be reset.
-var original_worm_body_colour = worm_body_colour
-var original_worm_back_colour = worm_back_colour
-var original_worm_front_colour = worm_front_colour
-var original_worm_outline_colour = worm_outline_colour
+var original_worm_body_colour: Color = worm_body_colour
+var original_worm_back_colour: Color = worm_back_colour
+var original_worm_front_colour: Color = worm_front_colour
+var original_worm_outline_colour: Color = worm_outline_colour
+var original_worm_icon_bg_colour: Color = worm_icon_bg_colour
 
 # Current score
 var score: int = 0
@@ -51,10 +56,13 @@ var debug_keys: bool = true
 # Use touchscreen interface?
 var touchscreen_controls: bool = DisplayServer.is_touchscreen_available()
 
+var chat_font: FontFile = null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
-
+	# Find the best font to use.
+	if ResourceLoader.exists("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf"):
+		chat_font = load("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:

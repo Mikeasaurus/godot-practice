@@ -92,6 +92,16 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Escape key"
 
+[node name="ChatLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Chat"
+
+[node name="ChatText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "C"
+
 [node name="GridContainer_touchscreen" type="GridContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
 visible = false
 layout_mode = 2
@@ -138,6 +148,16 @@ text = "Pause"
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Pause button in top left corner"
+
+[node name="ChatLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Chat"
+
+[node name="ChatText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_touchscreen"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Chat button in top left corner"
 
 [node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2

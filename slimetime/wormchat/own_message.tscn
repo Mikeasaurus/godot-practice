@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://b02glflgb3x4o"]
+
+[ext_resource type="Script" path="res://wormchat/own_message.gd" id="1_1co6p"]
+[ext_resource type="PackedScene" uid="uid://dg81msdx5nimm" path="res://wormchat/own_text.tscn" id="1_4s6ep"]
+
+[node name="OwnMessage" type="MarginContainer"]
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -45.0
+offset_bottom = 45.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_bottom = 20
+script = ExtResource("1_1co6p")
+
+[node name="OwnText" parent="." instance=ExtResource("1_4s6ep")]
+layout_mode = 2
+size_flags_horizontal = 8

@@ -1,0 +1,46 @@
+[gd_scene load_steps=10 format=3 uid="uid://dui3wdxe57p5r"]
+
+[ext_resource type="Texture2D" uid="uid://bm4d25o6vbagc" path="res://wormchat/icon-background.png" id="1_lsokn"]
+[ext_resource type="Script" path="res://wormchat/icon.gd" id="1_m14jm"]
+[ext_resource type="Texture2D" uid="uid://b7mgdesxpi5ii" path="res://wormchat/icon-outline.png" id="2_dkn2r"]
+[ext_resource type="Texture2D" uid="uid://bq8heuw2p3b5l" path="res://wormchat/icon-body.png" id="3_n8ykt"]
+[ext_resource type="Texture2D" uid="uid://8wjx60r0mdcf" path="res://wormchat/icon-top.png" id="4_8kqqu"]
+[ext_resource type="Texture2D" uid="uid://ddk8e8p84kspd" path="res://wormchat/icon-belly.png" id="5_rs48t"]
+[ext_resource type="Texture2D" uid="uid://oocrdnp2th3a" path="res://wormchat/icon-appendage-outline.png" id="6_24on1"]
+[ext_resource type="Texture2D" uid="uid://bqx2hayimu7ek" path="res://wormchat/icon-eyes.png" id="7_3na6d"]
+[ext_resource type="Texture2D" uid="uid://dt35ua8kwioyy" path="res://wormchat/icon-mouth.png" id="8_03qrb"]
+
+[node name="Icon" type="CenterContainer"]
+script = ExtResource("1_m14jm")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_lsokn")
+
+[node name="Outline" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("2_dkn2r")
+
+[node name="Body" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("3_n8ykt")
+
+[node name="Top" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("4_8kqqu")
+
+[node name="Belly" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("5_rs48t")
+
+[node name="AppendageOutline" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("6_24on1")
+
+[node name="Eyes" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("7_3na6d")
+
+[node name="Mouth" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("8_03qrb")

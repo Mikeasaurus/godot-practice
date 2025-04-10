@@ -1,0 +1,234 @@
+[gd_scene load_steps=14 format=3 uid="uid://1fdldwucvxju"]
+
+[ext_resource type="Script" path="res://wormchat/chat.gd" id="1_e0o74"]
+[ext_resource type="PackedScene" uid="uid://csjewo2nqeufg" path="res://wormchat/title.tscn" id="2_kniyt"]
+[ext_resource type="Texture2D" uid="uid://dnwslu4hiovni" path="res://wormchat/to-bottom-button-bg.png" id="2_yr72g"]
+[ext_resource type="Texture2D" uid="uid://b1oo5b0yq33pw" path="res://wormchat/to-bottom-button-arrow.png" id="3_jsmi6"]
+[ext_resource type="Texture2D" uid="uid://ddxpyu1c5piy8" path="res://wormchat/to-bottom-button-notify.png" id="4_37x1g"]
+[ext_resource type="Texture2D" uid="uid://b4y1a6pmlxeht" path="res://wormchat/close-button-bg.png" id="6_ygs5f"]
+[ext_resource type="Texture2D" uid="uid://bglmtqsmv3q1x" path="res://wormchat/close-button-X.png" id="7_43f7p"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t5xt0"]
+bg_color = Color(0, 0.333333, 0.866667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_73o0f"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pujq2"]
+bg_color = Color(0, 0.333333, 0.866667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o2ffw"]
+bg_color = Color(0.0666667, 0.4, 0.933333, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1i7sp"]
+bg_color = Color(0, 0.333333, 0.866667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mekqn"]
+bg_color = Color(0, 0.333333, 0.866667, 1)
+
+[node name="Chat" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_e0o74")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.768627)
+
+[node name="Title" parent="." instance=ExtResource("2_kniyt")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -127.0
+offset_top = 50.0
+offset_right = 127.0
+offset_bottom = 56.0
+grow_horizontal = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 150
+theme_override_constants/margin_bottom = 200
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PeerTypingLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -272.0
+offset_top = 360.0
+offset_right = 907.0
+offset_bottom = 394.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 24
+
+[node name="TextEdit" type="LineEdit" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -274.0
+offset_top = -143.0
+offset_right = 275.0
+offset_bottom = -74.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 30
+max_length = 255
+
+[node name="ToBottom" type="TextureRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 1339.0
+offset_top = 805.0
+offset_right = 1439.0
+offset_bottom = 905.0
+tooltip_text = "Scroll to latest message."
+texture = ExtResource("2_yr72g")
+metadata/_edit_group_ = true
+
+[node name="Arrow" type="TextureRect" parent="ToBottom"]
+modulate = Color(0.466667, 0.466667, 0.466667, 1)
+layout_mode = 0
+texture = ExtResource("3_jsmi6")
+
+[node name="Notifier" type="TextureRect" parent="ToBottom"]
+visible = false
+layout_mode = 0
+texture = ExtResource("4_37x1g")
+
+[node name="Close" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1339.0
+offset_top = 30.0
+offset_right = 1439.0
+offset_bottom = 130.0
+tooltip_text = "Close the chat window."
+texture = ExtResource("6_ygs5f")
+
+[node name="X" type="TextureRect" parent="Close"]
+modulate = Color(0.466667, 0.466667, 0.466667, 1)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("7_43f7p")
+
+[node name="SlimeNetAd" type="CenterContainer" parent="."]
+visible = false
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect2" type="ColorRect" parent="SlimeNetAd"]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 2
+color = Color(0, 0, 0, 0.768627)
+
+[node name="ColorRect" type="ColorRect" parent="SlimeNetAd"]
+custom_minimum_size = Vector2(700, 550)
+layout_mode = 2
+color = Color(0.201527, 0.201527, 0.201527, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SlimeNetAd"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="SlimeNetAd/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_t5xt0")
+text = "    Sign up for SlimeNet Premium    "
+
+[node name="RichTextLabel" type="RichTextLabel" parent="SlimeNetAd/VBoxContainer"]
+custom_minimum_size = Vector2(0, 350)
+layout_mode = 2
+theme_override_font_sizes/italics_font_size = 24
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "
+[center][i]Special offer! [s]$39.99[/s] $29.99 / month![/i][/center]
+
+Receive the following perks with your membership:
+
+[ul] More slime emotes to choose from. [/ul]
+[ul] Increase your standing in the social hierarchy. [/ul]
+[ul] 10 new AI-generated friends. [/ul]
+[ul] Animated profile backgrounds. [/ul]"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SlimeNetAd/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 50
+
+[node name="Button" type="Button" parent="SlimeNetAd/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = " No Thanks "
+
+[node name="Button2" type="Button" parent="SlimeNetAd/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+theme_override_styles/focus = SubResource("StyleBoxFlat_73o0f")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_pujq2")
+theme_override_styles/hover = SubResource("StyleBoxFlat_o2ffw")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_1i7sp")
+theme_override_styles/normal = SubResource("StyleBoxFlat_mekqn")
+text = " I Have No Money "
+
+[node name="ChatSyncTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="text_changed" from="TextEdit" to="." method="_on_text_edit_text_changed"]
+[connection signal="text_submitted" from="TextEdit" to="." method="_on_text_edit_text_submitted"]
+[connection signal="gui_input" from="ToBottom" to="." method="_on_to_bottom_gui_input"]
+[connection signal="mouse_entered" from="ToBottom" to="." method="_on_to_bottom_mouse_entered"]
+[connection signal="mouse_exited" from="ToBottom" to="." method="_on_to_bottom_mouse_exited"]
+[connection signal="gui_input" from="Close" to="." method="_on_close_gui_input"]
+[connection signal="mouse_entered" from="Close" to="." method="_on_close_mouse_entered"]
+[connection signal="mouse_exited" from="Close" to="." method="_on_close_mouse_exited"]
+[connection signal="timeout" from="ChatSyncTimer" to="." method="_on_chat_sync_timer_timeout"]

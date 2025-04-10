@@ -62,8 +62,9 @@ func _input(event: InputEvent) -> void:
 		elif Globals.touchscreen_controls:
 			_recent_click = true
 			$DoubletapTimer.start()
-		# For shooting slime, pass the general direction for shooting the slime.
-		segments[0].shoot_slime(get_global_mouse_position())
+		# Note: slime shooting action is triggered by Screen scene, not here.
+		# This way it won't be triggered if the user is just clicking on a button
+		# on the Screen.
 	# Debug action... grow the worm on command.
 	if Globals.debug_keys and event is InputEventKey and event.is_action_pressed("grow"):
 		# Add a new segment, just behind the front segment.
@@ -339,6 +340,10 @@ func _physics_process(delta: float) -> void:
 @rpc("authority","call_local","reliable")
 func _jump_sound () -> void:
 	$WormFront/JumpSound.play()
+
+# Tell worm to shoot slime, aiming at the given direction on screen.
+func shoot_slime (target: Vector2) -> void:
+	segments[0].shoot_slime(target)
 
 # Explode the worm.
 # (WHY???)
