@@ -30,6 +30,10 @@ func _ready() -> void:
 	# Miscellaneous stuff
 	$SlimeNetAd/VBoxContainer/HBoxContainer/Button.pressed.connect(MenuHandler.deactivate_menu)
 	$SlimeNetAd/VBoxContainer/HBoxContainer/Button2.pressed.connect(MenuHandler.deactivate_menu)
+	if Globals.chat_font != null:
+		$Title/Center/Label.add_theme_font_override("font",Globals.chat_font)
+		$PeerTypingLabel.add_theme_font_override("font",Globals.chat_font)
+		$TextEdit.add_theme_font_override("font",Globals.chat_font)
 # Handle scroll actions requested from outside of normal processing mode.
 func _process(_delta: float) -> void:
 	if do_scroll_to_bottom:

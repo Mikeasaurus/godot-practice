@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://dt4x5es854la3"]
+[gd_scene load_steps=2 format=3 uid="uid://dt4x5es854la3"]
 
 [ext_resource type="Script" path="res://wormchat/peer_messages.gd" id="1_1p7jb"]
-[ext_resource type="FontFile" uid="uid://drlm1tywrqgeh" path="res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf" id="2_e8ir2"]
 
 [node name="PeerMessages" type="MarginContainer"]
 offset_right = 40.0
@@ -21,5 +20,4 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
-theme_override_fonts/font = ExtResource("2_e8ir2")
 theme_override_font_sizes/font_size = 24

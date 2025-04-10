@@ -56,10 +56,13 @@ var debug_keys: bool = true
 # Use touchscreen interface?
 var touchscreen_controls: bool = DisplayServer.is_touchscreen_available()
 
+var chat_font: FontFile = null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
-
+	# Find the best font to use.
+	if ResourceLoader.exists("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf"):
+		chat_font = load("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:

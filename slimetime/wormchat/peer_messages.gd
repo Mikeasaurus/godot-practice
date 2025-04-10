@@ -14,6 +14,8 @@ var text_scene := preload("res://wormchat/text.tscn")
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	$GridContainer/Label.text = "     " + peer_name
+	if Globals.chat_font != null:
+		$GridContainer/Label.add_theme_font_override("font",Globals.chat_font)
 
 # Add a chat message from the peer.
 func add_message (text: String, icon_colours: Array[Color] = []) -> void:
