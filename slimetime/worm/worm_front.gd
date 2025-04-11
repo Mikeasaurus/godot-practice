@@ -1,7 +1,6 @@
 extends WormSegment
 
 signal ate_bug
-signal slime_shot (pos: Vector2, vel: Vector2)
 
 # Use these PackedScenes to instansiate these effects at runtime.
 # Alternatively, could use "preload" on the scene files.
@@ -80,30 +79,27 @@ func refresh_colour_scheme (body = null, back = null, front = null, outline = nu
 		frame.get_node("Backleg").modulate = front
 		frame.get_node("Outlines").modulate = outline
 
-func shoot_slime (t = null) -> void:
+# Get ready to shoot slime from the worm.
+# Note: This does everything except spawn the slime.
+# That has to be done at a higher level to ensure it's managed by the right authority.
+func shoot_slime (t: Vector2) -> Array[Vector2]:
 		# Where the slime originates from (based on position of worm's mouth).
 		var slime_start: Vector2 = mouth_position.rotated($Sprites.global_rotation)
-		# If no target direction given, then shoot straight ahead.
-		var slime_direction: Vector2 = facing_direction
-		# The input argument is the direction to shoot.
-		if t != null:
-			slime_direction = (t-(global_position+slime_start)).normalized()
-			# If shooting in backwards direction, turn the head around first.
-			# It will turn around anyway after a split second because the walk action will
-			# be brielfly triggered, but then the slime starting location would be for the original
-			# mouth location before turning around.
-			if slime_direction.dot(facing_direction) < 0:
-				facing_direction *= -1
-				update_sprite()
-				# Refresh slime starting location.
-				slime_start = mouth_position.rotated($Sprites.global_rotation)
-
-		# Send a signal to parent scene requesting a slime be created.
-		# Can't create it directly in this scene because the ownership isn't right
-		# for working with multiplayer sessions.
-		slime_shot.emit(global_position + slime_start, slime_direction * Globals.slime_speed)
+		var slime_direction: Vector2 = (t-(global_position+slime_start)).normalized()
+		# If shooting in backwards direction, turn the head around first.
+		# It will turn around anyway after a split second because the walk action will
+		# be brielfly triggered, but then the slime starting location would be for the original
+		# mouth location before turning around.
+		if slime_direction.dot(facing_direction) < 0:
+			facing_direction *= -1
+			update_sprite()
+			# Refresh slime starting location.
+			slime_start = mouth_position.rotated($Sprites.global_rotation)
 		# Play a sound when shooting slime.
 		_spit_sound.rpc()
+		# Return the starting position and velocity for the slime.
+		# Slime will be constructed at a higher level in the tree.
+		return [global_position + slime_start, slime_direction * Globals.slime_speed]
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func __process(_delta: float) -> void:

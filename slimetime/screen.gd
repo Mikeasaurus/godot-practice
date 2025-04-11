@@ -150,32 +150,24 @@ func unpause_game () -> void:
 	get_tree().paused = false
 
 # Handle slime shooting.
-# Note: this is kind of a roundabout approach right now.
-# - Click action is captured by ClickableArea,
-# - which calls shoot_slime on the Worm,
-# - which calls shoot_slime on the WormFront,
-# - which emits a slime_shot signal back to the Worm,
-# - which emis a slime_shot signal back to the Screen,
-# - which invokes shoot_slime on the Screen,
-# - which invokes rpc method _shoot_slime
-# It wasn't always like this... slime used to be handled entirely within WormFront.
-# However, with the addition of multiplayer, needed to bring the slime spawning
-# to the Screen level in order for it to be handled by the server authority.
-# I think I will refactor this very soon!
 func _on_clickable_area_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			var worm: Worm = $Worm
 			if worm == null: worm = $Worms.get_node("worm"+str(multiplayer.get_unique_id()))
-			worm.shoot_slime(get_global_mouse_position())
-func shoot_slime (pos: Vector2, vel: Vector2):
-	# Invoke on server.
-	_shoot_slime.rpc_id(1, pos, vel)
+			# Query worm for where slime should be spawned.
+			var position_and_velocity: Array[Vector2] = worm.segments[0].shoot_slime(get_global_mouse_position())
+			var pos: Vector2 = position_and_velocity[0]
+			var vel: Vector2 = position_and_velocity[1]
+			# Spawn the slime.
+			# Worm front could be z_index+5 if turned around.
+			_shoot_slime.rpc_id(1, pos, vel, worm.segments[0].z_index+5)
 @rpc("any_peer","call_local","reliable")
-func _shoot_slime (pos: Vector2, vel: Vector2):
+func _shoot_slime (pos: Vector2, vel: Vector2, z: int = 0):
 	var slime = $SlimeSpawner.spawn()
 	slime.global_position = pos
 	slime.linear_velocity = vel
+	slime.z_index = z
 func _spawn_slime (_data):
 	var slime := preload("res://features/slime.tscn").instantiate()
 	# Only enable collision detection on server copy of slime.
@@ -268,7 +260,6 @@ func _next_log () -> void:
 # Connect signals for our worm.
 func _on_worm_spawner_spawned(worm: Worm) -> void:
 	if worm.name == "worm"+str(multiplayer.get_unique_id()):
-		worm.slime_shot.connect(shoot_slime)
 		worm.hurt.connect(multiplayer_death)
 
 ####################

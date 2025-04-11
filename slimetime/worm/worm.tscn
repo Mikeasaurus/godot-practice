@@ -34,5 +34,4 @@ stream = ExtResource("5_xygfj")
 
 [connection signal="ate_bug" from="WormFront" to="." method="_on_worm_front_ate_bug"]
 [connection signal="landed" from="WormFront" to="." method="_on_worm_front_landed"]
-[connection signal="slime_shot" from="WormFront" to="." method="_on_worm_front_slime_shot"]
 [connection signal="timeout" from="DoubletapTimer" to="." method="_on_doubletap_timer_timeout"]

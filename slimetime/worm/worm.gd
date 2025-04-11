@@ -5,8 +5,6 @@ class_name Worm
 signal ate_bug
 ## Signal emitted when damage is taken.  Parent scene could use this to update a health bar, or end the game.
 signal hurt
-## Signal emitted when a slime is being shot.
-signal slime_shot (pos: Vector2, vel: Vector2)
 
 # Array to hold individual worm segments.
 var segments: Array[WormSegment] = []
@@ -341,10 +339,6 @@ func _physics_process(delta: float) -> void:
 func _jump_sound () -> void:
 	$WormFront/JumpSound.play()
 
-# Tell worm to shoot slime, aiming at the given direction on screen.
-func shoot_slime (target: Vector2) -> void:
-	segments[0].shoot_slime(target)
-
 # Explode the worm.
 # (WHY???)
 func explode () -> void:
@@ -377,10 +371,6 @@ func _on_doubletap_timer_timeout() -> void:
 # This is called when a worm segment sends a signal saying it took damage.
 func _on_hurt() -> void:
 	hurt.emit()
-
-# This is called when the worm front is shooting out slime.
-func _on_worm_front_slime_shot(pos: Vector2, vel: Vector2) -> void:
-	slime_shot.emit(pos, vel)
 
 # Play sound when the worm lands on a surface.
 @rpc("authority","call_local","reliable")

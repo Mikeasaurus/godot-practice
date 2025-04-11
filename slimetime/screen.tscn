@@ -317,7 +317,6 @@ position = Vector2(416, 4025)
 curve = SubResource("Curve2D_reswt")
 
 [connection signal="ate_bug" from="Worm" to="." method="_on_worm_ate_bug"]
-[connection signal="slime_shot" from="Worm" to="." method="shoot_slime"]
 [connection signal="spawned" from="WormSpawner" to="." method="_on_worm_spawner_spawned"]
 [connection signal="gui_input" from="Overlay/ClickableArea" to="." method="_on_clickable_area_gui_input"]
 [connection signal="gui_input" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_gui_input"]
