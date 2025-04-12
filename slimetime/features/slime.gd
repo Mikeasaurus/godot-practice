@@ -25,6 +25,8 @@ func _create_splatter (pos: Vector2, direction: Vector2) -> void:
 		# Have to do a deferred call for adding the particles, otherwise get the error message:
 		# ERROR: Can't change this state while flushing queries. Use call_deferred() or set_deferred() to change monitoring state instead.
 		call_deferred("add_sibling",p)
+	# Play a sound.
+	$SplatSound.play()
 
 # Get normal to any surface that's contacted, align direction vectors accordingly.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
@@ -34,16 +36,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if state.get_contact_count() > 0 and $Sprite2D.visible:
 		var n: Vector2 = state.get_contact_local_normal(0)
 		_create_splatter.rpc (position, n)
-		# Play a sound.
-		_splat_sound.rpc()
 		# Turn slime invisible until gets cleaned up.
 		$Sprite2D.visible = false
 		# Also stop it from colliding, so bugs don't get hit by stray, invisible slimes.
 		collision_layer = 0
-
-@rpc("authority","call_local","reliable")
-func _splat_sound () -> void:
-	$SplatSound.play()
 
 func _on_splat_sound_finished() -> void:
 	# Only clean up from server or single player.
