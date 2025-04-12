@@ -136,6 +136,7 @@ func restart () -> void:
 	MenuHandler.clear_menus()
 	# Disconnect from server.
 	multiplayer.multiplayer_peer.close()
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	# Go back to main menu.
 	get_tree().change_scene_to_file("res://menus/main_menu.tscn")
 
