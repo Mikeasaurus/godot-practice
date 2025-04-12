@@ -52,6 +52,8 @@ func _make_server () -> void:
 	multiplayer.multiplayer_peer = peer
 	# Don't trigger menus on server process.
 	MenuHandler.pause.disconnect(pause_game)
+	# Don't trigger slimes from screen clicking.
+	$Overlay/ClickableArea.hide()
 # Make this screen a client process, and connect to the specified server.
 func _make_client () -> void:
 	multiplayer.multiplayer_peer = null
