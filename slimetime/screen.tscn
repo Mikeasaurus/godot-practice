@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=20 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
@@ -7,7 +7,6 @@
 [ext_resource type="PackedScene" uid="uid://01ew1cglhaiw" path="res://bugs/bee.tscn" id="6_d1ftp"]
 [ext_resource type="PackedScene" uid="uid://buloqvk1emlul" path="res://bugs/fly.tscn" id="6_etxo6"]
 [ext_resource type="PackedScene" uid="uid://tohwherbpoe1" path="res://bugs/butterfly.tscn" id="7_uqsqx"]
-[ext_resource type="PackedScene" uid="uid://b4103dh1cjumw" path="res://menus/pause_menu.tscn" id="7_y7xe8"]
 [ext_resource type="PackedScene" uid="uid://b6wvdu21f1ewl" path="res://bugs/firefly.tscn" id="8_g1hl4"]
 [ext_resource type="Texture2D" uid="uid://b0ash4kuopfii" path="res://menus/pause.png" id="10_805ly"]
 [ext_resource type="PackedScene" uid="uid://duh80b506tef8" path="res://features/platform.tscn" id="11_5ahw7"]
@@ -260,10 +259,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("13_r8qe4")
 
-[node name="PauseMenu" parent="Overlay" instance=ExtResource("7_y7xe8")]
-process_mode = 2
-visible = false
-
 [node name="Chat" parent="Overlay" instance=ExtResource("11_icvtr")]
 process_mode = 3
 visible = false
@@ -316,6 +311,5 @@ curve = SubResource("Curve2D_reswt")
 [connection signal="gui_input" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_gui_input"]
 [connection signal="mouse_entered" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_entered"]
 [connection signal="mouse_exited" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_exited"]
-[connection signal="quit" from="Overlay/PauseMenu" to="." method="restart"]
 [connection signal="all_messages_read" from="Overlay/Chat" to="." method="_on_chat_all_messages_read"]
 [connection signal="new_message_notifier" from="Overlay/Chat" to="." method="_on_chat_new_message_notifier"]

@@ -21,15 +21,27 @@ func _ready() -> void:
 	$SpriteTileMapLayer.update_internals()
 	for c in $SpriteTileMapLayer.get_children():
 		c.name = c.scene_file_path.split('/')[-1].split('.')[0]+"_"+str(c.position.x)+"_"+str(c.position.y)
-	# If multiplayer mode, set up client or server instance (whichever is needed).
 	$WormSpawner.spawn_function = _spawn_worm
 	$SlimeSpawner.spawn_function = _spawn_slime
+	# If multiplayer mode, set up client or server instance (whichever is needed).
 	if Globals.is_client:
 		_make_client()
 	elif Globals.is_server:
 		_make_server()
 	else:
 		_make_local()
+
+# Dynamically set up pause menu.
+# This has to be done after server is set up, or there's some error messages
+# when running in a multiplayer context (some elements within the menu system
+# attempt to get a unique multiplayer id, and fail).
+func make_pause_menu() -> void:
+	var pause_menu: Control = load("res://menus/pause_menu.tscn").instantiate()
+	$Overlay.add_child(pause_menu)
+	pause_menu.quit.connect(restart)
+	pause_menu.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	pause_menu.hide()
+
 
 # Make this screen a server process, listening for incoming connections.
 func _make_server () -> void:
@@ -63,6 +75,8 @@ func _make_local() -> void:
 	worm.hurt.connect(game_over)
 	# Update score when bug eaten in local game.
 	worm.ate_bug.connect(_on_worm_ate_bug)
+	# Set up pause menu.
+	make_pause_menu()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -193,6 +207,10 @@ var next_log : int = 0
 
 # Pass user information once connection is made.
 func _on_connected_to_server () -> void:
+	# Add pause menu.
+	# Have to wait until server connection, or some elements of the pause menu
+	# (maybe appearance editor?) complain about being unable to get unique id.
+	make_pause_menu()
 	# Start displaying log messages from the server, rate limited.
 	$Overlay/LogTimer.timeout.connect(_next_log)
 	# Hide the score, not used for multiplayer.
