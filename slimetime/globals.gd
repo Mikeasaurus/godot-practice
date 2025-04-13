@@ -51,7 +51,7 @@ var original_worm_icon_bg_colour: Color = worm_icon_bg_colour
 var score: int = 0
 
 # Enable debug keys
-var debug_keys: bool = true
+var debug_keys: bool = false
 
 # Use touchscreen interface?
 var touchscreen_controls: bool = DisplayServer.is_touchscreen_available()
