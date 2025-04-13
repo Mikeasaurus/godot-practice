@@ -64,6 +64,12 @@ func _ready() -> void:
 	if ResourceLoader.exists("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf"):
 		chat_font = load("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf")
 
+# Delegate requests for adding slime splatter particles to the screen.
+# There are multiple contexts in which the splatter could be generated, and it
+# ultimately has to be managed by the Screen instance.  So this signal acts as
+# an intermediary to get that splatter to happen.
+signal request_splatter (pos: Vector2, direction: Vector2)
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	pass

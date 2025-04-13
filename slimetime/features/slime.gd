@@ -18,8 +18,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	# Only splat if a surface is hit, and only splat once.
 	if state.get_contact_count() > 0 and $Sprite2D.visible:
 		var n: Vector2 = state.get_contact_local_normal(0)
-		var splatter: Splatter = Splatter.create(global_position, n)
-		add_sibling(splatter)
+		Globals.request_splatter.emit(global_position, n, z_index)
 		queue_free()
 
 

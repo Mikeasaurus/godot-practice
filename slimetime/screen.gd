@@ -23,6 +23,9 @@ func _ready() -> void:
 		c.name = c.scene_file_path.split('/')[-1].split('.')[0]+"_"+str(c.position.x)+"_"+str(c.position.y)
 	$WormSpawner.spawn_function = _spawn_worm
 	$SlimeSpawner.spawn_function = _spawn_slime
+	$SplatterSpawner.spawn_function = _spawn_splatter
+	# Handle requests to put slime splatters on the screen from other (child) scenes.
+	Globals.request_splatter.connect(_make_splatter)
 	# If multiplayer mode, set up client or server instance (whichever is needed).
 	if Globals.is_client:
 		_make_client()
@@ -198,6 +201,20 @@ func _spawn_slime (_data):
 	if Globals.is_client:
 		slime.collision_mask = 0
 	return slime
+func _make_splatter (pos: Vector2, direction: Vector2, z: int = 0):
+	# Make sure this is only done on authority.
+	# The other clients will see it via SplatterSpawner.
+	if multiplayer.get_unique_id() != 1: return
+	$SplatterSpawner.spawn(PackedVector2Array([pos,direction,Vector2(z,0)]))
+func _spawn_splatter (data: PackedVector2Array):
+	var splatter: Splatter = preload("res://features/splatter.tscn").instantiate()
+	var pos: Vector2 = data[0]
+	var direction: Vector2 = data[1]
+	var z: int = int(data[2].x)
+	splatter.global_position = pos
+	splatter.direction = direction
+	splatter.z_index = z
+	return splatter
 
 # Multiplayer functionality
 
