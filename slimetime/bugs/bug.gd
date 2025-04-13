@@ -43,8 +43,12 @@ func _sync_properties() -> void:
 		linear_velocity = synced_linear_velocity
 		rotation = synced_rotation
 		angular_velocity = synced_angular_velocity
-func _integrate_forces(_state: PhysicsDirectBodyState2D) -> void:
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	_sync_properties ()
+	# Check if a slimed bug is hitting a surface, make splatter effect.
+	if is_slimed and state.get_contact_count() > 0:
+		var n: Vector2 = state.get_contact_local_normal(0)
+		Globals.request_splatter.emit(global_position, n, z_index+1)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
