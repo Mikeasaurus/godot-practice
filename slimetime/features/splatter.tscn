@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://b8p0fdmad0vcv"]
+
+[ext_resource type="Script" path="res://features/splatter.gd" id="1_yvdg8"]
+[ext_resource type="AudioStream" uid="uid://c20jw10h4xbfj" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="2_lwbs2"]
+[ext_resource type="PackedScene" uid="uid://b675104byppv0" path="res://features/particle.tscn" id="2_rp1d8"]
+
+[node name="Splatter" type="Node2D"]
+script = ExtResource("1_yvdg8")
+particle_scene = ExtResource("2_rp1d8")
+
+[node name="SplatSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("2_lwbs2")
+
+[connection signal="finished" from="SplatSound" to="." method="_on_splat_sound_finished"]
