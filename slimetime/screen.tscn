@@ -265,10 +265,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("13_r8qe4")
 
-[node name="Chat" parent="Overlay" instance=ExtResource("11_icvtr")]
-process_mode = 3
-visible = false
-
 [node name="LogLabel" type="Label" parent="Overlay"]
 offset_left = 126.0
 offset_top = 3.0
@@ -282,6 +278,10 @@ horizontal_alignment = 1
 
 [node name="LogTimer" type="Timer" parent="Overlay"]
 wait_time = 3.0
+
+[node name="Chat" parent="Overlay" instance=ExtResource("11_icvtr")]
+process_mode = 3
+visible = false
 
 [node name="GameOverScreen" type="CanvasLayer" parent="."]
 visible = false
