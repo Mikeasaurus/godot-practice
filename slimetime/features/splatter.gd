@@ -27,11 +27,6 @@ static func create (pos: Vector2, dir: Vector2) -> Splatter:
 	splatter.direction = dir
 	return splatter
 	
-	
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
-
 func _on_splat_sound_finished() -> void:
 	# Only clean up from server or single player.
 	# Remote clients will have the scene managed by a MultiplayerSpawner.

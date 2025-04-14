@@ -51,10 +51,6 @@ func _ready() -> void:
 		Globals.original_worm_icon_bg_colour = icon_bg_colour
 		_bg.color = Globals.worm_icon_bg_colour
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
-
 func _on_back_button_pressed() -> void:
 	MenuHandler.deactivate_menu()
 

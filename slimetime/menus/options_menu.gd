@@ -20,10 +20,6 @@ func _ready() -> void:
 		$MarginContainer/CenterContainer/VBoxContainer/GridContainer/VBoxContainer/SubViewPortContainer/SubViewport/Worm/WormFront/Sprites/Camera2D.offset = Vector2(-32,-25)
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
-
 func _on_back_button_pressed() -> void:
 	MenuHandler.deactivate_menu()
 

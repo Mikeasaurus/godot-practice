@@ -5,10 +5,6 @@ extends RigidBody2D
 func _ready() -> void:
 	pass # Replace with function body.
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass # Replace with function body.
-	
 # Remove particle if it touches something solid, or leaves the screen. 
 func _on_body_entered(_body: Node2D) -> void:
 	queue_free()

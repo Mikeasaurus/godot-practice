@@ -70,10 +70,6 @@ func _ready() -> void:
 # an intermediary to get that splatter to happen.
 signal request_splatter (pos: Vector2, direction: Vector2)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
-
 # Multiplayer information.
 var is_client: bool = false
 var is_server: bool = false

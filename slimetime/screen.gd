@@ -84,10 +84,6 @@ func _make_local() -> void:
 	# Set up pause menu.
 	make_pause_menu()
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
-
 # Listen for some keys.
 func _input(event: InputEvent) -> void:
 	if is_in_menu: return  # Ignore key presses while user is navigating a menu.
