@@ -3,6 +3,9 @@ extends Control
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	MenuHandler.done_submenus.connect(_return_from_submenu)
+	# Can't "quit" from web version.
+	if OS.get_name() == "Web":
+		$MarginContainer/CenterContainer/VBoxContainer/QuitButton.hide()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -26,3 +29,6 @@ func _on_credits_button_pressed() -> void:
 # When submenus are done, need to show the main menu again.
 func _return_from_submenu() -> void:
 	$MarginContainer.show()
+
+func _on_quit_button_pressed() -> void:
+	get_tree().quit()
