@@ -284,6 +284,9 @@ func _spawn_worm (data):
 	# Set the multiplayer authority for this worm.
 	# (the client that will control the worm movement).
 	worm.set_multiplayer_authority(id)
+	# If this is our worm, display it in front of any other worms in the same area.
+	if id == multiplayer.get_unique_id():
+		worm.z_index += 25  # 5 segments in a worm, each with up to 5 sub-layers?
 	return worm
 # Send a system message to the clients.
 @rpc("call_local","reliable")
