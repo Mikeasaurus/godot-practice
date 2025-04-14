@@ -74,6 +74,11 @@ func get_slimed () -> void:
 	# amount of time... so we don't run out of bugs to play with.
 	if Globals.is_server:
 		$RespawnTimer.start()
+	# Actually, respawn in single player mode too.  So if the player slimes the bug
+	# but it lands somewhere inaccessible, it will go back to its usual spot
+	# in a minute so the user can try again.
+	elif not Globals.is_client:
+		$RespawnTimer.start()
 
 # Get eaten.
 func eat () -> void:
