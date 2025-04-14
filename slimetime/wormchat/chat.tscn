@@ -222,6 +222,15 @@ text = " I Have No Money "
 [node name="ChatSyncTimer" type="Timer" parent="."]
 wait_time = 0.5
 
+[node name="SubmitButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1253.0
+offset_top = 938.0
+offset_right = 1325.0
+offset_bottom = 1003.0
+theme_override_font_sizes/font_size = 40
+text = "  >  "
+
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="text_changed" from="TextEdit" to="." method="_on_text_edit_text_changed"]
 [connection signal="text_submitted" from="TextEdit" to="." method="_on_text_edit_text_submitted"]
@@ -232,3 +241,4 @@ wait_time = 0.5
 [connection signal="mouse_entered" from="Close" to="." method="_on_close_mouse_entered"]
 [connection signal="mouse_exited" from="Close" to="." method="_on_close_mouse_exited"]
 [connection signal="timeout" from="ChatSyncTimer" to="." method="_on_chat_sync_timer_timeout"]
+[connection signal="pressed" from="SubmitButton" to="." method="_on_submit_button_pressed"]

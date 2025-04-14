@@ -187,9 +187,15 @@ func _on_text_edit_text_changed(new_text: String) -> void:
 		_peer_typing.rpc_id(1,Globals.handle)
 # Called when the local user adds a new chat message.
 func _on_text_edit_text_submitted(new_text: String) -> void:
+	if new_text == "": return  # Ignore blank text submissions.
 	send_msg(new_text)
 	# Clear the text entry box.
 	$TextEdit.clear()
+# Button for submitting text (same effect as pressing enter key).
+func _on_submit_button_pressed() -> void:
+	_on_text_edit_text_submitted($TextEdit.text)
+	# Put focus back on text box.
+	$TextEdit.grab_focus()
 
 # Modify appearance of bottom button based on scroll position
 func _update_scroll_button () -> void:
