@@ -2,6 +2,7 @@ extends Node2D
 
 var is_game_over: bool = false
 var is_dead_multiplayer: bool = false
+var is_in_menu: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -42,7 +43,7 @@ func make_pause_menu() -> void:
 	var pause_menu: Control = load("res://menus/pause_menu.tscn").instantiate()
 	$Overlay.add_child(pause_menu)
 	pause_menu.quit.connect(restart)
-	pause_menu.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	pause_menu.process_mode = Node.PROCESS_MODE_ALWAYS
 	pause_menu.hide()
 
 
@@ -89,6 +90,7 @@ func _process(_delta: float) -> void:
 
 # Listen for some keys.
 func _input(event: InputEvent) -> void:
+	if is_in_menu: return  # Ignore key presses while user is navigating a menu.
 	if Globals.debug_keys and event.is_action_pressed("instakill"):
 		game_over()
 	elif is_game_over == true and (event is InputEventKey or event is InputEventMouseButton) and event.pressed:
@@ -171,11 +173,19 @@ func restart () -> void:
 func pause_game () -> void:
 	# Ignore the pause functionality if in a game over state.
 	if is_game_over: return
-	get_tree().paused = true
+	# For single player, pause the screen.
+	# For multiplayer, need to keep everything running.
+	if not Globals.is_client:
+		get_tree().paused = true
+	# Ignore keys while in a menu system (don't move the worm).
+	is_in_menu = true
+	my_worm().controllable = false
 	MenuHandler.activate_menu($Overlay/PauseMenu)
 
 func unpause_game () -> void:
 	get_tree().paused = false
+	is_in_menu = false
+	my_worm().controllable = true
 
 # Handle slime shooting.
 func _on_clickable_area_gui_input(event: InputEvent) -> void:
@@ -314,7 +324,8 @@ func _on_chat_button_mouse_exited() -> void:
 	$Overlay/Shortcuts/ChatButton.self_modulate = Color.hex(0xffffff77)
 # Open chat window with button pressed.
 func open_chat() -> void:
-	get_tree().paused = true
+	is_in_menu = true
+	my_worm().controllable = false
 	MenuHandler.activate_menu($Overlay/Chat)
 func _on_chat_button_gui_input(event: InputEvent) -> void:
 	# Ignore the chat functionality if in a game over state.

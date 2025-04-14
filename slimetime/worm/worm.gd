@@ -30,7 +30,7 @@ var _recent_click: bool = false
 # Whether to keep worm segments together, or let them roll around independently.
 var _coherent: bool = true
 # Whether to listen for keyboard controls.
-var _controllable: bool = true
+var controllable: bool = true
 # Whether worm is locally managed.
 var _local: bool = true
 
@@ -42,7 +42,7 @@ func _ready() -> void:
 	segments.append_array([$WormFront, $WormSegment3, $WormSegment2, $WormSegment1, $WormTail])
 	# If this is a multiplayer game and this isn't *our* worm, then make it passive.
 	if (Globals.is_client or Globals.is_server) and get_multiplayer_authority() != multiplayer.get_unique_id():
-		_controllable = false
+		controllable = false
 		_local = false
 		return
 	# Listen for damage taken by any of the segments.
@@ -50,7 +50,7 @@ func _ready() -> void:
 		segment.hurt.connect(_on_hurt)
 
 func _input(event: InputEvent) -> void:
-	if not _controllable: return
+	if not controllable: return
 	# Mouse / touch event
 	if event is InputEventMouseButton and event.pressed:
 		# This is a fallback for when automatic detection of double-click / double-tap fails.
@@ -244,24 +244,25 @@ func _physics_process(delta: float) -> void:
 	# Generate a force of motion in response to user input (front segment only)
 	# Determine direction to move in, based on direction specified by user.
 	var move_direction: Vector2 = Vector2.ZERO
-	if Input.is_action_pressed("move_right"):
-		move_direction += Vector2(1,0)
-	if Input.is_action_pressed("move_left"):
-		move_direction += Vector2(-1,0)
-	if Input.is_action_pressed("move_down"):
-		move_direction += Vector2(0,1)
-	if Input.is_action_pressed("move_up"):
-		move_direction += Vector2(0,-1)
-	# Quick hack for maintaining movement so long as a movement key is held down.
-	if move_direction == Vector2.ZERO:
-		_key_held = false
-	elif _key_held:
-		move_direction = segments[0].facing_direction
-	# Check for mouse / touchscreen input as well.
-	if Globals.touchscreen_controls and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		var click_pos: Vector2 = get_global_mouse_position()
-		var worm_pos: Vector2 = segments[0].global_position
-		move_direction = (click_pos - worm_pos)
+	if controllable:
+		if Input.is_action_pressed("move_right"):
+			move_direction += Vector2(1,0)
+		if Input.is_action_pressed("move_left"):
+			move_direction += Vector2(-1,0)
+		if Input.is_action_pressed("move_down"):
+			move_direction += Vector2(0,1)
+		if Input.is_action_pressed("move_up"):
+			move_direction += Vector2(0,-1)
+		# Quick hack for maintaining movement so long as a movement key is held down.
+		if move_direction == Vector2.ZERO:
+			_key_held = false
+		elif _key_held:
+			move_direction = segments[0].facing_direction
+		# Check for mouse / touchscreen input as well.
+		if Globals.touchscreen_controls and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			var click_pos: Vector2 = get_global_mouse_position()
+			var worm_pos: Vector2 = segments[0].global_position
+			move_direction = (click_pos - worm_pos)
 
 	var head: WormSegment = segments[0]
 	# Check if there's any user-driven movement, and if it's not orthogonal
@@ -304,7 +305,7 @@ func _physics_process(delta: float) -> void:
 	# I'm handling it here because this will interact with the worm's physics, and
 	# I want those modifications to be done as synchronously as possible (all within _physics_process)
 	# so there's no contention of forces/reactions or unexpected behaviour.
-	if Input.is_action_just_pressed("jump") or _jump_triggered:
+	if controllable and (Input.is_action_just_pressed("jump") or _jump_triggered):
 		_jump_triggered = false  # _jump_triggered is a flag to capture double-clicks from _input.
 		if segments[0].on_surface:
 			# Apply jump sound.  Only once.
@@ -347,7 +348,7 @@ func explode () -> void:
 	if not _coherent: return
 	# Turn off all activity for the worm (slime shooting, walking, jumping, etc.)
 	_coherent = false
-	_controllable = false
+	controllable = false
 	# Detach the segments from any surface and add a random impulse to each segment.
 	for s in segments:
 		s.release_from_surface()
@@ -357,7 +358,7 @@ func respawn () -> void:
 	for s in segments:
 		s.respawn()
 	_coherent = true
-	_controllable = true
+	controllable = true
 
 # Pass along signal when a bug is eaten.
 func _on_worm_front_ate_bug() -> void:
