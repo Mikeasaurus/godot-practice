@@ -68,6 +68,7 @@ func _ready() -> void:
 # There are multiple contexts in which the splatter could be generated, and it
 # ultimately has to be managed by the Screen instance.  So this signal acts as
 # an intermediary to get that splatter to happen.
+@warning_ignore("unused_signal")  # This signal is actually used, just in other scenes.
 signal request_splatter (pos: Vector2, direction: Vector2)
 
 # Multiplayer information.
