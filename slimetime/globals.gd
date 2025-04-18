@@ -91,6 +91,21 @@ func check_invite (code: String) -> String:
 		n >>= 8
 		s = str(n%256) + '.' + s
 	return s
+func make_invite (s: String) -> String:
+	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	var n: int = 0
+	for x in s.split('.'):
+		n <<= 8
+		n += int(x)
+	n = (n*17345149)%(36**8-19)
+	n = (n*541)%(36**8-19)
+	n = (n*241)%(36**8-19)
+	var a: Array[String] = []
+	for i in range(8):
+		@warning_ignore("integer_division")
+		a.append(table[n/(36**(7-i))])
+		n %= (36**(7-i))
+	return str(''.join(a))
 
 # Reset global variables (when game restarts).
 func reset () -> void:

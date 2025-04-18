@@ -6,6 +6,10 @@ func _ready() -> void:
 	# Can't "quit" from web version.
 	if OS.get_name() == "Web":
 		$MarginContainer/CenterContainer/VBoxContainer/QuitButton.hide()
+	# If running in headless mode, then immediately start the server.
+	if DisplayServer.get_name() == "headless":
+		Globals.is_server = true
+		get_tree().call_deferred("change_scene_to_file","res://screen.tscn")
 
 func _on_new_game_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://screen.tscn")

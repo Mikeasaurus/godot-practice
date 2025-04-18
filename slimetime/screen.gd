@@ -58,6 +58,16 @@ func _make_server () -> void:
 	MenuHandler.pause.disconnect(pause_game)
 	# Don't trigger slimes from screen clicking.
 	$Overlay/ClickableArea.hide()
+	$HTTPRequest.request_completed.connect(_print_invite_code)
+	$HTTPRequest.request('https://api.ipify.org')
+func _print_invite_code (result: int, _response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	if result != HTTPRequest.Result.RESULT_SUCCESS: return
+	var invite: String = Globals.make_invite(body.get_string_from_utf8())
+	var message: String = "Server started, listening on port 1156\nInvite code:  " + invite
+	print (message)
+	$ServerScreen/ConnectionInfo.text = message
+	$ServerScreen.show()
+
 # Make this screen a client process, and connect to the specified server.
 func _make_client () -> void:
 	multiplayer.multiplayer_peer = null

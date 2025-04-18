@@ -70,7 +70,6 @@ custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 48
-text = "RLDEJR4W"
 max_length = 10
 
 [node name="DisplayNameLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
@@ -81,7 +80,6 @@ text = "Display Name:"
 [node name="DisplayNameLineEdit" type="LineEdit" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
-text = "Mike"
 max_length = 20
 
 [node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
@@ -106,6 +104,7 @@ theme_override_font_sizes/font_size = 48
 text = "Connect"
 
 [node name="ServerButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 48
