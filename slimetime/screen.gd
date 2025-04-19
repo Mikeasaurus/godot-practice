@@ -1,6 +1,9 @@
 extends Node2D
 
 var score: int = 0
+var bugs_eaten: int = 0
+var total_bugs: int = 0
+@onready var start_time: int = Time.get_ticks_msec()
 
 var is_game_over: bool = false
 var is_dead_multiplayer: bool = false
@@ -24,6 +27,7 @@ func _ready() -> void:
 	$SpriteTileMapLayer.update_internals()
 	for c in $SpriteTileMapLayer.get_children():
 		c.name = c.scene_file_path.split('/')[-1].split('.')[0]+"_"+str(c.position.x)+"_"+str(c.position.y)
+		total_bugs += 1
 	$WormSpawner.spawn_function = _spawn_worm
 	$SlimeSpawner.spawn_function = _spawn_slime
 	$SplatterSpawner.spawn_function = _spawn_splatter
@@ -113,8 +117,11 @@ func _input(event: InputEvent) -> void:
 		open_chat()
 		
 func _on_worm_ate_bug() -> void:
+	bugs_eaten += 1
 	score += 100
 	$Overlay/Score.text = "Score:\n %d"%score
+	if bugs_eaten == total_bugs:
+		won_game()
 
 # Get the player's own worm.
 func my_worm() -> Worm:
@@ -124,10 +131,13 @@ func my_worm() -> Worm:
 func game_over () -> void:
 	if is_game_over: return  # Game Over screen already initiated?
 	my_worm().explode()
+	var prompt: String
 	if Globals.touchscreen_controls:
-		$GameOverScreen/Label.text = "GAME OVER\nScore: %d\n\nTap screen to restart"%score
+		prompt = "Tap screen to restart"
 	else:
-		$GameOverScreen/Label.text = "GAME OVER\nScore: %d\n\nPress any key / click to restart"%score
+		prompt = "Press any key / click to restart"
+	@warning_ignore("integer_division")
+	$GameOverScreen/Label.text = "GAME OVER\nScore: %d\nBugs eaten: %d/%d (%d%%)\n\n%s"%[score,bugs_eaten,total_bugs,score/total_bugs,prompt]
 	$GameOverScreen.visible = true
 	# Fade in the "GAME OVER" text.
 	var tween: Tween = get_tree().create_tween()
@@ -166,10 +176,38 @@ func respawn () -> void:
 	my_worm().respawn()
 	$GameOverScreen.visible = false
 
+# When the player has eaten all the bugs, display a message before restarting.
+@warning_ignore("integer_division")
+func won_game () -> void:
+	if is_game_over: return  # Game Over screen already initiated?
+	my_worm().controllable = false
+	var time: int = (Time.get_ticks_msec() - start_time) / 1000
+	var hours: int = time / 3600
+	time %= 3600
+	var minutes: int = time / 60
+	var seconds: int = time % 60
+	var tstring: String = "%02d:%02d:%02d"%[hours,minutes,seconds]
+	var prompt: String
+	if Globals.touchscreen_controls:
+		prompt = "Tap screen to restart"
+	else:
+		prompt = "Press any key / click to restart"
+	$GameOverScreen/Label.text = "CONGRATULATIONS!\nAll bugs eaten!\nTotal time: %s\n\n%s"%[tstring,prompt]
+	$GameOverScreen/ColorRect.color = Color.hex(0x00ff0080)
+	$GameOverScreen.visible = true
+	# Fade in the "GAME OVER" text.
+	var tween: Tween = get_tree().create_tween()
+	tween.tween_interval(1.0)
+	tween.tween_property($GameOverScreen/Label, "theme_override_colors/font_color", Color.WHITE, 1.0)
+	# Delay before waiting for a key press to restart.
+	# "await" idea copied from ProjectEruption.
+	await get_tree().create_timer(2.0).timeout
+	is_game_over = true
+
 # Restart the game after a game over screen.
 func restart () -> void:
 	get_tree().paused = false  # Unpause the game.
-	Globals.reset()  # Reset global state (score, etc.)
+	Globals.reset()  # Reset global state
 	MenuHandler.clear_menus()
 	# Disconnect from server.
 	multiplayer.multiplayer_peer.close()
