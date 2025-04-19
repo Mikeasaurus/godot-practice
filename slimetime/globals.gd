@@ -47,9 +47,6 @@ var original_worm_front_colour: Color = worm_front_colour
 var original_worm_outline_colour: Color = worm_outline_colour
 var original_worm_icon_bg_colour: Color = worm_icon_bg_colour
 
-# Current score
-var score: int = 0
-
 # Enable debug keys
 var debug_keys: bool = false
 
@@ -109,6 +106,5 @@ func make_invite (s: String) -> String:
 
 # Reset global variables (when game restarts).
 func reset () -> void:
-	score = 0
 	is_client = false
 	is_server = false

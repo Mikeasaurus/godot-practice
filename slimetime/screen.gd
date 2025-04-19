@@ -1,5 +1,7 @@
 extends Node2D
 
+var score: int = 0
+
 var is_game_over: bool = false
 var is_dead_multiplayer: bool = false
 var is_in_menu: bool = false
@@ -111,8 +113,8 @@ func _input(event: InputEvent) -> void:
 		open_chat()
 		
 func _on_worm_ate_bug() -> void:
-	Globals.score += 100
-	$Overlay/Score.text = "Score:\n %d"%Globals.score
+	score += 100
+	$Overlay/Score.text = "Score:\n %d"%score
 
 # Get the player's own worm.
 func my_worm() -> Worm:
@@ -123,9 +125,9 @@ func game_over () -> void:
 	if is_game_over: return  # Game Over screen already initiated?
 	my_worm().explode()
 	if Globals.touchscreen_controls:
-		$GameOverScreen/Label.text = "GAME OVER\nScore: %d\n\nTap screen to restart"%Globals.score
+		$GameOverScreen/Label.text = "GAME OVER\nScore: %d\n\nTap screen to restart"%score
 	else:
-		$GameOverScreen/Label.text = "GAME OVER\nScore: %d\n\nPress any key / click to restart"%Globals.score
+		$GameOverScreen/Label.text = "GAME OVER\nScore: %d\n\nPress any key / click to restart"%score
 	$GameOverScreen.visible = true
 	# Fade in the "GAME OVER" text.
 	var tween: Tween = get_tree().create_tween()
