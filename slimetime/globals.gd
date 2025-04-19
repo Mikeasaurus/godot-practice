@@ -58,7 +58,9 @@ var chat_font: FontFile = null
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Find the best font to use.
-	if ResourceLoader.exists("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf"):
+	if ResourceLoader.exists(("res://fonts/ProximaSoft/ProximaSoft-SemiBold.woff2")):
+		chat_font = load("res://fonts/ProximaSoft/ProximaSoft-SemiBold.woff2")
+	elif ResourceLoader.exists("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf"):
 		chat_font = load("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf")
 
 # Delegate requests for adding slime splatter particles to the screen.
