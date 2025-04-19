@@ -238,6 +238,8 @@ func _on_clickable_area_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			var worm: Worm = my_worm()
+			# In case not initialized yet (clicked screen *just* after starting).
+			if worm == null: return
 			# Query worm for where slime should be spawned.
 			var position_and_velocity: Array[Vector2] = worm.segments[0].shoot_slime(get_global_mouse_position())
 			var pos: Vector2 = position_and_velocity[0]
