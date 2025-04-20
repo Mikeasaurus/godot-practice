@@ -60,8 +60,8 @@ func _ready() -> void:
 	# Find the best font to use.
 	if ResourceLoader.exists(("res://fonts/ProximaSoft/ProximaSoft-SemiBold.woff2")):
 		chat_font = load("res://fonts/ProximaSoft/ProximaSoft-SemiBold.woff2")
-	elif ResourceLoader.exists("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf"):
-		chat_font = load("res://fonts/roundedmplus1c/RoundedMplus1c-Medium.ttf")
+	else:
+		chat_font = load("res://fonts/nautica-rounded/nautica-rounded.semibold.ttf")
 
 # Delegate requests for adding slime splatter particles to the screen.
 # There are multiple contexts in which the splatter could be generated, and it
