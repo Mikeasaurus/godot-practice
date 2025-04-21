@@ -2,6 +2,9 @@ extends Node
 
 # Global parameters
 
+# Current version of the game.
+var version: String = "0.1.0"
+
 # Strength of gravity
 var gravity: float = 500
 

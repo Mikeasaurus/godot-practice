@@ -3,6 +3,8 @@ extends Control
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	MenuHandler.done_submenus.connect(_return_from_submenu)
+	# Print version info.
+	$VersionLabel.text = "Slime Time v" + Globals.version
 	# Can't "quit" from web version.
 	if OS.get_name() == "Web":
 		$MarginContainer/CenterContainer/VBoxContainer/QuitButton.hide()
