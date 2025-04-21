@@ -36,12 +36,24 @@ func _on_connect_button_pressed() -> void:
 	multiplayer.multiplayer_peer = peer
 	# Stop user from trying to connect while establishing a connection.
 	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ConnectButton.disabled = true
-func _on_connection_failed():
+func _error_message (msg: String) -> void:
 	var stderr: Label = $MarginContainer/CenterContainer/VBoxContainer/ErrorLabel
-	stderr.text = "Connection failed"
+	stderr.text = msg
 	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ConnectButton.disabled = false
+func _on_connection_failed():
+	_error_message ("Connection failed")
 # This is called when the server connection is tested, and is a working server.
 func _on_connected_to_server():
+	# Get server info.
+	Globals.server_info.connect(_on_server_info_received)
+	Globals.request_server_info()
+func _on_server_info_received (info: Dictionary) -> void:
+	# Make sure we have a compatible version.
+	if info['version'] != Globals.version:
+		_error_message ("Server requires version %s to connect."%info['version'])
+		multiplayer.multiplayer_peer.close()
+		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+		return
 	# Clear this menu off the stack.
 	MenuHandler.deactivate_menu()
 	# Start the main game screen, which should detect the client / server info above (held in global state).

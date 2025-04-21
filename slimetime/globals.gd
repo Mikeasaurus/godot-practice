@@ -5,6 +5,20 @@ extends Node
 # Current version of the game.
 var version: String = "0.1.0"
 
+# Query server information.
+# To use: connect the server_info signal, and then call request_server_info().
+signal server_info (info: Dictionary)
+func request_server_info () -> void:
+	_request_server_info.rpc_id(1)
+@rpc("any_peer","reliable")
+func _request_server_info () -> void:
+	if multiplayer.get_unique_id() != 1: return
+	var id: int = multiplayer.get_remote_sender_id()
+	receive_server_info.rpc_id(id,{'version':version})
+@rpc("authority","reliable")
+func receive_server_info (info: Dictionary) -> void:
+	server_info.emit(info)
+
 # Strength of gravity
 var gravity: float = 500
 
