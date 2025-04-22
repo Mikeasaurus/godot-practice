@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://mm5w2ifcivrb"]
+[gd_scene load_steps=6 format=3 uid="uid://mm5w2ifcivrb"]
 
 [ext_resource type="Texture2D" uid="uid://ckqysw7v7gbjw" path="res://wormchat/upperleftwhitebubble.png" id="1_8i1k3"]
 [ext_resource type="Script" path="res://wormchat/text.gd" id="1_xse5n"]
@@ -44,6 +44,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.2, 0.2, 1)
 theme_override_constants/line_spacing = -10
 theme_override_font_sizes/font_size = 30
+vertical_alignment = 1
 
 [node name="ColorRect" type="ColorRect" parent="CenterVBox/Center/Label"]
 z_index = -1

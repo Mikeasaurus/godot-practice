@@ -7,6 +7,8 @@ var text: String
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	if Globals.chat_font != null:
+		$CenterVBox/Center/Label.add_theme_font_override("font",Globals.chat_font)
 	$CenterVBox/Center/Label.text = text
 
 # Apply line wrapping.
