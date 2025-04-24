@@ -33,7 +33,10 @@ func _sync_properties() -> void:
 		rotation = synced_rotation
 		angular_velocity = synced_angular_velocity
 		_resync = false
-	elif not Globals.is_client:
+		return
+	# The rest of this logic is only needed in multiplayer context.
+	if not Globals.is_client and not Globals.is_server: return
+	if not Globals.is_client:
 		synced_position = position
 		synced_linear_velocity = linear_velocity
 		synced_rotation = rotation
