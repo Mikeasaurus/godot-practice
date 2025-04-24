@@ -77,6 +77,8 @@ func _ready() -> void:
 	# Find the best font to use.
 	if ResourceLoader.exists(("res://fonts/ProximaSoft/ProximaSoft-SemiBold.woff2")):
 		chat_font = load("res://fonts/ProximaSoft/ProximaSoft-SemiBold.woff2")
+	elif ResourceLoader.exists(("res://fonts/ProximaSoft/ProximaSoft-SemiBold.otf")):
+		chat_font = load("res://fonts/ProximaSoft/ProximaSoft-SemiBold.otf")
 	else:
 		chat_font = load("res://fonts/nautica-rounded/nautica-rounded.semibold.ttf")
 
