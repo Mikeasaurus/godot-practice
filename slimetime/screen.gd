@@ -27,6 +27,22 @@ func _ready() -> void:
 	$SpriteTileMapLayer.update_internals()
 	for c in $SpriteTileMapLayer.get_children():
 		c.name = c.scene_file_path.split('/')[-1].split('.')[0]+"_"+str(c.position.x)+"_"+str(c.position.y)
+		# Define visibility range for bugs' MultiplayerSynchronizer.
+		# Will stop sending sync updates once out of range.
+		# Need to define it within an anonymous function here so we have access to
+		# the bug context.
+		if Globals.is_server:
+			var f = func bug_is_visible (peer: int) -> bool:
+				if peer == 0: return false
+				var w: Worm = peer_worm(peer)
+				# During initialization, always update all bugs.
+				if w == null: return true
+				var diff: Vector2 = c.global_position - w.segments[0].global_position
+				if abs(diff.x) > Globals.visibility_range.x: return false
+				if abs(diff.y) > Globals.visibility_range.y: return false
+				return true
+			var s: MultiplayerSynchronizer = c.get_node("MultiplayerSynchronizer")
+			s.call_deferred("add_visibility_filter",f)
 		total_bugs += 1
 	$WormSpawner.spawn_function = _spawn_worm
 	$SlimeSpawner.spawn_function = _spawn_slime
@@ -126,6 +142,9 @@ func _on_worm_ate_bug() -> void:
 # Get the player's own worm.
 func my_worm() -> Worm:
 	return $Worms.get_node("worm"+str(multiplayer.get_unique_id()))
+# Get a peer's worm.
+func peer_worm (id: int) -> Worm:
+	return $Worms.get_node("worm"+str(id))
 
 # Trigger a game over screen.
 func game_over () -> void:

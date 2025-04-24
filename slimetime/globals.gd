@@ -19,6 +19,14 @@ func _request_server_info () -> void:
 func receive_server_info (info: Dictionary) -> void:
 	server_info.emit(info)
 
+# Visibility range for sprites.
+# Used for turning off processing / multiplayer synchronizing when far enough away.
+# Make it the same size as the window.
+# It could probably be about two thirds of this size for the way the camera will
+# always centre the view, but this way it's easier to search/replace if the
+# game resolution is ever changed.
+var visibility_range: Vector2 = Vector2(1920,1080)
+
 # Strength of gravity
 var gravity: float = 500
 
