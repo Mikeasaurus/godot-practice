@@ -57,6 +57,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 func _ready() -> void:
 	$AnimatedSprite2D.play()
 	starting_position = global_position
+	_disable_if_not_visible()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -112,6 +113,7 @@ func _on_respawn_timer_timeout() -> void:
 	is_slimed = false
 	is_eaten = false
 	set_deferred("freeze",false)
+	set_deferred("_freeze_status",false)
 	stuck_surface = null
 	visible = true
 
@@ -125,6 +127,7 @@ func _on_body_entered(body: Node) -> void:
 		# Check if already slimed, and hitting moving platform.
 		elif body.get_collision_layer() == 1 and is_slimed:
 			set_deferred("freeze",true)
+			set_deferred("_freeze_status",true)
 			stuck_surface = body
 			stuck_offset = position - body.global_position
 			$GroundSound.play()
@@ -133,4 +136,28 @@ func _on_body_entered(body: Node) -> void:
 		$GroundSound.play()
 		# If hitting something solid and already slimed, then stick to the surface.
 		set_deferred("freeze",true)
+		set_deferred("_freeze_status",true)
 		stuck_surface = null
+
+# Turn off bug movement and processing when it's far enough away.
+# Should save some CPU time in single player games.
+var _freeze_status: bool  # Remember the true state of "freeze" (if bug was in visible range).
+func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
+	if not Globals.is_client and not Globals.is_server:
+		_freeze_status = freeze
+		if not is_slimed:
+			freeze = true
+		set_process(false)
+		set_physics_process(false)
+func _on_visible_on_screen_notifier_2d_screen_entered() -> void:
+	if not Globals.is_client and not Globals.is_server:
+		freeze = _freeze_status
+		set_process(true)
+		set_physics_process(true)
+# The above doesn't work for bugs that start off-screen.
+# So this function is more brute-force for turning off those sprites at
+# the beginning of the game.
+# There should be a better way to achieve this???
+func _disable_if_not_visible () -> void:
+	if not $VisibleOnScreenNotifier2D.is_on_screen():
+		_on_visible_on_screen_notifier_2d_screen_exited()
