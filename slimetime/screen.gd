@@ -144,7 +144,10 @@ func my_worm() -> Worm:
 	return $Worms.get_node("worm"+str(multiplayer.get_unique_id()))
 # Get a peer's worm.
 func peer_worm (id: int) -> Worm:
-	return $Worms.get_node("worm"+str(id))
+	if $Worms.has_node("worm"+str(id)):
+		return $Worms.get_node("worm"+str(id))
+	else:
+		return null
 
 # Trigger a game over screen.
 func game_over () -> void:
