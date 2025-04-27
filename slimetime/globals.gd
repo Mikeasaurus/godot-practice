@@ -3,7 +3,7 @@ extends Node
 # Global parameters
 
 # Current version of the game.
-var version: String = "0.1.0"
+var version: String = "0.1.1"
 
 # Query server information.
 # To use: connect the server_info signal, and then call request_server_info().
