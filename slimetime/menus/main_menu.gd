@@ -18,7 +18,11 @@ func _on_new_game_button_pressed() -> void:
 
 func _on_multiplayer_button_pressed() -> void:
 	$MarginContainer.hide()
-	MenuHandler.activate_menu($MultiplayerMenu)
+	# No multiplayer support from web interface yet.
+	if OS.get_name() == "Web":
+		MenuHandler.activate_menu($DownloadMenu)
+	else:
+		MenuHandler.activate_menu($MultiplayerMenu)
 
 func _on_options_button_pressed() -> void:
 	$MarginContainer.hide()
