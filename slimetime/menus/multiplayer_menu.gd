@@ -3,7 +3,12 @@ extends Control
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	# Fill in invite code and display name from last time
+	# (if there were values previously used by the user).
+	if Globals.invite != '':
+		$MarginContainer/CenterContainer/VBoxContainer/GridContainer/InviteCodeLineEdit.text = Globals.invite
+	if Globals.handle != '':
+		$MarginContainer/CenterContainer/VBoxContainer/GridContainer/DisplayNameLineEdit.text = Globals.handle
 
 
 func _on_back_button_pressed() -> void:
