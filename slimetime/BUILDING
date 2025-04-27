@@ -1,0 +1,9 @@
+Checklist when building:
+
+- Check for fonts, make sure appropriate ones are in "fonts" directory.
+- Run "git stash" to remove any local overrides that were used for testing.
+- Make sure version is updated in Globals.
+- Create web build in the appropriate version directory.
+- Add zipped versions of Windows and Linux builds to root of web build.
+  - slimetime-vX.Y.Z.zip for Windows, slimetime-linux-vX.Y.Z.zip for Linux.
+- For headless server builds, ensure max fps is set to 60.
