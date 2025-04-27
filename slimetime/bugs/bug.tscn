@@ -24,16 +24,16 @@ properties/4/spawn = true
 properties/4/replication_mode = 2
 properties/5/path = NodePath(".:synced_position")
 properties/5/spawn = true
-properties/5/replication_mode = 2
+properties/5/replication_mode = 1
 properties/6/path = NodePath(".:synced_linear_velocity")
 properties/6/spawn = true
-properties/6/replication_mode = 2
+properties/6/replication_mode = 1
 properties/7/path = NodePath(".:synced_rotation")
 properties/7/spawn = true
-properties/7/replication_mode = 2
+properties/7/replication_mode = 1
 properties/8/path = NodePath(".:synced_angular_velocity")
 properties/8/spawn = true
-properties/8/replication_mode = 2
+properties/8/replication_mode = 1
 
 [node name="Bug" type="RigidBody2D"]
 collision_layer = 4
