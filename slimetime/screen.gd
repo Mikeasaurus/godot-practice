@@ -74,10 +74,13 @@ func _make_server () -> void:
 	multiplayer.multiplayer_peer = null
 	multiplayer.peer_disconnected.connect(_on_client_disconnected)
 	var peer := WebSocketMultiplayerPeer.new()
-	var key := load("res://cert/privkey.key")
-	var cert := load("res://cert/fullchain.crt")
-	var tls_options := TLSOptions.server(key,cert)
-	peer.create_server(1156,"*",tls_options)
+	if Globals.localhost:
+		peer.create_server(1156)
+	else:
+		var key := load("res://cert/privkey.key")
+		var cert := load("res://cert/fullchain.crt")
+		var tls_options := TLSOptions.server(key,cert)
+		peer.create_server(1156,"*",tls_options)
 	multiplayer.multiplayer_peer = peer
 	# Don't trigger menus on server process.
 	MenuHandler.pause.disconnect(pause_game)
@@ -100,7 +103,10 @@ func _make_client () -> void:
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 	var peer := WebSocketMultiplayerPeer.new()
-	peer.create_client("wss://slimetime.mikeasaurus.ca:1156")
+	if Globals.localhost:
+		peer.create_client("ws://localhost:1156")
+	else:
+		peer.create_client("wss://slimetime.mikeasaurus.ca:1156")
 	multiplayer.multiplayer_peer = peer
 	# Hide the screen until setup is complete.
 	# Need the sprites to be properly synced with server.  Before then, things

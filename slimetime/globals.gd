@@ -5,6 +5,9 @@ extends Node
 # Current version of the game.
 var version: String = "0.1.1"
 
+# Flag for testing multiplayer on localhost.
+var localhost: bool = false
+
 # Query server information.
 # To use: connect the server_info signal, and then call request_server_info().
 signal server_info (info: Dictionary)
