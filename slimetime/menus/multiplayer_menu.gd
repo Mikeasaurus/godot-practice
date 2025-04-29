@@ -7,6 +7,9 @@ func _ready() -> void:
 	# (if there was a name previously used by the user within this session).
 	if Globals.handle != '':
 		$MarginContainer/CenterContainer/VBoxContainer/GridContainer/DisplayNameLineEdit.text = Globals.handle
+	# For local multiplayer testing, allow creating a server from this menu.
+	if Globals.localhost:
+		$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ServerButton.show()
 
 
 func _on_back_button_pressed() -> void:
