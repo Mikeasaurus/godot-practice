@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://nvvudbtxijls"]
+[gd_scene load_steps=5 format=3 uid="uid://nvvudbtxijls"]
 
 [ext_resource type="Script" path="res://menus/main_menu.gd" id="1_kjikk"]
 [ext_resource type="PackedScene" uid="uid://16iuasf15alq" path="res://menus/options_menu.tscn" id="2_mhw2o"]
 [ext_resource type="PackedScene" uid="uid://ri5u11mug16x" path="res://menus/multiplayer_menu.tscn" id="2_mx6v7"]
 [ext_resource type="PackedScene" uid="uid://dghirlf6381r8" path="res://menus/credits_menu.tscn" id="3_ox7cp"]
-[ext_resource type="PackedScene" uid="uid://chwacgtkrchw5" path="res://menus/download_menu.tscn" id="3_x1ufr"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -25,10 +24,6 @@ grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
 [node name="MultiplayerMenu" parent="." instance=ExtResource("2_mx6v7")]
-visible = false
-layout_mode = 1
-
-[node name="DownloadMenu" parent="." instance=ExtResource("3_x1ufr")]
 visible = false
 layout_mode = 1
 
