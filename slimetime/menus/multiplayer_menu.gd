@@ -3,10 +3,8 @@ extends Control
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# Fill in invite code and display name from last time
-	# (if there were values previously used by the user).
-	if Globals.invite != '':
-		$MarginContainer/CenterContainer/VBoxContainer/GridContainer/InviteCodeLineEdit.text = Globals.invite
+	# Fill in user handle from last time
+	# (if there was a name previously used by the user within this session).
 	if Globals.handle != '':
 		$MarginContainer/CenterContainer/VBoxContainer/GridContainer/DisplayNameLineEdit.text = Globals.handle
 
@@ -16,21 +14,12 @@ func _on_back_button_pressed() -> void:
 
 func _on_connect_button_pressed() -> void:
 	var stderr: Label = $MarginContainer/CenterContainer/VBoxContainer/ErrorLabel
-	var invite: String = $MarginContainer/CenterContainer/VBoxContainer/GridContainer/InviteCodeLineEdit.text
 	var handle: String = $MarginContainer/CenterContainer/VBoxContainer/GridContainer/DisplayNameLineEdit.text
 	stderr.text = ""
-	if len(invite) == 0:
-		stderr.text = "Please enter an invite code"
-		return
-	var server: String = Globals.check_invite(invite)
-	if server == "":
-		stderr.text = "Invalid invite code"
-		return
 	if len(handle) == 0:
 		stderr.text = "Please enter a display name"
 		return
 	# Store connection info.
-	Globals.invite = invite
 	Globals.handle = handle
 	# Establish a connection to the server.
 	multiplayer.multiplayer_peer = null

@@ -103,38 +103,7 @@ signal request_splatter (pos: Vector2, direction: Vector2)
 # Multiplayer information.
 var is_client: bool = false
 var is_server: bool = false
-var invite: String = ""
 var handle: String = ""
-func check_invite (code: String) -> String:
-	if len(code) != 8: return ''
-	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	code = code.to_upper()
-	var n: int = 0
-	for i in range(len(code)):
-		n = n * 36 + table.find(code[i])
-	n = (n*1000000) % (36**8-19)
-	if (n >= 2**32): return ''
-	if n < 0: return ''
-	var s: String = str(n%256)
-	for i in range(3):
-		n >>= 8
-		s = str(n%256) + '.' + s
-	return s
-func make_invite (s: String) -> String:
-	var table: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	var n: int = 0
-	for x in s.split('.'):
-		n <<= 8
-		n += int(x)
-	n = (n*17345149)%(36**8-19)
-	n = (n*541)%(36**8-19)
-	n = (n*241)%(36**8-19)
-	var a: Array[String] = []
-	for i in range(8):
-		@warning_ignore("integer_division")
-		a.append(table[n/(36**(7-i))])
-		n %= (36**(7-i))
-	return str(''.join(a))
 
 # Reset global variables (when game restarts).
 func reset () -> void:

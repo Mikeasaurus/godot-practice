@@ -60,25 +60,14 @@ theme_override_constants/h_separation = 50
 theme_override_constants/v_separation = 20
 columns = 2
 
-[node name="InviteCodeLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "Invite Code:"
-
-[node name="InviteCodeLineEdit" type="LineEdit" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(500, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 48
-max_length = 10
-
 [node name="DisplayNameLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
-text = "Display Name:"
+text = "Name:"
 
 [node name="DisplayNameLineEdit" type="LineEdit" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 48
 max_length = 20
 
