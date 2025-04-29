@@ -36,8 +36,8 @@ func _on_connect_button_pressed() -> void:
 	multiplayer.multiplayer_peer = null
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
-	var peer := ENetMultiplayerPeer.new()
-	peer.create_client(Globals.check_invite(Globals.invite),1156)
+	var peer := WebSocketMultiplayerPeer.new()
+	peer.create_client("wss://slimetime.mikeasaurus.ca:1156")
 	multiplayer.multiplayer_peer = peer
 	# Stop user from trying to connect while establishing a connection.
 	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ConnectButton.disabled = true
