@@ -221,6 +221,21 @@ spawn_path = NodePath("../Splatters")
 
 [node name="Overlay" type="CanvasLayer" parent="."]
 
+[node name="Instructions" type="Label" parent="Overlay"]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -336.0
+offset_top = 87.0
+offset_right = 349.0
+offset_bottom = 175.0
+grow_horizontal = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 64
+text = "These are instructions"
+
 [node name="Score" type="Label" parent="Overlay"]
 offset_left = 1559.0
 offset_top = 5.0

@@ -120,6 +120,36 @@ func _make_local() -> void:
 	worm.ate_bug.connect(_on_worm_ate_bug)
 	# Set up pause menu.
 	make_pause_menu()
+	# Show instructions.
+	call_deferred("_show_instructions")
+func _show_instructions () -> void:
+	# Only show instructions the first time playing.
+	if Globals.showed_instructions: return
+	var i: Label = $Overlay/Instructions
+	i.modulate = Color.TRANSPARENT
+	i.show()
+	var msgs: Array[String]
+	if Globals.touchscreen_controls:
+		msgs = [
+			"Tap on screen to shoot slime",
+			"Press on screen to move in that direction",
+			"Double-tap screen to jump"
+		]
+	else:
+		msgs = [
+			"Use WASD or arrow keys to move",
+			"Click on screen to shoot slime",
+			"Press spacebar to jump"
+		]
+	for msg in msgs:
+		var tween: Tween = get_tree().create_tween()
+		i.text = msg
+		tween.tween_interval(1.0)
+		tween.tween_property(i, "modulate", Color.WHITE, 1.0)
+		tween.tween_interval(1.0)
+		tween.tween_property(i, "modulate", Color.TRANSPARENT, 1.0)
+		await tween.finished
+	Globals.showed_instructions = true
 
 # Listen for some keys.
 func _input(event: InputEvent) -> void:

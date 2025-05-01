@@ -81,6 +81,9 @@ var debug_keys: bool = false
 # Use touchscreen interface?
 var touchscreen_controls: bool = DisplayServer.is_touchscreen_available()
 
+# Remember if on-screen instructions were shown.
+var showed_instructions: bool = false
+
 var chat_font: FontFile = null
 
 # Called when the node enters the scene tree for the first time.
