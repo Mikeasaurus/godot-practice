@@ -57,6 +57,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 func _ready() -> void:
 	$AnimatedSprite2D.play()
 	starting_position = global_position
+	# This fixes a multiplayer glitch where sometimes far away bugs are stuck
+	# at (0,0) in a peer's multiplaery instance.
+	synced_position = global_position
+	# Turn off processing for far away bugs.
 	_disable_if_not_visible()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
