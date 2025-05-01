@@ -51,18 +51,23 @@ signal worm_colour_updated
 func set_worm_body_colour(c: Color):
 	worm_body_colour = c
 	worm_colour_updated.emit()
+	_eventually_save_state()
 func set_worm_back_colour(c: Color):
 	worm_back_colour = c
 	worm_colour_updated.emit()
+	_eventually_save_state()
 func set_worm_front_colour(c: Color):
 	worm_front_colour = c
 	worm_colour_updated.emit()
+	_eventually_save_state()
 func set_worm_outline_colour(c: Color):
 	worm_outline_colour = c
 	worm_colour_updated.emit()
+	_eventually_save_state()
 func set_worm_icon_bg_colour(c: Color):
 	worm_icon_bg_colour = c
 	worm_colour_updated.emit()
+	_eventually_save_state()
 var worm_body_colour: Color = Color.hex(0xff8e5bff): set = set_worm_body_colour
 var worm_back_colour: Color = Color.hex(0xf15c61ff): set = set_worm_back_colour
 var worm_front_colour: Color = Color.hex(0xfef0ccff): set = set_worm_front_colour
@@ -95,6 +100,42 @@ func _ready() -> void:
 		chat_font = load("res://fonts/ProximaSoft/ProximaSoft-SemiBold.otf")
 	else:
 		chat_font = load("res://fonts/nautica-rounded/nautica-rounded.semibold.ttf")
+	_manage_persistent_state()
+
+# Manage persistent game state.
+var _save_state_timer: Timer
+func _eventually_save_state() -> void:
+	if _save_state_timer == null: return
+	if not _save_state_timer.is_stopped():
+		_save_state_timer.stop()
+	_save_state_timer.start()
+func _save_state() -> void:
+	var state: Dictionary
+	state['worm_body_colour'] = worm_body_colour.to_html()
+	state['worm_back_colour'] = worm_back_colour.to_html()
+	state['worm_front_colour'] = worm_front_colour.to_html()
+	state['worm_outline_colour'] = worm_outline_colour.to_html()
+	state['worm_icon_bg_colour'] = worm_icon_bg_colour.to_html()
+	state['handle'] = handle
+	var f: FileAccess = FileAccess.open("user://config.json",FileAccess.WRITE)
+	f.store_line(JSON.stringify(state,"\t"))
+func _manage_persistent_state() -> void:
+	var f: FileAccess = FileAccess.open("user://config.json",FileAccess.READ)
+	if f != null:
+		var state: Dictionary = JSON.parse_string(f.get_as_text())
+		worm_body_colour = Color.from_string(state['worm_body_colour'], original_worm_body_colour)
+		worm_back_colour = Color.from_string(state['worm_back_colour'], original_worm_back_colour)
+		worm_front_colour = Color.from_string(state['worm_front_colour'], original_worm_front_colour)
+		worm_outline_colour = Color.from_string(state['worm_outline_colour'], worm_outline_colour)
+		worm_icon_bg_colour = Color.from_string(state['worm_icon_bg_colour'], original_worm_icon_bg_colour)
+		handle = state['handle']
+	# Set up delay for saving state.
+	# So we don't repeatedly write the file as properties like colour are updated.
+	_save_state_timer = Timer.new()
+	_save_state_timer.wait_time = 5.0
+	_save_state_timer.one_shot = true
+	_save_state_timer.timeout.connect(_save_state)
+	add_child(_save_state_timer)
 
 # Delegate requests for adding slime splatter particles to the screen.
 # There are multiple contexts in which the splatter could be generated, and it
@@ -106,7 +147,10 @@ signal request_splatter (pos: Vector2, direction: Vector2)
 # Multiplayer information.
 var is_client: bool = false
 var is_server: bool = false
-var handle: String = ""
+var handle: String = "": set = _set_handle
+func _set_handle (h: String) -> void:
+	handle = h
+	_eventually_save_state()
 
 # Reset global variables (when game restarts).
 func reset () -> void:
