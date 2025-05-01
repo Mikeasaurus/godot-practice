@@ -38,8 +38,8 @@ theme_override_constants/separation = 50
 [node name="Title" type="Label" parent="ColorRect/MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
-text = "Download the game for smoother gameplay
-and multiplayer support."
+text = "Game running too slow from the browser?
+Download to play from your desktop."
 horizontal_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ColorRect/MarginContainer/CenterContainer/VBoxContainer"]

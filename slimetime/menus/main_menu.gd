@@ -8,6 +8,8 @@ func _ready() -> void:
 	# Can't "quit" from web version.
 	if OS.get_name() == "Web":
 		$MarginContainer/CenterContainer/VBoxContainer/QuitButton.hide()
+	else:
+		$MarginContainer/CenterContainer/VBoxContainer/DownloadButton.hide()
 	# If running in headless mode, then immediately start the server.
 	if DisplayServer.get_name() == "headless":
 		Globals.is_server = true
@@ -34,3 +36,7 @@ func _return_from_submenu() -> void:
 
 func _on_quit_button_pressed() -> void:
 	get_tree().quit()
+
+func _on_download_button_pressed() -> void:
+	$MarginContainer.hide()
+	MenuHandler.activate_menu($DownloadMenu)
