@@ -34,6 +34,13 @@ func _ready() -> void:
 		$Title/Center/Label.add_theme_font_override("font",Globals.chat_font)
 		$PeerTypingLabel.add_theme_font_override("font",Globals.chat_font)
 		$TextEdit.add_theme_font_override("font",Globals.chat_font)
+	# Persist the chat history on server side.
+	if Globals.is_server:
+		_chatfile = FileAccess.open("user://chat",FileAccess.READ_WRITE)
+		if _chatfile == null:
+			_chatfile = FileAccess.open("user://chat",FileAccess.WRITE_READ)
+		while _chatfile.get_position() < _chatfile.get_length():
+			chat.append(_chatfile.get_var())
 # Handle scroll actions requested from outside of normal processing mode.
 func _process(_delta: float) -> void:
 	if do_scroll_to_bottom:
@@ -57,6 +64,8 @@ var current_peer_messages: PeerMessages = null
 
 # Chat history
 var chat := []
+# Server-side persistent chat
+var _chatfile: FileAccess = null
 
 # Initialize client bookkeeping when they join.
 func _register(id) -> void:
@@ -101,6 +110,8 @@ func _peer_typing (handle: String):
 @rpc("call_local","any_peer","reliable")
 func _send_msg (msg: Array) -> void:
 	chat.append(msg)
+	_chatfile.store_var(msg)
+	_chatfile.flush()
 	# If a client just sent a message, then clear their "typing" status.
 	var handle: String = msg[0]
 	if handle in last_typed:
