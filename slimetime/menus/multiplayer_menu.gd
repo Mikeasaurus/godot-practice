@@ -42,6 +42,8 @@ func _error_message (msg: String) -> void:
 	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ConnectButton.disabled = false
 func _on_connection_failed():
 	_error_message ("Connection failed")
+	multiplayer.multiplayer_peer.close()
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 # This is called when the server connection is tested, and is a working server.
 func _on_connected_to_server():
 	# Get server info.
