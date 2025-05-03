@@ -2,9 +2,6 @@ extends RigidBody2D
 
 class_name WormSegment
 
-# Signal to indicate the segment has landed on a surface
-signal landed
-
 # Signal to indicate the segment just took some damage
 signal hurt
 
@@ -153,8 +150,13 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		else:
 			facing_direction = feet_direction.rotated(PI/2)
 		if not on_surface:
-			landed.emit()  # For playing landing sound (handled in worm_front)
+			ground_sound()
 		on_surface = true
+
+# Stub for making sound when landing.
+# No sound by default, overridden by front segment to make sound.
+func ground_sound () -> void:
+	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

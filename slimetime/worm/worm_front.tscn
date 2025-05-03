@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://dd7mpa5anwn06"]
+[gd_scene load_steps=33 format=3 uid="uid://dd7mpa5anwn06"]
 
 [ext_resource type="Script" path="res://worm/worm_front.gd" id="1_7ixcj"]
 [ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://features/slime.tscn" id="2_4874p"]
@@ -23,6 +23,7 @@
 [ext_resource type="Texture2D" uid="uid://f68d36lu1gt6" path="res://worm/front-walk3-b.png" id="18_uqcba"]
 [ext_resource type="Texture2D" uid="uid://dgkpe5oeqayv1" path="res://worm/front-walk3-outline.png" id="19_38db1"]
 [ext_resource type="AudioStream" uid="uid://bytvlsxnxc076" path="res://audio/349182__natty23__whoosh.wav" id="21_b0sip"]
+[ext_resource type="AudioStream" uid="uid://4r8shsnsbali" path="res://audio/215162__otisjames__thud.wav" id="24_fig56"]
 
 [sub_resource type="Animation" id="Animation_4q7xl"]
 length = 0.001
@@ -342,6 +343,9 @@ stream = ExtResource("12_wkfij")
 
 [node name="EatSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("13_hk801")
+
+[node name="GroundSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("24_fig56")
 
 [node name="DamageArea2D" type="Area2D" parent="."]
 collision_layer = 0

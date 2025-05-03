@@ -134,3 +134,10 @@ func _on_body_entered(body: Node) -> void:
 @rpc("authority","call_local","reliable")
 func _spit_sound () -> void:
 	$SpitSound.play()
+
+# Play sound when the worm lands on a surface.
+@rpc("authority","call_local","reliable")
+func _ground_sound () -> void:
+	$GroundSound.play()
+func ground_sound() -> void:
+	_ground_sound.rpc()

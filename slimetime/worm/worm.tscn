@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://bl2u1vwrkn7sx"]
+[gd_scene load_steps=5 format=3 uid="uid://bl2u1vwrkn7sx"]
 
 [ext_resource type="Script" path="res://worm/worm.gd" id="1_qcnrn"]
 [ext_resource type="PackedScene" uid="uid://ss2xikvy6bt7" path="res://worm/worm_segment.tscn" id="2_om62i"]
 [ext_resource type="PackedScene" uid="uid://c6aw5rjsklap6" path="res://worm/worm_tail.tscn" id="3_ombl0"]
 [ext_resource type="PackedScene" uid="uid://dd7mpa5anwn06" path="res://worm/worm_front.tscn" id="4_x58aa"]
-[ext_resource type="AudioStream" uid="uid://4r8shsnsbali" path="res://audio/215162__otisjames__thud.wav" id="5_xygfj"]
 
 [node name="Worm" type="Node2D"]
 script = ExtResource("1_qcnrn")
@@ -29,9 +28,5 @@ position = Vector2(259, 231)
 wait_time = 0.2
 one_shot = true
 
-[node name="GroundSound" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("5_xygfj")
-
 [connection signal="ate_bug" from="WormFront" to="." method="_on_worm_front_ate_bug"]
-[connection signal="landed" from="WormFront" to="." method="_on_worm_front_landed"]
 [connection signal="timeout" from="DoubletapTimer" to="." method="_on_doubletap_timer_timeout"]

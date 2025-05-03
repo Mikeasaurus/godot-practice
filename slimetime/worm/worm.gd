@@ -372,10 +372,3 @@ func _on_doubletap_timer_timeout() -> void:
 # This is called when a worm segment sends a signal saying it took damage.
 func _on_hurt() -> void:
 	hurt.emit()
-
-# Play sound when the worm lands on a surface.
-@rpc("authority","call_local","reliable")
-func _ground_sound () -> void:
-	$GroundSound.play()
-func _on_worm_front_landed() -> void:
-	_ground_sound.rpc()
