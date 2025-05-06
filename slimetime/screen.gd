@@ -154,8 +154,6 @@ func _show_instructions () -> void:
 # Listen for some keys.
 func _input(event: InputEvent) -> void:
 	if is_in_menu: return  # Ignore key presses while user is navigating a menu.
-	if Globals.debug_keys and event.is_action_pressed("instakill"):
-		game_over()
 	elif is_game_over == true and (event is InputEventKey or event is InputEventMouseButton) and event.pressed:
 		restart()
 	elif is_dead_multiplayer == true and (event is InputEventKey or event is InputEventMouseButton) and event.pressed:
