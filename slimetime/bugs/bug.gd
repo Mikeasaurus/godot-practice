@@ -7,6 +7,8 @@ var starting_position: Vector2
 
 # Whether bug is flying or inactive.
 @export var is_slimed: bool = false
+# Whether bug is currently stuck to a surface.
+@export var is_stuck: bool = false
 # Whether bug is eaten.
 # Mainly useful for multiplayer mode, to keep the bug in the scene tree but disable it.
 @export var is_eaten: bool = false
@@ -71,7 +73,8 @@ func _process(_delta: float) -> void:
 		return
 	if freeze and stuck_surface != null and multiplayer.get_unique_id() == 1:
 		position = stuck_surface.global_position + stuck_offset
-		# If frozen, _integrate_forces not called.  So need to call sync from here.
+	# If frozen, _integrate_forces not called.  So need to call sync from here.
+	if freeze:
 		_sync_properties()
 
 # Change state of the bug so it's in a dormant, slimed state.
@@ -116,8 +119,17 @@ func _on_respawn_timer_timeout() -> void:
 	$CollisionShape2D.set_deferred("disabled",false)
 	is_slimed = false
 	is_eaten = false
-	set_deferred("freeze",false)
-	set_deferred("_freeze_status",false)
+	is_stuck = false
+	# Check if bug is visible on screen.
+	# For multiplayer server, this is always true (server always needs to "see" everything).
+	if Globals.is_server or $VisibleOnScreenNotifier2D.is_on_screen():
+		set_deferred("freeze",false)
+		set_process(true)
+		set_physics_process(true)
+	elif not Globals.is_client:
+		set_deferred("freeze",true)
+		set_process(false)
+		set_physics_process(false)
 	stuck_surface = null
 	visible = true
 
@@ -131,31 +143,29 @@ func _on_body_entered(body: Node) -> void:
 		# Check if already slimed, and hitting moving platform.
 		elif body.get_collision_layer() == 1 and is_slimed:
 			set_deferred("freeze",true)
-			set_deferred("_freeze_status",true)
 			stuck_surface = body
 			stuck_offset = position - body.global_position
 			$GroundSound.play()
+			is_stuck = true
 	# Otherwise, hitting stationary body.
 	else:
 		$GroundSound.play()
+		is_stuck = true
 		# If hitting something solid and already slimed, then stick to the surface.
 		set_deferred("freeze",true)
-		set_deferred("_freeze_status",true)
 		stuck_surface = null
 
 # Turn off bug movement and processing when it's far enough away.
 # Should save some CPU time in single player games.
-var _freeze_status: bool  # Remember the true state of "freeze" (if bug was in visible range).
 func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
 	if not Globals.is_client and not Globals.is_server:
-		_freeze_status = freeze
 		if not is_slimed:
 			freeze = true
-		set_process(false)
-		set_physics_process(false)
+			set_process(false)
+			set_physics_process(false)
 func _on_visible_on_screen_notifier_2d_screen_entered() -> void:
 	if not Globals.is_client and not Globals.is_server:
-		freeze = _freeze_status
+		freeze = is_stuck
 		set_process(true)
 		set_physics_process(true)
 # The above doesn't work for bugs that start off-screen.
