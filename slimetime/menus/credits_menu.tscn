@@ -51,9 +51,9 @@ layout_mode = 2
 theme_override_font_sizes/normal_font_size = 24
 theme_override_font_sizes/bold_font_size = 24
 bbcode_enabled = true
-text = "[center]
-Code by Mike
-Graphics by Mike
+text = "[center]Main character based on \"Mango\" from Goodbye Volcano High (by KO-OP)
+
+Code and graphics by Mike
 
 [table=1]
 [cell][left]Chat font: Nautica Rounded SemiBold[/left][/cell]
@@ -90,7 +90,10 @@ Audio from freesound.org:
 	[url]https://freesound.org/s/352402/[/url]
 	License: Creative Commons 0
 [/cell]
-[/table]"
+[/table]
+[center]
+Godot License: [url]https://godotengine.org/license/[/url]
+[/center]"
 fit_content = true
 
 [node name="HSeparator2" type="HSeparator" parent="MarginContainer/CenterContainer/VBoxContainer"]
