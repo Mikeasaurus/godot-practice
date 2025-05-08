@@ -7,3 +7,4 @@ Checklist when building:
 - Add downloadable versions of Windows and Linux builds to root of web build.
   - slimetime-vX.Y.Z.exe for Windows, slimetime-vX.Y.Z.x86_64 for Linux.
 - For headless server builds, ensure max fps is set to 60.
+- For HTML5 builds, enable "Experimental Virtual Keyboard".

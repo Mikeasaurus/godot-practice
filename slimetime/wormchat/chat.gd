@@ -228,7 +228,10 @@ func _on_visibility_changed() -> void:
 	# Start focus on the text input box, so user can start typing immediately.
 	# https://www.reddit.com/r/godot/comments/kun5r7/is_there_a_way_to_set_a_node_as_focused_upon_game/?rdt=54934
 	# https://docs.godotengine.org/en/stable/tutorials/ui/gui_navigation.html#necessary-code
-	$TextEdit.grab_focus()
+	# Note: not done for touchscreen devices, since the on-screen keyboard will show up right away
+	# and cover up the chat dialogue.
+	if not Globals.touchscreen_controls:
+		$TextEdit.grab_focus()
 	# Before displaying the first message, set horizontal spacing for the chat.
 	# Use a dummy chat message from a peer, long enough for line wrapping.
 	# This gives the maxiumum amount of horizontal space that would be used for a mesage.
