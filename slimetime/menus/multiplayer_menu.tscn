@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://ri5u11mug16x"]
+[gd_scene load_steps=5 format=3 uid="uid://ri5u11mug16x"]
 
 [ext_resource type="Script" path="res://menus/multiplayer_menu.gd" id="1_5jbku"]
+[ext_resource type="PackedScene" uid="uid://blqqmlx16vwl6" path="res://menus/full_screen_toggle.tscn" id="2_lomcv"]
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_8htwf"]
 color = Color(1, 1, 1, 1)
@@ -104,6 +105,8 @@ text = "Create Server"
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 theme_override_font_sizes/font_size = 36
+
+[node name="FullScreenToggle" parent="." instance=ExtResource("2_lomcv")]
 
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ConnectButton" to="." method="_on_connect_button_pressed"]

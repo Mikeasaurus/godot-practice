@@ -160,6 +160,11 @@ func _input(event: InputEvent) -> void:
 		respawn()
 		is_dead_multiplayer = false
 		_is_dying_multiplayer = false
+	elif event.is_action_pressed("toggle_fullscreen"):
+		if DisplayServer.window_get_mode() == DisplayServer.WindowMode.WINDOW_MODE_WINDOWED:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WindowMode.WINDOW_MODE_WINDOWED)
 	elif event.is_action_pressed("open_chat") and Globals.is_client:
 		# Do on next frame, to ingore the "c" character press in the chat window.
 		await get_tree().process_frame

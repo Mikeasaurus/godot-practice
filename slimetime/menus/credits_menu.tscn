@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dghirlf6381r8"]
+[gd_scene load_steps=5 format=3 uid="uid://dghirlf6381r8"]
 
 [ext_resource type="Script" path="res://menus/credits_menu.gd" id="1_odl0w"]
+[ext_resource type="PackedScene" uid="uid://blqqmlx16vwl6" path="res://menus/full_screen_toggle.tscn" id="2_rb6n6"]
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_d8rk4"]
 color = Color(1, 1, 1, 1)
@@ -105,5 +106,7 @@ theme_override_styles/separator = SubResource("StyleBoxLine_nk5i5")
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Back"
+
+[node name="FullScreenToggle" parent="." instance=ExtResource("2_rb6n6")]
 
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

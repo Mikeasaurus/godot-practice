@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://b88skvef3btfn"]
+[gd_scene load_steps=5 format=3 uid="uid://b88skvef3btfn"]
 
 [ext_resource type="Script" path="res://menus/controls_menu.gd" id="1_f1kbu"]
+[ext_resource type="PackedScene" uid="uid://blqqmlx16vwl6" path="res://menus/full_screen_toggle.tscn" id="2_hd1y8"]
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_5ajxi"]
 color = Color(1, 1, 1, 1)
@@ -92,6 +93,16 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Escape key"
 
+[node name="FullscreenLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Fullscreen"
+
+[node name="FullscreenText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "F"
+
 [node name="ChatLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/GridContainer_keyboard_controls"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
@@ -168,5 +179,7 @@ theme_override_styles/separator = SubResource("StyleBoxLine_curnv")
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Back"
+
+[node name="FullScreenToggle" parent="." instance=ExtResource("2_hd1y8")]
 
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

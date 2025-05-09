@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://b4103dh1cjumw"]
+[gd_scene load_steps=4 format=3 uid="uid://b4103dh1cjumw"]
 
 [ext_resource type="Script" path="res://menus/pause_menu.gd" id="1_4j3lk"]
 [ext_resource type="PackedScene" uid="uid://16iuasf15alq" path="res://menus/options_menu.tscn" id="2_qaw5y"]
+[ext_resource type="PackedScene" uid="uid://blqqmlx16vwl6" path="res://menus/full_screen_toggle.tscn" id="3_55ahb"]
 
 [node name="PauseMenu" type="Control"]
 layout_mode = 3
@@ -59,6 +60,8 @@ text = "Options"
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Quit"
+
+[node name="FullScreenToggle" parent="." instance=ExtResource("3_55ahb")]
 
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/OptionsButton" to="." method="_on_options_button_pressed"]
