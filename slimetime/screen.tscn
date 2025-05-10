@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=21 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://duh80b506tef8" path="res://features/platform.tscn" id="11_5ahw7"]
 [ext_resource type="PackedScene" uid="uid://1fdldwucvxju" path="res://wormchat/chat.tscn" id="11_icvtr"]
 [ext_resource type="Texture2D" uid="uid://cfqifiggbljne" path="res://menus/chat.png" id="12_61u0q"]
+[ext_resource type="Texture2D" uid="uid://c8aq3cptiguih" path="res://menus/beachball.png" id="12_v7556"]
 [ext_resource type="Texture2D" uid="uid://wqv66c4474hh" path="res://menus/chat-notifier.png" id="13_r8qe4"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
@@ -257,7 +258,7 @@ grow_vertical = 2
 [node name="Shortcuts" type="HBoxContainer" parent="Overlay"]
 offset_right = 100.0
 offset_bottom = 100.0
-theme_override_constants/separation = 20
+theme_override_constants/separation = 30
 
 [node name="PauseButton" type="Button" parent="Overlay/Shortcuts"]
 visible = false
@@ -279,6 +280,13 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("13_r8qe4")
+
+[node name="BeachballButton" type="TextureRect" parent="Overlay/Shortcuts"]
+visible = false
+self_modulate = Color(1, 1, 1, 0.466667)
+layout_mode = 2
+tooltip_text = "Spawn a beach ball."
+texture = ExtResource("12_v7556")
 
 [node name="LogLabel" type="Label" parent="Overlay"]
 offset_left = 126.0
@@ -340,10 +348,19 @@ text = "Server started, listening on port 1156
 Invite code:   012345678"
 horizontal_alignment = 1
 
+[node name="Beachballs" type="Node2D" parent="."]
+
+[node name="BeachballSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://features/beachball.tscn")
+spawn_path = NodePath("../Beachballs")
+
 [connection signal="spawned" from="WormSpawner" to="." method="_on_worm_spawner_spawned"]
 [connection signal="gui_input" from="Overlay/ClickableArea" to="." method="_on_clickable_area_gui_input"]
 [connection signal="gui_input" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_gui_input"]
 [connection signal="mouse_entered" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_entered"]
 [connection signal="mouse_exited" from="Overlay/Shortcuts/ChatButton" to="." method="_on_chat_button_mouse_exited"]
+[connection signal="gui_input" from="Overlay/Shortcuts/BeachballButton" to="." method="_on_beachball_button_gui_input"]
+[connection signal="mouse_entered" from="Overlay/Shortcuts/BeachballButton" to="." method="_on_beachball_button_mouse_entered"]
+[connection signal="mouse_exited" from="Overlay/Shortcuts/BeachballButton" to="." method="_on_beachball_button_mouse_exited"]
 [connection signal="all_messages_read" from="Overlay/Chat" to="." method="_on_chat_all_messages_read"]
 [connection signal="new_message_notifier" from="Overlay/Chat" to="." method="_on_chat_new_message_notifier"]
