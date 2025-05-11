@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://decyn02rm6vq2"]
+[gd_scene load_steps=26 format=4 uid="uid://decyn02rm6vq2"]
 
 [ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
@@ -13,7 +13,12 @@
 [ext_resource type="PackedScene" uid="uid://1fdldwucvxju" path="res://wormchat/chat.tscn" id="11_icvtr"]
 [ext_resource type="Texture2D" uid="uid://cfqifiggbljne" path="res://menus/chat.png" id="12_61u0q"]
 [ext_resource type="Texture2D" uid="uid://c8aq3cptiguih" path="res://menus/beachball.png" id="12_v7556"]
+[ext_resource type="Texture2D" uid="uid://ov5nr4kgrjnw" path="res://menus/reactions.png" id="13_57x5h"]
 [ext_resource type="Texture2D" uid="uid://wqv66c4474hh" path="res://menus/chat-notifier.png" id="13_r8qe4"]
+[ext_resource type="Texture2D" uid="uid://dsghcmj4ax448" path="res://reactions/surprise_button.png" id="14_xakip"]
+[ext_resource type="Texture2D" uid="uid://djrtrdilb0vtb" path="res://reactions/question_button.png" id="15_7hbur"]
+[ext_resource type="Texture2D" uid="uid://dyjbfamea368w" path="res://reactions/grumble_button.png" id="16_jlgrb"]
+[ext_resource type="Texture2D" uid="uid://wmrqg4tr4alv" path="res://reactions/slimeheart_button.png" id="17_rqq37"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b7afo"]
 texture = ExtResource("1_vx3mq")
@@ -288,6 +293,44 @@ layout_mode = 2
 tooltip_text = "Spawn a beach ball."
 texture = ExtResource("12_v7556")
 
+[node name="ReactionButton" type="TextureRect" parent="Overlay/Shortcuts"]
+visible = false
+self_modulate = Color(1, 1, 1, 0.466667)
+layout_mode = 2
+tooltip_text = "Show a reaction."
+texture = ExtResource("13_57x5h")
+
+[node name="Reactions" type="HBoxContainer" parent="Overlay"]
+visible = false
+offset_top = 142.0
+offset_right = 230.0
+offset_bottom = 242.0
+theme_override_constants/separation = 30
+
+[node name="SurprisedButton" type="TextureRect" parent="Overlay/Reactions"]
+self_modulate = Color(1, 1, 1, 0.466667)
+layout_mode = 2
+texture = ExtResource("14_xakip")
+
+[node name="ConfusedButton" type="TextureRect" parent="Overlay/Reactions"]
+self_modulate = Color(1, 1, 1, 0.466667)
+layout_mode = 2
+texture = ExtResource("15_7hbur")
+
+[node name="GrumbleButton" type="TextureRect" parent="Overlay/Reactions"]
+self_modulate = Color(1, 1, 1, 0.466667)
+layout_mode = 2
+texture = ExtResource("16_jlgrb")
+
+[node name="SlimeHeartButton" type="TextureRect" parent="Overlay/Reactions"]
+self_modulate = Color(1, 1, 1, 0.466667)
+layout_mode = 2
+texture = ExtResource("17_rqq37")
+
+[node name="ReactionTimer" type="Timer" parent="Overlay/Reactions"]
+wait_time = 3.0
+one_shot = true
+
 [node name="LogLabel" type="Label" parent="Overlay"]
 offset_left = 126.0
 offset_top = 3.0
@@ -362,5 +405,21 @@ spawn_path = NodePath("../Beachballs")
 [connection signal="gui_input" from="Overlay/Shortcuts/BeachballButton" to="." method="_on_beachball_button_gui_input"]
 [connection signal="mouse_entered" from="Overlay/Shortcuts/BeachballButton" to="." method="_on_beachball_button_mouse_entered"]
 [connection signal="mouse_exited" from="Overlay/Shortcuts/BeachballButton" to="." method="_on_beachball_button_mouse_exited"]
+[connection signal="gui_input" from="Overlay/Shortcuts/ReactionButton" to="." method="_on_reaction_button_gui_input"]
+[connection signal="mouse_entered" from="Overlay/Shortcuts/ReactionButton" to="." method="_on_reaction_button_mouse_entered"]
+[connection signal="mouse_exited" from="Overlay/Shortcuts/ReactionButton" to="." method="_on_reaction_button_mouse_exited"]
+[connection signal="gui_input" from="Overlay/Reactions/SurprisedButton" to="." method="_on_surprised_button_gui_input"]
+[connection signal="mouse_entered" from="Overlay/Reactions/SurprisedButton" to="." method="_on_surprised_button_mouse_entered"]
+[connection signal="mouse_exited" from="Overlay/Reactions/SurprisedButton" to="." method="_on_surprised_button_mouse_exited"]
+[connection signal="gui_input" from="Overlay/Reactions/ConfusedButton" to="." method="_on_confused_button_gui_input"]
+[connection signal="mouse_entered" from="Overlay/Reactions/ConfusedButton" to="." method="_on_confused_button_mouse_entered"]
+[connection signal="mouse_exited" from="Overlay/Reactions/ConfusedButton" to="." method="_on_confused_button_mouse_exited"]
+[connection signal="gui_input" from="Overlay/Reactions/GrumbleButton" to="." method="_on_grumble_button_gui_input"]
+[connection signal="mouse_entered" from="Overlay/Reactions/GrumbleButton" to="." method="_on_grumble_button_mouse_entered"]
+[connection signal="mouse_exited" from="Overlay/Reactions/GrumbleButton" to="." method="_on_grumble_button_mouse_exited"]
+[connection signal="gui_input" from="Overlay/Reactions/SlimeHeartButton" to="." method="_on_slime_heart_button_gui_input"]
+[connection signal="mouse_entered" from="Overlay/Reactions/SlimeHeartButton" to="." method="_on_slime_heart_button_mouse_entered"]
+[connection signal="mouse_exited" from="Overlay/Reactions/SlimeHeartButton" to="." method="_on_slime_heart_button_mouse_exited"]
+[connection signal="timeout" from="Overlay/Reactions/ReactionTimer" to="." method="_on_reaction_timer_timeout"]
 [connection signal="all_messages_read" from="Overlay/Chat" to="." method="_on_chat_all_messages_read"]
 [connection signal="new_message_notifier" from="Overlay/Chat" to="." method="_on_chat_new_message_notifier"]

@@ -1,23 +1,35 @@
-[gd_scene load_steps=33 format=3 uid="uid://dd7mpa5anwn06"]
+[gd_scene load_steps=46 format=3 uid="uid://dd7mpa5anwn06"]
 
 [ext_resource type="Script" path="res://worm/worm_front.gd" id="1_7ixcj"]
 [ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://features/slime.tscn" id="2_4874p"]
 [ext_resource type="PackedScene" uid="uid://qs6dhqvybwnq" path="res://features/crumb.tscn" id="3_6ydm7"]
+[ext_resource type="Texture2D" uid="uid://yq7ask81bkqx" path="res://reactions/question1.png" id="4_i238b"]
+[ext_resource type="Texture2D" uid="uid://cmlwhuah885nx" path="res://reactions/question2.png" id="5_bcrhb"]
+[ext_resource type="Texture2D" uid="uid://cglue4orjpqfy" path="res://reactions/question3.png" id="6_w5l6a"]
 [ext_resource type="Texture2D" uid="uid://xr53vj2ebvu" path="res://worm/front-outline.png" id="7_fc3qa"]
+[ext_resource type="Texture2D" uid="uid://crqr75mkb4jpd" path="res://reactions/grumble1.png" id="7_qfv5u"]
+[ext_resource type="Texture2D" uid="uid://d1lynbr63tm1p" path="res://reactions/grumble2.png" id="8_3kf4s"]
 [ext_resource type="Texture2D" uid="uid://bl12tabuh2g" path="res://worm/front-body.png" id="8_gug04"]
 [ext_resource type="Texture2D" uid="uid://crr3r5rv3umqa" path="res://worm/front-top.png" id="9_30gi8"]
+[ext_resource type="Texture2D" uid="uid://dxy3xuw0dhm4c" path="res://reactions/grumble3.png" id="9_vm5mq"]
+[ext_resource type="Texture2D" uid="uid://b55tpncsr7aqb" path="res://reactions/slimeheart1.png" id="10_lvl3x"]
 [ext_resource type="Texture2D" uid="uid://cr0qwifpt6t1j" path="res://worm/front-belly.png" id="10_rocqg"]
 [ext_resource type="Texture2D" uid="uid://6h1ew214snop" path="res://features/hit.png" id="10_v1jwa"]
 [ext_resource type="Texture2D" uid="uid://dd0cj52iyque2" path="res://worm/front-walk1-a.png" id="11_dta1g"]
 [ext_resource type="Texture2D" uid="uid://c535h1swtnata" path="res://worm/front-appendage-outline.png" id="11_huslo"]
+[ext_resource type="Texture2D" uid="uid://dwq0xogbsespl" path="res://reactions/slimeheart2.png" id="11_j6eob"]
 [ext_resource type="Texture2D" uid="uid://x083pbqc5yr5" path="res://worm/front-eyes.png" id="11_kb3c4"]
 [ext_resource type="Texture2D" uid="uid://d1larstpgrtq3" path="res://worm/front-walk1-b.png" id="12_2vsfe"]
 [ext_resource type="Texture2D" uid="uid://dp0jxqtdjwr80" path="res://worm/front-mouth.png" id="12_j0ttl"]
+[ext_resource type="Texture2D" uid="uid://cv2lfc6y41v45" path="res://reactions/slimeheart3.png" id="12_mygyu"]
 [ext_resource type="AudioStream" uid="uid://bsyma0k5y5heh" path="res://audio/352402__noahpardo__npx-throat-gathering-spit-2.wav" id="12_wkfij"]
 [ext_resource type="AudioStream" uid="uid://boua4s0jseys6" path="res://audio/20279__koops__apple_crunch_16.wav" id="13_hk801"]
+[ext_resource type="Texture2D" uid="uid://cmpi1rqcwd3mt" path="res://reactions/surprise1.png" id="13_rr2em"]
 [ext_resource type="Texture2D" uid="uid://0s3ot6t3tbi3" path="res://worm/front-walk1-outline.png" id="13_yx147"]
 [ext_resource type="Texture2D" uid="uid://dh6ptannxwy1d" path="res://worm/front-walk2-a.png" id="14_1dnpk"]
+[ext_resource type="Texture2D" uid="uid://boyklnaet323u" path="res://reactions/surprise2.png" id="14_utqiu"]
 [ext_resource type="Texture2D" uid="uid://42x5oon55mn6" path="res://worm/front-walk2-b.png" id="15_eac5t"]
+[ext_resource type="Texture2D" uid="uid://dtpqppl2o43no" path="res://reactions/surprise3.png" id="15_q0yso"]
 [ext_resource type="Texture2D" uid="uid://ds0psoy5e0x6t" path="res://worm/front-walk2-outline.png" id="16_q2ijb"]
 [ext_resource type="Texture2D" uid="uid://bn2y2ix652wss" path="res://worm/front-walk3-a.png" id="17_gfuqo"]
 [ext_resource type="Texture2D" uid="uid://f68d36lu1gt6" path="res://worm/front-walk3-b.png" id="18_uqcba"]
@@ -111,6 +123,70 @@ _data = {
 "walk": SubResource("Animation_no1wo")
 }
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_5lh23"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_i238b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_bcrhb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_w5l6a")
+}],
+"loop": true,
+"name": &"confused",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_qfv5u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_3kf4s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_vm5mq")
+}],
+"loop": true,
+"name": &"grumble",
+"speed": 10.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"none",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_lvl3x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_j6eob")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_mygyu")
+}],
+"loop": true,
+"name": &"slimeheart",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_rr2em")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_utqiu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_q0yso")
+}],
+"loop": true,
+"name": &"surprised",
+"speed": 10.0
+}]
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_bkwjp"]
 radius = 31.0161
 
@@ -191,6 +267,15 @@ properties/20/replication_mode = 2
 properties/21/path = NodePath(".:feet_direction")
 properties/21/spawn = true
 properties/21/replication_mode = 2
+properties/22/path = NodePath("Sprites/Reaction:animation")
+properties/22/spawn = true
+properties/22/replication_mode = 2
+properties/23/path = NodePath("Sprites/Reaction:frame")
+properties/23/spawn = true
+properties/23/replication_mode = 2
+properties/24/path = NodePath("Sprites/Reaction:visible")
+properties/24/spawn = true
+properties/24/replication_mode = 1
 
 [node name="WormFront" type="RigidBody2D"]
 position = Vector2(29, -52)
@@ -219,6 +304,11 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
+
+[node name="Reaction" type="AnimatedSprite2D" parent="Sprites"]
+position = Vector2(141, -86)
+sprite_frames = SubResource("SpriteFrames_5lh23")
+animation = &"none"
 
 [node name="HeadDamageArea2D" type="Area2D" parent="Sprites"]
 collision_layer = 0
