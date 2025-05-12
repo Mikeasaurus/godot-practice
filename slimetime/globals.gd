@@ -3,7 +3,7 @@ extends Node
 # Global parameters
 
 # Current version of the game.
-var version: String = "0.2.2"
+var version: String = "0.2.3"
 
 # Flag for testing multiplayer on localhost.
 var localhost: bool = false
