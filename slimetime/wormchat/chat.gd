@@ -113,7 +113,7 @@ func _send_msg (msg: Array) -> void:
 	_chatfile.store_var(msg)
 	_chatfile.flush()
 	# If a client just sent a message, then clear their "typing" status.
-	var handle: String = msg[0]
+	var handle: String = msg[1]
 	if handle in last_typed:
 		last_typed.erase(handle)
 
@@ -126,11 +126,12 @@ func _send_msg (msg: Array) -> void:
 @rpc("reliable")
 func _new_messages (msgs) -> void:
 	for msg in msgs:
-		var sender: String = msg[0]
-		var text: String = msg[1]
-		var icon_colours: Array[Color] = msg[2]
+		var user_id: int = msg[0]
+		var handle: String = msg[1]
+		var text: String = msg[2]
+		var icon_colours: Array[Color] = msg[3]
 		# Message from this own peer.
-		if sender == Globals.handle:
+		if user_id == Globals.user_id:
 			# Done the last peer messages.
 			current_peer_messages = null
 			var my_message: OwnMessage = own_message_scene.instantiate()
@@ -139,9 +140,10 @@ func _new_messages (msgs) -> void:
 		# Message from a peer.
 		else:
 			# Starting a new set of messages?
-			if current_peer_messages == null or sender != current_peer_messages.peer_name:
+			if current_peer_messages == null or user_id != current_peer_messages.user_id:
 				current_peer_messages = peer_message_scene.instantiate()
-				current_peer_messages.peer_name = sender
+				current_peer_messages.user_id = user_id
+				current_peer_messages.handle = handle
 				dialogue.add_child(current_peer_messages)
 			current_peer_messages.add_message(text, icon_colours)
 	# Send new message notification, if it wasn't immediately displayed.
@@ -176,7 +178,7 @@ func send_msg (text: String) -> void:
 		Globals.worm_outline_colour,
 		Globals.worm_icon_bg_colour,
 	]
-	_send_msg.rpc_id(1,[Globals.handle,text,icon_colours])
+	_send_msg.rpc_id(1,[Globals.user_id,Globals.handle,text,icon_colours])
 
 # Check if scrolled to bottom of messages.
 func at_bottom () -> bool:

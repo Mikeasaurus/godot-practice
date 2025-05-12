@@ -6,14 +6,15 @@ class_name PeerMessages
 # Arranged with a label above the first message, and the icon appearing only
 # on the final message.
 
-var peer_name: String
+var user_id: int
+var handle: String
 
 var icon_scene := preload("res://wormchat/icon.tscn")
 var text_scene := preload("res://wormchat/text.tscn")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	$GridContainer/Label.text = "     " + peer_name
+	$GridContainer/Label.text = "     " + handle
 	if Globals.chat_font != null:
 		$GridContainer/Label.add_theme_font_override("font",Globals.chat_font)
 

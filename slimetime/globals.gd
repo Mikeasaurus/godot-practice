@@ -101,6 +101,12 @@ func _ready() -> void:
 	else:
 		chat_font = load("res://fonts/nautica-rounded/nautica-rounded.semibold.ttf")
 	_manage_persistent_state()
+	# Generate a user id if none previously generated.
+	# Can only generate a 53-bit integer, since this gets cast into a float
+	# (with 53-bit mantissa) in the JSON config file.
+	if user_id == -1:
+		# 32 bits + 21 bits = 53 bits total precision.
+		user_id = (randi()<<21) + randi_range(0,(1<<21)-1)
 
 # Manage persistent game state.
 var _save_state_timer: Timer
@@ -117,6 +123,7 @@ func _save_state() -> void:
 	state['worm_outline_colour'] = worm_outline_colour.to_html()
 	state['worm_icon_bg_colour'] = worm_icon_bg_colour.to_html()
 	state['handle'] = handle
+	state['user_id'] = user_id
 	var f: FileAccess = FileAccess.open("user://config.json",FileAccess.WRITE)
 	f.store_line(JSON.stringify(state,"\t"))
 func _manage_persistent_state() -> void:
@@ -129,6 +136,8 @@ func _manage_persistent_state() -> void:
 		worm_outline_colour = Color.from_string(state['worm_outline_colour'], worm_outline_colour)
 		worm_icon_bg_colour = Color.from_string(state['worm_icon_bg_colour'], original_worm_icon_bg_colour)
 		handle = state['handle']
+		if 'user_id' in state:
+			user_id = state['user_id']
 	# Set up delay for saving state.
 	# So we don't repeatedly write the file as properties like colour are updated.
 	_save_state_timer = Timer.new()
@@ -150,6 +159,10 @@ var is_server: bool = false
 var handle: String = "": set = _set_handle
 func _set_handle (h: String) -> void:
 	handle = h
+	_eventually_save_state()
+var user_id: int = -1: set = _set_user_id
+func _set_user_id (id: int) -> void:
+	user_id = id
 	_eventually_save_state()
 
 # Reset global variables (when game restarts).
