@@ -93,6 +93,11 @@ func _make_server () -> void:
 	print (message)
 	$ServerScreen/ConnectionInfo.text = message
 	$ServerScreen.show()
+	# Show list of online players (list is synchronized with connected peers).
+	$Overlay/Players.show()
+	# Start displaying log messages from the server.
+	$Overlay/LogTimer.timeout.connect(_next_log)
+	$Overlay/LogTimer.start()
 
 # Make this screen a client process, and connect to the specified server.
 func _make_client () -> void:
@@ -233,7 +238,7 @@ func multiplayer_death () -> void:
 func _death_message ():
 	var id: int = multiplayer.get_remote_sender_id()
 	var handle: String = players[id][0]
-	_log.rpc("%s has died."%handle)
+	_log("%s has died."%handle)
 func respawn () -> void:
 	my_worm().respawn()
 	$GameOverScreen.visible = false
@@ -350,17 +355,12 @@ func _on_connected_to_server () -> void:
 	# Have to wait until server connection, or some elements of the pause menu
 	# (maybe appearance editor?) complain about being unable to get unique id.
 	make_pause_menu()
-	# Start displaying log messages from the server, rate limited.
-	$Overlay/LogTimer.timeout.connect(_next_log)
 	# Hide the score, not used for multiplayer.
 	$Overlay/Score.visible = false
 	# Register the player on the server (store user handle and then spawn a worm).
 	_register_player.rpc_id(1,Globals.handle)
-	# Start the log message display, after a short delay (above) to wait for our own connection message.
-	_next_log()
 	await get_tree().create_timer(0.1).timeout
 	show()
-	$Overlay/LogTimer.start()
 # If server disconnects unexpectedly, return to main menu.
 func _on_server_disconnected () -> void:
 	# Note: this seems to get called on a client after a disconnect, so in that
@@ -371,11 +371,12 @@ func _on_connection_failed() -> void:
 	$Overlay/LogLabel.text = "Connection failed.  Playing locally."
 func _on_client_disconnected (id) -> void:
 	if id not in players: return  # Ignore test coonections (before player fully connected)
-	_log.rpc("%s has left the server."%players[id][0])
+	_log("%s has left the server."%players[id][0])
 	var worm: Worm = players[id][1]
 	$Worms.remove_child(worm)
 	worm.queue_free()
 	players.erase(id)
+	_update_player_list()
 	_remove_beachball(id)
 	
 # Give new client all info needed to get started.
@@ -387,7 +388,9 @@ func _register_player (handle) -> void:
 	# Store player information.
 	players[id] = [handle,worm]
 	# Send a log message, telling everyone that a new player has arrived.
-	_log.rpc("%s has joined the server."%handle)
+	_log("%s has joined the server."%handle)
+	# Also update list of online players.
+	_update_player_list()
 # Custom spawner for worms, to set up the multiplayer authority properly.
 func _spawn_worm (data):
 	var id: int = data[0]
@@ -404,24 +407,27 @@ func _spawn_worm (data):
 	if id == multiplayer.get_unique_id():
 		worm.z_index += 25  # 5 segments in a worm, each with up to 5 sub-layers?
 	return worm
+# Update list of online players.
+func _update_player_list() -> void:
+	var list: String = ""
+	for id in players:
+		var handle: String = players[id][0]
+		list += "\n"+handle
+	$Overlay/Players.text = "Online:"+list
 # Send a system message to the clients.
-@rpc("call_local","reliable")
 func _log (msg: String) -> void:
 	logs.append(msg)
-	if multiplayer.is_server():
-		print (msg)
+	print (msg)
 # Triggered by LogTimer
 func _next_log () -> void:
 	if next_log < len(logs):
 		$Overlay/LogLabel.text = logs[next_log]
-		$Overlay/LogLabel.add_theme_color_override("font_color",Color(0,1,0,1))
-		$Overlay/LogLabel.add_theme_color_override("font_outline_color",Color(0,0,0,1))
+		$Overlay/LogLabel.modulate = Color.WHITE
 		next_log += 1
 	else:
 		# If no new messages, fade out the last message shown.
 		var tween: Tween = get_tree().create_tween()
-		tween.tween_property($Overlay/LogLabel, "theme_override_colors/font_color", Color(0,1,0,0), 1)
-		tween.parallel().tween_property($Overlay/LogLabel, "theme_override_colors/font_outline_color", Color(0,0,0,0), 1)
+		tween.tween_property($Overlay/LogLabel, "modulate", Color.TRANSPARENT, 1)
 
 # Connect signals for our worm.
 func _on_worm_spawner_spawned(worm: Worm) -> void:
