@@ -326,19 +326,29 @@ func _spawn_slime (_data):
 	if Globals.is_client:
 		slime.collision_mask = 0
 	return slime
-func _make_splatter (pos: Vector2, direction: Vector2, z: int = 0):
+func _make_splatter (pos: Vector2, direction: Vector2, z: int = 0, sound: bool = true):
 	# Make sure this is only done on authority.
 	# The other clients will see it via SplatterSpawner.
 	if multiplayer.get_unique_id() != 1: return
-	$SplatterSpawner.spawn(PackedVector2Array([pos,direction,Vector2(z,0)]))
+	var s: int
+	if sound:
+		s = 1
+	else:
+		s = 0
+	$SplatterSpawner.spawn(PackedVector2Array([pos,direction,Vector2(z,s)]))
 func _spawn_splatter (data: PackedVector2Array):
 	var splatter: Splatter = preload("res://features/splatter.tscn").instantiate()
 	var pos: Vector2 = data[0]
 	var direction: Vector2 = data[1]
 	var z: int = int(data[2].x)
+	var s: int = int(data[2].y)
 	splatter.global_position = pos
 	splatter.direction = direction
 	splatter.z_index = z
+	if s == 1:
+		splatter.sound = true
+	else:
+		splatter.sound = false
 	return splatter
 
 # Multiplayer functionality

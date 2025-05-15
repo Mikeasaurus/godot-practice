@@ -6,6 +6,7 @@ class_name Splatter
 @export var particle_scene: PackedScene
 
 var direction: Vector2
+var sound: bool = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -20,7 +21,8 @@ func _ready() -> void:
 		# ERROR: Can't change this state while flushing queries. Use call_deferred() or set_deferred() to change monitoring state instead.
 		call_deferred("add_sibling",p)
 	# Play a sound.
-	$SplatSound.play()
+	if sound:
+		$SplatSound.play()
 static func create (pos: Vector2, dir: Vector2) -> Splatter:
 	var splatter: Splatter = load("res://features/splatter.tscn").instantiate()
 	splatter.global_position = pos

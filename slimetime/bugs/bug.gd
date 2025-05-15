@@ -53,7 +53,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	# Check if a slimed bug is hitting a surface, make splatter effect.
 	if is_slimed and state.get_contact_count() > 0:
 		var n: Vector2 = state.get_contact_local_normal(0)
-		Globals.request_splatter.emit(global_position, n, z_index+1)
+		Globals.request_splatter.emit(global_position, n, z_index+1, false)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
