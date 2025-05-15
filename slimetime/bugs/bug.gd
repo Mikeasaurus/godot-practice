@@ -145,11 +145,11 @@ func _on_body_entered(body: Node) -> void:
 			set_deferred("freeze",true)
 			stuck_surface = body
 			stuck_offset = position - body.global_position
-			$GroundSound.play()
+			ground_sound()
 			is_stuck = true
 	# Otherwise, hitting stationary body.
 	else:
-		$GroundSound.play()
+		ground_sound()
 		is_stuck = true
 		# If hitting something solid and already slimed, then stick to the surface.
 		set_deferred("freeze",true)
@@ -175,3 +175,10 @@ func _on_visible_on_screen_notifier_2d_screen_entered() -> void:
 func _disable_if_not_visible () -> void:
 	if not $VisibleOnScreenNotifier2D.is_on_screen():
 		_on_visible_on_screen_notifier_2d_screen_exited()
+
+# Play sound when the bug hits a surface.
+@rpc("authority","call_local","reliable")
+func _ground_sound () -> void:
+	$GroundSound.play()
+func ground_sound() -> void:
+	_ground_sound.rpc()
