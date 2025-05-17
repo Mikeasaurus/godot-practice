@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://xkg3ucnitsra"]
+
+[ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://wheel.tscn" id="1_41m3k"]
+[ext_resource type="Script" path="res://car.gd" id="1_88aey"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jbip1"]
+size = Vector2(80, 116)
+
+[node name="Car" type="RigidBody2D"]
+gravity_scale = 0.0
+script = ExtResource("1_88aey")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -58.0
+offset_right = 40.0
+offset_bottom = 58.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_jbip1")
+
+[node name="Wheels" type="Node2D" parent="."]
+
+[node name="FrontLeft" parent="Wheels" instance=ExtResource("1_41m3k")]
+position = Vector2(33, 37)
+
+[node name="FrontRight" parent="Wheels" instance=ExtResource("1_41m3k")]
+position = Vector2(-33, 36)
+
+[node name="RearLeft" parent="Wheels" instance=ExtResource("1_41m3k")]
+position = Vector2(32, -34)
+
+[node name="RearRight" parent="Wheels" instance=ExtResource("1_41m3k")]
+position = Vector2(-33, -35)
