@@ -6,7 +6,7 @@ extends Node
 var version: String = "0.2.3"
 
 # Flag for testing multiplayer on localhost.
-var localhost: bool = false
+var localhost: bool = true
 
 # Query server information.
 # To use: connect the server_info signal, and then call request_server_info().

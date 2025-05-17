@@ -173,7 +173,8 @@ func _input(event: InputEvent) -> void:
 		else:
 			DisplayServer.window_set_mode(DisplayServer.WindowMode.WINDOW_MODE_WINDOWED)
 	elif event.is_action_pressed("open_chat") and Globals.is_client:
-		# Do on next frame, to ingore the "c" character press in the chat window.
+		# Do on next frame, to ignore the "c" character that was just pressed
+		# (so it isn't typed in the chat window).
 		await get_tree().process_frame
 		open_chat()
 		
@@ -482,8 +483,6 @@ func _on_beachball_button_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			# Spawn the ball near the player.
-			#p.position = position + mouth_position.rotated($Sprites.global_rotation)
-			#p.linear_velocity = facing_direction.rotated(angle) * speed
 			var worm: Worm = my_worm()
 			var ball_position = worm.segments[0].global_position \
 				+ worm.segments[0].facing_direction * 100 \

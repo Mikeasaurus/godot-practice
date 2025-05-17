@@ -1,10 +1,10 @@
 extends RigidBody2D
 
 ## Top speed of car (pixels/second)
-@export var max_speed: float = 1000.0
+@export var max_speed: float = 2000.0
 
 ## Acceleration (pixels/second/second)
-@export var acceleration: float = 1000.0
+@export var acceleration: float = 2000.0
 
 ## Drag (as deceleration)
 @export var deceleration: float = acceleration/3
@@ -44,10 +44,10 @@ func _process(delta: float) -> void:
 	else:
 		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
 			if wheel.rotation < 0:
-				wheel.rotation += dr
+				wheel.rotation += 2*dr
 			elif wheel.rotation > 0:
-				wheel.rotation -= dr
-			if abs(wheel.rotation) <= dr:
+				wheel.rotation -= 2*dr
+			if abs(wheel.rotation) <= 2*dr:
 				wheel.rotation = 0
 
 	#######################################################
