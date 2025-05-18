@@ -1,10 +1,10 @@
 extends RigidBody2D
 
 ## Top speed of car (pixels/second)
-@export var max_speed: float = 2000.0
+@export var max_speed: float = 1500.0
 
 ## Acceleration (pixels/second/second)
-@export var acceleration: float = 2000.0
+@export var acceleration: float = 1500.0
 
 ## Drag (as deceleration)
 @export var deceleration: float = acceleration/3
@@ -13,7 +13,7 @@ extends RigidBody2D
 @export var brakes: float = acceleration
 
 ## How far the wheels can turn in one direction (degrees)
-@export var max_wheel_angle: float = 45.0
+@export var max_wheel_angle: float = 30.0
 
 ## How fast the wheels can turn (degrees/sec)
 @export var wheel_turn_speed: float = 120.0
