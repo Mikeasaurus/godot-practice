@@ -25,6 +25,11 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	# Zoom out camera the faster the car is going.
+	# Zoom = 1.0 at stop, 0.5 at max speed.
+	var z: float = 1 / (1 + abs($Wheels/FrontLeft.speed) / max_speed)
+	$Camera2D.zoom.x = z
+	$Camera2D.zoom.y = z
 	#######################################################
 	# Wheel turning
 	#######################################################
