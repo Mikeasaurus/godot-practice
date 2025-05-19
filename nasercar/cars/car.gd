@@ -4,7 +4,7 @@ extends RigidBody2D
 @export var max_speed: float = 1500.0
 
 ## Acceleration (pixels/second/second)
-@export var acceleration: float = 1500.0
+@export var acceleration: float = 500.0
 
 ## Drag (as deceleration)
 @export var deceleration: float = acceleration/3
@@ -26,8 +26,7 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	# Zoom out camera the faster the car is going.
-	# Zoom = 1.0 at stop, 0.5 at max speed.
-	var z: float = 1 / (1 + abs($Wheels/FrontLeft.speed) / max_speed)
+	var z: float = 2.0 / (1 + 2*abs($Wheels/FrontLeft.speed) / max_speed)
 	$Camera2D.zoom.x = z
 	$Camera2D.zoom.y = z
 	#######################################################
