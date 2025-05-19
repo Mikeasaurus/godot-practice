@@ -18,10 +18,17 @@ extends RigidBody2D
 ## How fast the wheels can turn (degrees/sec)
 @export var wheel_turn_speed: float = 120.0
 
+## Whether this car is user controllable.
+@export var controllable: bool = false
+
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
 
+# Let this car be playable by the local user.
+func make_playable () -> void:
+	controllable = true
+	$Camera2D.enabled = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -29,67 +36,68 @@ func _process(delta: float) -> void:
 	var z: float = 2.0 / (1 + 2*abs($Wheels/FrontLeft.speed) / max_speed)
 	$Camera2D.zoom.x = z
 	$Camera2D.zoom.y = z
-	#######################################################
-	# Wheel turning
-	#######################################################
-	var dr: float = wheel_turn_speed * delta / 180 * PI
-	var max_r: float = max_wheel_angle / 180 * PI
-	# Turn left
-	if Input.is_action_pressed("turn_left"):
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
-			if wheel.rotation > -max_r:
-				wheel.rotation -= dr
-	# Turn right
-	elif Input.is_action_pressed("turn_right"):
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
-			if wheel.rotation < max_r:
-				wheel.rotation += dr
-	# Re-center
-	else:
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
-			if wheel.rotation < 0:
-				wheel.rotation += 2*dr
-			elif wheel.rotation > 0:
-				wheel.rotation -= 2*dr
-			if abs(wheel.rotation) <= 2*dr:
-				wheel.rotation = 0
+	if controllable:
+		#######################################################
+		# Wheel turning
+		#######################################################
+		var dr: float = wheel_turn_speed * delta / 180 * PI
+		var max_r: float = max_wheel_angle / 180 * PI
+		# Turn left
+		if Input.is_action_pressed("turn_left"):
+			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
+				if wheel.rotation > -max_r:
+					wheel.rotation -= dr
+		# Turn right
+		elif Input.is_action_pressed("turn_right"):
+			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
+				if wheel.rotation < max_r:
+					wheel.rotation += dr
+		# Re-center
+		else:
+			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
+				if wheel.rotation < 0:
+					wheel.rotation += 2*dr
+				elif wheel.rotation > 0:
+					wheel.rotation -= 2*dr
+				if abs(wheel.rotation) <= 2*dr:
+					wheel.rotation = 0
 
-	#######################################################
-	# Acceleration from wheels
-	#######################################################
-	if Input.is_action_pressed("go"):
-		var dv: float = acceleration * delta
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			if wheel.speed < max_speed:
-				wheel.speed += dv
-	elif Input.is_action_pressed("stop"):
-		var dv: float = brakes * delta
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			if wheel.speed > 0:
-				wheel.speed -= dv
-			elif wheel.speed < 0:
-				wheel.speed += dv
-			if abs(wheel.speed) <= dv:
-				wheel.speed = 0
-	elif Input.is_action_pressed("reverse"):
-		var dv: float = acceleration * delta
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			if wheel.speed > -max_speed:
-				wheel.speed -= dv
-	# Update free-moving wheels to current ground speed in their direction.
-	elif false:
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			var rot: float = wheel.global_rotation + PI/2
-			wheel.speed = linear_velocity.dot(Vector2.from_angle(rot))
-	else:
-		var dv: float = deceleration * delta
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			if wheel.speed > 0:
-				wheel.speed -= dv
-			elif wheel.speed < 0:
-				wheel.speed += dv
-			if abs(wheel.speed) <= dv:
-				wheel.speed = 0
+		#######################################################
+		# Acceleration from wheels
+		#######################################################
+		if Input.is_action_pressed("go"):
+			var dv: float = acceleration * delta
+			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+				if wheel.speed < max_speed:
+					wheel.speed += dv
+		elif Input.is_action_pressed("stop"):
+			var dv: float = brakes * delta
+			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+				if wheel.speed > 0:
+					wheel.speed -= dv
+				elif wheel.speed < 0:
+					wheel.speed += dv
+				if abs(wheel.speed) <= dv:
+					wheel.speed = 0
+		elif Input.is_action_pressed("reverse"):
+			var dv: float = acceleration * delta
+			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+				if wheel.speed > -max_speed:
+					wheel.speed -= dv
+		# Update free-moving wheels to current ground speed in their direction.
+		elif false:
+			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+				var rot: float = wheel.global_rotation + PI/2
+				wheel.speed = linear_velocity.dot(Vector2.from_angle(rot))
+		else:
+			var dv: float = deceleration * delta
+			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+				if wheel.speed > 0:
+					wheel.speed -= dv
+				elif wheel.speed < 0:
+					wheel.speed += dv
+				if abs(wheel.speed) <= dv:
+					wheel.speed = 0
 func _physics_process(delta: float) -> void:
 	#######################################################
 	# Calculate movement (based on wheel speed and ground friction)

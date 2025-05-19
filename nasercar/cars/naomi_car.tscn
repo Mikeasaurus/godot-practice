@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://bvoj5fwm75u8v"]
+
+[ext_resource type="PackedScene" uid="uid://xkg3ucnitsra" path="res://cars/car.tscn" id="1_awwwh"]
+[ext_resource type="Texture2D" uid="uid://cq1jkn6quwyid" path="res://cars/naomicar.png" id="2_220w2"]
+
+[node name="NaomiCar" instance=ExtResource("1_awwwh")]
+
+[node name="Sprite2D" parent="Wheels" index="4"]
+texture = ExtResource("2_220w2")
