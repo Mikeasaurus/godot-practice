@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://xkg3ucnitsra"]
+[gd_scene load_steps=5 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
 [ext_resource type="Script" path="res://cars/car.gd" id="1_88aey"]
+[ext_resource type="AudioStream" uid="uid://dxqavad1nchgy" path="res://audio/158728__erdie__engine04-loop.wav" id="3_5h513"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4ldm1"]
 radius = 35.0
@@ -35,3 +36,7 @@ scale = Vector2(2, 2)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 enabled = false
+
+[node name="EngineSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_5h513")
+autoplay = true

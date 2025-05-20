@@ -34,6 +34,8 @@ func _ready() -> void:
 func make_playable () -> void:
 	controllable = true
 	$Camera2D.enabled = true
+	# Make own engine sound louder.
+	$EngineSound.volume_db = 1.0
 
 # Make this car follow a predetermined path
 # (as local CPU).
@@ -154,6 +156,14 @@ func _process(delta: float) -> void:
 			elif angle_diff > 0:
 				if wheel.rotation < max_r:
 					wheel.rotation += dr
+	#######################################################
+	# Engine sound
+	#######################################################
+	var speed: float = linear_velocity.length()
+	if speed <= 0.05 * max_speed:
+		$EngineSound.pitch_scale = 0.5
+	else:
+		$EngineSound.pitch_scale = 1 + speed / max_speed
 
 func _physics_process(delta: float) -> void:
 	#######################################################
