@@ -44,12 +44,10 @@ func make_cpu (track_path: Path2D) -> void:
 	_pathfollow = PathFollow2D.new()
 	path.add_child(_pathfollow)
 	_rect = ColorRect.new()
-	_pathfollow.add_child(_rect)
+	#_pathfollow.add_child(_rect)
 	_rect.size = Vector2(40,40)
 	_rect.position = Vector2(-20,-20)
 	_rect.color = Color.RED
-	#add_sibling(path)
-	#path.global_position = global_position - path.curve.get_point_position(0)
 	var offset: Vector2 = global_position - path.curve.get_point_position(0)
 	#TODO: more robost with starting orientation.
 	_pathfollow.v_offset = offset.x
@@ -130,32 +128,32 @@ func _process(delta: float) -> void:
 	#######################################################
 	if _pathfollow != null:
 		# Make sure our target point is far enough ahead.
-		#var target_direction: Vector2 = _pathfollow.global_position - global_position
-		var target_direction: Vector2 = _rect.global_position - global_position
+		var target_direction: Vector2 = _pathfollow.global_position - global_position
 		var dx: float = target_direction.length()
-		if dx < 100:
-			_pathfollow.progress += 100 - dx
+		if false and dx < 10:
+			_pathfollow.progress += 300
+		else:
+			_pathfollow.progress += (300/dx) * linear_velocity.length() * delta
 		# Go go go
 		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			if wheel.speed < max_speed/10:
+			if wheel.speed < max_speed:
 				wheel.speed += acceleration * delta
 		# ... in right direction
 		var angle: float = target_direction.angle() - global_rotation
 		var angle_degrees: float = angle / PI * 180
 		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
-			#TODO
-			#var target_angle: float = target_direction.angle() - PI/2 #- global_rotation
-			wheel.global_rotation = target_direction.angle() - PI/2
-			#if target_angle < wheel.global_rotation:
-				#if wheel.rotation > -max_r:
-					#print ("OK")
-					#wheel.rotation -= dr
-				#else:
-					#print ("NOT OK")
-			#elif target_angle > wheel.global_rotation:
-				#if wheel.rotation < max_r:
-					#wheel.rotation += dr
-			#wheel.rotation = target_angle
+			# Target angle of wheel (from wheel frame of reference).
+			var target_angle: float = target_direction.angle() - PI/2 - rotation
+			# Difference in angle between wheel and target path.
+			var angle_diff: float = target_angle - wheel.rotation
+			if angle_diff >= PI: angle_diff -= 2*PI
+			elif angle_diff <= -PI: angle_diff += 2*PI
+			if angle_diff < 0:
+				if wheel.rotation > -max_r:
+					wheel.rotation -= dr
+			elif angle_diff > 0:
+				if wheel.rotation < max_r:
+					wheel.rotation += dr
 
 func _physics_process(delta: float) -> void:
 	#######################################################
