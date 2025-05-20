@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://xkg3ucnitsra"]
+[gd_scene load_steps=6 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
 [ext_resource type="Script" path="res://cars/car.gd" id="1_88aey"]
 [ext_resource type="AudioStream" uid="uid://dxqavad1nchgy" path="res://audio/158728__erdie__engine04-loop.wav" id="3_5h513"]
+[ext_resource type="AudioStream" uid="uid://c32p6fxjy0hxb" path="res://audio/659463__diogorusso__shoot-car-door-slam.wav" id="4_af8g7"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4ldm1"]
 radius = 35.0
@@ -10,6 +11,8 @@ height = 116.0
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0
+contact_monitor = true
+max_contacts_reported = 2
 script = ExtResource("1_88aey")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -40,3 +43,13 @@ enabled = false
 [node name="EngineSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("3_5h513")
 autoplay = true
+
+[node name="CrashSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_af8g7")
+pitch_scale = 0.5
+
+[node name="CrashSoundTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[connection signal="timeout" from="CrashSoundTimer" to="." method="_on_crash_sound_timer_timeout"]

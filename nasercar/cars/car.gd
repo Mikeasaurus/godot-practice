@@ -24,11 +24,12 @@ extends RigidBody2D
 ## The path to follow if this is a CPU.
 @export var path: Path2D = null
 var _pathfollow: PathFollow2D = null
-var _rect: ColorRect = null
+
+var _crashing: bool = false
 
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	body_entered.connect(_on_body_entered)
 
 # Let this car be playable by the local user.
 func make_playable () -> void:
@@ -45,11 +46,7 @@ func make_cpu (track_path: Path2D) -> void:
 	path = track_path
 	_pathfollow = PathFollow2D.new()
 	path.add_child(_pathfollow)
-	_rect = ColorRect.new()
 	#_pathfollow.add_child(_rect)
-	_rect.size = Vector2(40,40)
-	_rect.position = Vector2(-20,-20)
-	_rect.color = Color.RED
 	var offset: Vector2 = global_position - path.curve.get_point_position(0)
 	#TODO: more robost with starting orientation.
 	_pathfollow.v_offset = offset.x
@@ -132,7 +129,7 @@ func _process(delta: float) -> void:
 		# Make sure our target point is far enough ahead.
 		var target_direction: Vector2 = _pathfollow.global_position - global_position
 		var dx: float = target_direction.length()
-		if false and dx < 10:
+		if dx < 10:
 			_pathfollow.progress += 300
 		else:
 			_pathfollow.progress += (300/dx) * linear_velocity.length() * delta
@@ -142,7 +139,6 @@ func _process(delta: float) -> void:
 				wheel.speed += acceleration * delta
 		# ... in right direction
 		var angle: float = target_direction.angle() - global_rotation
-		var angle_degrees: float = angle / PI * 180
 		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
 			# Target angle of wheel (from wheel frame of reference).
 			var target_angle: float = target_direction.angle() - PI/2 - rotation
@@ -179,4 +175,10 @@ func _physics_process(delta: float) -> void:
 		#var dv: Vector2 = wheel.speed * Vector2.from_angle(rot) - linear_velocity
 		var dv: Vector2 = target_v - actual_v
 		apply_force(mass/4.0/delta*dv, wheel.position.rotated(rotation))
-	#print (linear_velocity, ' ', $Wheels/RearLeft.
+
+func _on_body_entered(_body: Node) -> void:
+	if _crashing: return  # Only play sound once during a crashing period.
+	$CrashSound.play()
+	_crashing = true
+func _on_crash_sound_timer_timeout() -> void:
+	_crashing = false
