@@ -21,6 +21,11 @@ extends RigidBody2D
 ## Whether this car is user controllable.
 @export var controllable: bool = false
 
+## The path to follow if this is a CPU.
+@export var path: Path2D = null
+var _pathfollow: PathFollow2D = null
+var _rect: ColorRect = null
+
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
@@ -30,18 +35,39 @@ func make_playable () -> void:
 	controllable = true
 	$Camera2D.enabled = true
 
+# Make this car follow a predetermined path
+# (as local CPU).
+func make_cpu (track_path: Path2D) -> void:
+	# Make a copy of the track path, so we can add our own PathFollow2D.
+	#path = track_path.duplicate()
+	path = track_path
+	_pathfollow = PathFollow2D.new()
+	path.add_child(_pathfollow)
+	_rect = ColorRect.new()
+	_pathfollow.add_child(_rect)
+	_rect.size = Vector2(40,40)
+	_rect.position = Vector2(-20,-20)
+	_rect.color = Color.RED
+	#add_sibling(path)
+	#path.global_position = global_position - path.curve.get_point_position(0)
+	var offset: Vector2 = global_position - path.curve.get_point_position(0)
+	#TODO: more robost with starting orientation.
+	_pathfollow.v_offset = offset.x
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	# Zoom out camera the faster the car is going.
 	var z: float = 2.0 / (1 + 2*abs($Wheels/FrontLeft.speed) / max_speed)
 	$Camera2D.zoom.x = z
 	$Camera2D.zoom.y = z
+
+	var dr: float = wheel_turn_speed * delta / 180 * PI
+	var max_r: float = max_wheel_angle / 180 * PI
+
 	if controllable:
 		#######################################################
 		# Wheel turning
 		#######################################################
-		var dr: float = wheel_turn_speed * delta / 180 * PI
-		var max_r: float = max_wheel_angle / 180 * PI
 		# Turn left
 		if Input.is_action_pressed("turn_left"):
 			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
@@ -98,6 +124,39 @@ func _process(delta: float) -> void:
 					wheel.speed += dv
 				if abs(wheel.speed) <= dv:
 					wheel.speed = 0
+
+	#######################################################
+	# Path following for CPUs
+	#######################################################
+	if _pathfollow != null:
+		# Make sure our target point is far enough ahead.
+		#var target_direction: Vector2 = _pathfollow.global_position - global_position
+		var target_direction: Vector2 = _rect.global_position - global_position
+		var dx: float = target_direction.length()
+		if dx < 100:
+			_pathfollow.progress += 100 - dx
+		# Go go go
+		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+			if wheel.speed < max_speed/10:
+				wheel.speed += acceleration * delta
+		# ... in right direction
+		var angle: float = target_direction.angle() - global_rotation
+		var angle_degrees: float = angle / PI * 180
+		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
+			#TODO
+			#var target_angle: float = target_direction.angle() - PI/2 #- global_rotation
+			wheel.global_rotation = target_direction.angle() - PI/2
+			#if target_angle < wheel.global_rotation:
+				#if wheel.rotation > -max_r:
+					#print ("OK")
+					#wheel.rotation -= dr
+				#else:
+					#print ("NOT OK")
+			#elif target_angle > wheel.global_rotation:
+				#if wheel.rotation < max_r:
+					#wheel.rotation += dr
+			#wheel.rotation = target_angle
+
 func _physics_process(delta: float) -> void:
 	#######################################################
 	# Calculate movement (based on wheel speed and ground friction)
