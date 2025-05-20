@@ -38,6 +38,7 @@ func _ready() -> void:
 func make_playable () -> void:
 	controllable = true
 	$Camera2D.enabled = true
+	$Arrow.show()
 	# Make own engine sound louder.
 	$EngineSound.volume_db = 1.0
 
@@ -64,6 +65,10 @@ func _process(delta: float) -> void:
 	var z: float = 2.0 / (1 + 2*abs($Wheels/FrontLeft.speed) / max_speed)
 	$Camera2D.zoom.x = z
 	$Camera2D.zoom.y = z
+	# Arrow pointing to player needs to stay oriented upward.
+	$Arrow.global_rotation = 0
+	$Arrow.scale = 2*Vector2(1/$Camera2D.zoom.x, 1/$Camera2D.zoom.y)
+	$Arrow.offset.y = -60*$Camera2D.zoom.y
 
 	var dr: float = wheel_turn_speed * delta / 180 * PI
 	var max_r: float = max_wheel_angle / 180 * PI
