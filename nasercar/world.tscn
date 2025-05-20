@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://b4tklj1nsft7a"]
+[gd_scene load_steps=19 format=4 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_5oo6t"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://ground.png" id="1_cexhq"]
@@ -9,6 +9,8 @@
 [ext_resource type="PackedScene" uid="uid://bvoj5fwm75u8v" path="res://cars/naomi_car.tscn" id="6_als8x"]
 [ext_resource type="PackedScene" uid="uid://d254t8huvudx6" path="res://cars/stella_car.tscn" id="7_48ewy"]
 [ext_resource type="PackedScene" uid="uid://t281m7hks87i" path="res://cars/trish_car.tscn" id="8_fjqmw"]
+[ext_resource type="AudioStream" uid="uid://xnlgqle1fo4l" path="res://audio/20440__agfx__beep-pager.wav" id="10_leqvv"]
+[ext_resource type="AudioStream" uid="uid://dgii4vaux02bg" path="res://audio/196236__alienxxx__long-beep_011.wav" id="11_l7rta"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fosln"]
 texture = ExtResource("1_cexhq")
@@ -89,7 +91,7 @@ tile_set = SubResource("TileSet_w3afj")
 [node name="Road" type="TileMapLayer" parent="."]
 texture_filter = 1
 scale = Vector2(8, 8)
-tile_map_data = PackedByteArray("AAABAAAAAAACAAEAAAABAP//AAAAAAEAAAABAAEAAAAAAAEAAAABAP7/AAACAAAAAAAAAP7/AAABAAAAAAD///7/AAABAAAAAAD+//7/AAAAAAIAAAD+//3/AAAAAAEAAAD+//z/AAAAAAAAAAD///z/AAABAAAAAAAAAPz/AAABAAAAAAABAPz/AAABAAAAAAACAPz/AAABAAAAAAADAPz/AAABAAAAAAAEAP3/AAAAAAEAAAAEAP7/AAAAAAEAAAAEAP//AAAAAAIAAAAEAAEAAAAAAAEAAAAEAAIAAAAAAAEAAAADAAMAAAABAAAAAAACAAMAAAABAAAAAAABAAMAAAAAAAIAAAAEAAMAAAACAAIAAAAEAPz/AAACAAAAAAABAAIAAAAAAAEAAAAFAP//AAABAAAAAAAGAP//AAABAAAAAAAHAP//AAABAAAAAAAIAP//AAABAAAAAAAJAP//AAABAAAAAAAKAP7/AAAAAAEAAAAKAP3/AAAAAAEAAAAKAPz/AAAAAAEAAAAKAPv/AAAAAAEAAAAKAPr/AAAAAAEAAAAKAPn/AAAAAAEAAAAKAPj/AAAAAAEAAAAKAPf/AAAAAAEAAAAKAP//AAACAAIAAAAKAPb/AAAAAAEAAAAKAPX/AAAAAAEAAAAKAPT/AAAAAAEAAAAKAPP/AAAAAAEAAAAKAPL/AAACAAEAAAA=")
+tile_map_data = PackedByteArray("AAABAAAAAAACAAEAAAABAP//AAAAAAEAAAABAAEAAAAAAAEAAAABAP7/AAACAAAAAAAAAP7/AAABAAAAAAD///7/AAABAAAAAAD+//7/AAAAAAIAAAD+//3/AAAAAAEAAAD+//z/AAAAAAAAAAD///z/AAABAAAAAAAAAPz/AAABAAAAAAABAPz/AAABAAAAAAACAPz/AAABAAAAAAADAPz/AAABAAAAAAAEAP3/AAAAAAEAAAAEAP7/AAAAAAEAAAAEAP//AAAAAAIAAAAEAAEAAAAAAAEAAAAEAAIAAAAAAAEAAAADAAMAAAABAAAAAAACAAMAAAABAAAAAAABAAMAAAAAAAIAAAAEAAMAAAACAAIAAAAEAPz/AAACAAAAAAABAAIAAAAAAAEAAAAFAP//AAABAAAAAAAGAP//AAABAAAAAAAHAP//AAABAAAAAAAIAP//AAABAAAAAAAJAP//AAABAAAAAAAKAP7/AAAAAAEAAAAKAP3/AAAAAAEAAAAKAPz/AAAAAAEAAAAKAPv/AAAAAAEAAAAKAPr/AAAAAAEAAAAKAPn/AAAAAAEAAAAKAPj/AAAAAAEAAAAKAPf/AAAAAAEAAAAKAP//AAACAAIAAAAKAPb/AAAAAAEAAAAKAPX/AAACAAEAAAAKAPT/AAAAAAEAAAAKAPP/AAAAAAEAAAAKAPL/AAAAAAEAAAA=")
 tile_set = SubResource("TileSet_ma33w")
 
 [node name="Cars" type="Node2D" parent="."]
@@ -122,3 +124,39 @@ tile_set = SubResource("TileSet_3v7t6")
 
 [node name="TrackPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_2l6ov")
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(5375, -5986)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="GoLabel" type="Label" parent="CanvasLayer"]
+visible = false
+texture_filter = 1
+offset_left = 625.0
+offset_top = 1.0
+offset_right = 681.0
+offset_bottom = 35.0
+scale = Vector2(10, 10)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "GO!!!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FadeIn" type="ColorRect" parent="CanvasLayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Beep1" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("10_leqvv")
+
+[node name="Beep2" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("11_l7rta")
+pitch_scale = 2.0

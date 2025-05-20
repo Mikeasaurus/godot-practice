@@ -21,6 +21,9 @@ extends RigidBody2D
 ## Whether this car is user controllable.
 @export var controllable: bool = false
 
+## Whether this car is allowed to move.
+var moveable: bool = false
+
 ## The path to follow if this is a CPU.
 @export var path: Path2D = null
 var _pathfollow: PathFollow2D = null
@@ -51,6 +54,10 @@ func make_cpu (track_path: Path2D) -> void:
 	#TODO: more robost with starting orientation.
 	_pathfollow.v_offset = offset.x
 
+# Allow this car to start moving.
+func go () -> void:
+	moveable = true
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	# Zoom out camera the faster the car is going.
@@ -61,7 +68,7 @@ func _process(delta: float) -> void:
 	var dr: float = wheel_turn_speed * delta / 180 * PI
 	var max_r: float = max_wheel_angle / 180 * PI
 
-	if controllable:
+	if controllable and moveable:
 		#######################################################
 		# Wheel turning
 		#######################################################
@@ -125,7 +132,7 @@ func _process(delta: float) -> void:
 	#######################################################
 	# Path following for CPUs
 	#######################################################
-	if _pathfollow != null:
+	if _pathfollow != null and moveable:
 		# Make sure our target point is far enough ahead.
 		var target_direction: Vector2 = _pathfollow.global_position - global_position
 		var dx: float = target_direction.length()
@@ -162,6 +169,7 @@ func _process(delta: float) -> void:
 		$EngineSound.pitch_scale = 1 + speed / max_speed
 
 func _physics_process(delta: float) -> void:
+	if not moveable: return
 	#######################################################
 	# Calculate movement (based on wheel speed and ground friction)
 	#######################################################
