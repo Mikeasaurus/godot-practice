@@ -10,6 +10,7 @@ func _ready() -> void:
 	$Cars/StellaCar.make_cpu($TrackPath)
 	$Cars/TrishCar.make_cpu($TrackPath)
 	$Cars/ReedCar.make_cpu($TrackPath)
+	$Cars/SageCar.make_cpu($TrackPath)
 	# Start of race.
 	$CanvasLayer/FadeIn.show()
 	var fadein: Tween = create_tween()
