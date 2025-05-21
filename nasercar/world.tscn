@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=4 uid="uid://b4tklj1nsft7a"]
+[gd_scene load_steps=20 format=4 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_5oo6t"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://ground.png" id="1_cexhq"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bvoj5fwm75u8v" path="res://cars/naomi_car.tscn" id="6_als8x"]
 [ext_resource type="PackedScene" uid="uid://d254t8huvudx6" path="res://cars/stella_car.tscn" id="7_48ewy"]
 [ext_resource type="PackedScene" uid="uid://t281m7hks87i" path="res://cars/trish_car.tscn" id="8_fjqmw"]
+[ext_resource type="PackedScene" uid="uid://ceeynox2pxkxl" path="res://cars/reed_car.tscn" id="9_trxo8"]
 [ext_resource type="AudioStream" uid="uid://xnlgqle1fo4l" path="res://audio/20440__agfx__beep-pager.wav" id="10_leqvv"]
 [ext_resource type="AudioStream" uid="uid://dgii4vaux02bg" path="res://audio/196236__alienxxx__long-beep_011.wav" id="11_l7rta"]
 
@@ -114,6 +115,10 @@ rotation = 3.14159
 
 [node name="TrishCar" parent="Cars" instance=ExtResource("8_fjqmw")]
 position = Vector2(762, 418)
+rotation = 3.14159
+
+[node name="ReedCar" parent="Cars" instance=ExtResource("9_trxo8")]
+position = Vector2(899, 414)
 rotation = 3.14159
 
 [node name="Obstacles" type="TileMapLayer" parent="."]
