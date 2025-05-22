@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=4 uid="uid://b4tklj1nsft7a"]
+[gd_scene load_steps=22 format=4 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_5oo6t"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://ground.png" id="1_cexhq"]
@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://rem6honk7xys" path="res://cars/sage_car.tscn" id="10_jqir8"]
 [ext_resource type="AudioStream" uid="uid://xnlgqle1fo4l" path="res://audio/20440__agfx__beep-pager.wav" id="10_leqvv"]
 [ext_resource type="AudioStream" uid="uid://dgii4vaux02bg" path="res://audio/196236__alienxxx__long-beep_011.wav" id="11_l7rta"]
+[ext_resource type="PackedScene" uid="uid://dsew28lh05yyv" path="res://cars/rosa_car.tscn" id="11_w11g2"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fosln"]
 texture = ExtResource("1_cexhq")
@@ -111,7 +112,7 @@ position = Vector2(897, 258)
 rotation = 3.14159
 
 [node name="StellaCar" parent="Cars" instance=ExtResource("7_48ewy")]
-position = Vector2(623, 420)
+position = Vector2(841, 587)
 rotation = 3.14159
 
 [node name="TrishCar" parent="Cars" instance=ExtResource("8_fjqmw")]
@@ -124,6 +125,10 @@ rotation = 3.14159
 
 [node name="SageCar" parent="Cars" instance=ExtResource("10_jqir8")]
 position = Vector2(695, 585)
+rotation = 3.14159
+
+[node name="RosaCar" parent="Cars" instance=ExtResource("11_w11g2")]
+position = Vector2(630, 418)
 rotation = 3.14159
 
 [node name="Obstacles" type="TileMapLayer" parent="."]
