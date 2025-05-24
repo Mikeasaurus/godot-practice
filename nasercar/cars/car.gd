@@ -29,6 +29,7 @@ var moveable: bool = false
 var _pathfollow: PathFollow2D = null
 
 var _crashing: bool = false
+var _skidding: bool = false
 
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -72,6 +73,22 @@ func _process(delta: float) -> void:
 
 	var dr: float = wheel_turn_speed * delta / 180 * PI
 	var max_r: float = max_wheel_angle / 180 * PI
+
+	# Skidding
+	if Input.is_action_just_pressed("skid"):
+		_skidding = not _skidding
+		if _skidding:
+			$TireSquealSound.play(2.6)
+		else:
+			$TireSquealSound.stop()
+			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+				wheel._current_skidmark = null
+	if _skidding and controllable:
+		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+			if wheel._current_skidmark == null:
+				wheel._current_skidmark = load("res://cars/skid_mark.tscn").instantiate()
+				add_sibling(wheel._current_skidmark)
+			wheel._current_skidmark.add_skid(wheel.global_position)
 
 	if controllable and moveable:
 		#######################################################

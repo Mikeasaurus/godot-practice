@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://carfgs1mg40pn"]
+
+[ext_resource type="Script" path="res://cars/skid_mark.gd" id="1_auf4s"]
+
+[node name="SkidMark" type="Line2D"]
+script = ExtResource("1_auf4s")
+
+[node name="CleanupTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="timeout" from="CleanupTimer" to="." method="_on_cleanup_timer_timeout"]
