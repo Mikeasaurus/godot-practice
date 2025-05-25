@@ -6,6 +6,7 @@
 script = ExtResource("1_auf4s")
 
 [node name="CleanupTimer" type="Timer" parent="."]
+wait_time = 10.0
 one_shot = true
 
 [connection signal="timeout" from="CleanupTimer" to="." method="_on_cleanup_timer_timeout"]

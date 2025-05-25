@@ -18,6 +18,10 @@ extends RigidBody2D
 ## How fast the wheels can turn (degrees/sec)
 @export var wheel_turn_speed: float = 120.0
 
+## Coefficient of friction for wheels.  Relative to acceleration force.
+## Should be > 1.0 or car will always be skidding.
+@export var friction: float = 10
+
 ## Whether this car is user controllable.
 @export var controllable: bool = false
 
@@ -29,11 +33,12 @@ var moveable: bool = false
 var _pathfollow: PathFollow2D = null
 
 var _crashing: bool = false
-var _skidding: bool = false
 
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
+	# Raise the z_index so effects like skid marks appear beneath it.
+	z_index = 1
 
 # Let this car be playable by the local user.
 func make_playable () -> void:
@@ -73,22 +78,6 @@ func _process(delta: float) -> void:
 
 	var dr: float = wheel_turn_speed * delta / 180 * PI
 	var max_r: float = max_wheel_angle / 180 * PI
-
-	# Skidding
-	if Input.is_action_just_pressed("skid"):
-		_skidding = not _skidding
-		if _skidding:
-			$TireSquealSound.play(2.6)
-		else:
-			$TireSquealSound.stop()
-			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-				wheel._current_skidmark = null
-	if _skidding and controllable:
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			if wheel._current_skidmark == null:
-				wheel._current_skidmark = load("res://cars/skid_mark.tscn").instantiate()
-				add_sibling(wheel._current_skidmark)
-			wheel._current_skidmark.add_skid(wheel.global_position)
 
 	if controllable and moveable:
 		#######################################################
@@ -197,17 +186,43 @@ func _physics_process(delta: float) -> void:
 	if not moveable: return
 	#######################################################
 	# Calculate movement (based on wheel speed and ground friction)
+	# Also handle wheel skidding effect here.
 	#######################################################
+	var skidding: bool = false
 	for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-		# Difference in velocity between wheel and ground.
+		# Orientation of wheel.
 		var rot: float = wheel.global_rotation + PI/2
-		#var rot: float = wheel.rotation + PI/2
-		#TODO
-		var actual_v: Vector2 = linear_velocity + wheel.position.rotated(rotation+PI/2) * angular_velocity
-		var target_v: Vector2 = wheel.speed * Vector2.from_angle(rot)
-		#var dv: Vector2 = wheel.speed * Vector2.from_angle(rot) - linear_velocity
-		var dv: Vector2 = target_v - actual_v
-		apply_force(mass/4.0/delta*dv, wheel.position.rotated(rotation))
+		# Velocity of wheel axis (on car) w.r.t. ground.
+		var car_v: Vector2 = linear_velocity + wheel.position.rotated(rotation+PI/2) * angular_velocity
+		# Velocity of wheel spinning (opposite to direction that car motion will be).
+		var wheel_v: Vector2 = wheel.speed * -Vector2.from_angle(rot)
+		# Net velocity of wheel against ground.
+		var net_v: Vector2 = car_v + wheel_v
+		# Force of friction should counteract this force.
+		var f: Vector2 = mass/4.0/delta * -net_v
+		# Cap the static friction force.
+		var mag: float = f.length()
+		if mag > mass * acceleration * friction:
+			mag = mass * acceleration * friction
+			f = f.limit_length(mag)
+			# If static friction force was maxxed out, then there's some skidding
+			# for the wheel.
+			skidding = true
+			if wheel._current_skidmark == null:
+				wheel._current_skidmark = load("res://cars/skid_mark.tscn").instantiate()
+				add_sibling(wheel._current_skidmark)
+			wheel._current_skidmark.add_skid(wheel.global_position)
+		# If static force was sufficient to stick wheel to ground, then there
+		# is no skidding.
+		else:
+			wheel._current_skidmark = null
+
+		if skidding and not $TireSquealSound.playing:
+			$TireSquealSound.play(2.0)
+		if not skidding and $TireSquealSound.playing:
+			$TireSquealSound.stop()
+
+		apply_force(f, wheel.position.rotated(rotation))
 
 func _on_body_entered(_body: Node) -> void:
 	if _crashing: return  # Only play sound once during a crashing period.
