@@ -184,7 +184,10 @@ func _process(delta: float) -> void:
 	#######################################################
 	# Engine sound
 	#######################################################
-	var speed: float = linear_velocity.length()
+	var speed: float = 0.
+	for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+		speed += wheel.speed
+	speed = abs(speed)/4
 	if speed <= 0.05 * max_speed:
 		$EngineSound.pitch_scale = 0.5
 	else:
