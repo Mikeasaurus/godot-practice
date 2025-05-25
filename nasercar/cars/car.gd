@@ -209,6 +209,7 @@ func _physics_process(delta: float) -> void:
 func _on_body_entered(_body: Node) -> void:
 	if _crashing: return  # Only play sound once during a crashing period.
 	$CrashSound.play()
+	$CrashSoundTimer.start()
 	_crashing = true
 func _on_crash_sound_timer_timeout() -> void:
 	_crashing = false
