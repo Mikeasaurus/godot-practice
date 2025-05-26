@@ -32,6 +32,7 @@ var moveable: bool = false
 @export var path: Path2D = null
 var _pathfollow: PathFollow2D = null
 
+# For playing crashing sound.
 var _crashing: bool = false
 
 var _contact: bool = false
@@ -200,9 +201,6 @@ func _physics_process(delta: float) -> void:
 	# can take a while for the wheels to slow down and reverse).
 	if _contact:
 		apply_impulse(mass*max_speed*0.1*_contact_normal)
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			if abs(wheel.speed) > max_speed * 0.01:
-				wheel.speed *= 0.5
 		_contact = false
 		return
 	#######################################################
@@ -218,7 +216,7 @@ func _physics_process(delta: float) -> void:
 		# of friction force (allow car to spin a bit).
 		var car_v: Vector2
 		if _crashing:
-			car_v = linear_velocity + 0.1*wheel.position.rotated(rotation+PI/2) * angular_velocity
+			car_v = linear_velocity + 0.5*wheel.position.rotated(rotation+PI/2) * angular_velocity
 		# Otherwise, under normal circumstances car should avoid spinning freely.
 		else:
 			car_v = linear_velocity + wheel.position.rotated(rotation+PI/2) * angular_velocity
@@ -252,17 +250,24 @@ func _physics_process(delta: float) -> void:
 
 		apply_force(f, wheel.position.rotated(rotation))
 
+# Detect collision with an obstacle.
+# Triggers code above for moving around the obstacle.
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if state.get_contact_count() > 0:
 		_contact = true
 		_contact_normal = state.get_contact_local_normal(0)
-	else:
-		_contact = false
 
-func _on_body_entered(_body: Node) -> void:
+func _on_body_entered(body: Node) -> void:
 	if _crashing: return  # Only play sound once during a crashing period.
 	$CrashSound.play()
 	$CrashSoundTimer.start()
 	_crashing = true
+	# If crashing into a solid object (not another car), then cut down the
+	# wheel speed.
+	if "max_speed" not in body:
+		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+			if abs(wheel.speed) > max_speed * 0.01:
+				wheel.speed *= 0.5
+
 func _on_crash_sound_timer_timeout() -> void:
 	_crashing = false
