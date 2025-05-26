@@ -10,7 +10,7 @@ extends RigidBody2D
 @export var deceleration: float = acceleration/3
 
 ## Brake power (pixels/second/second)
-@export var brakes: float = acceleration
+@export var brakes: float = acceleration*2
 
 ## How far the wheels can turn in one direction (degrees)
 @export var max_wheel_angle: float = 30.0
