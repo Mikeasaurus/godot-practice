@@ -34,6 +34,9 @@ var _pathfollow: PathFollow2D = null
 
 var _crashing: bool = false
 
+var _contact: bool = false
+var _contact_normal: Vector2 = Vector2.ZERO
+
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
@@ -69,8 +72,19 @@ func go () -> void:
 func _process(delta: float) -> void:
 	# Zoom out camera the faster the car is going.
 	var z: float = 2.0 / (1 + 2*abs($Wheels/FrontLeft.speed) / max_speed)
-	$Camera2D.zoom.x = z
-	$Camera2D.zoom.y = z
+	var zoom_limit: float = 0.1 * delta
+	if z < $Camera2D.zoom.x:
+		$Camera2D.zoom.x = z
+		$Camera2D.zoom.y = z
+	# When car slowing down, zoom back in.
+	# But limit speed of zoom to avoid issues when speed suddenly drops.
+	elif z-zoom_limit > $Camera2D.zoom.x:
+		$Camera2D.zoom.x += zoom_limit
+		$Camera2D.zoom.y += zoom_limit
+	else:
+		$Camera2D.zoom.x = z
+		$Camera2D.zoom.y = z
+		
 	# Arrow pointing to player needs to stay oriented upward.
 	$Arrow.global_rotation = 0
 	$Arrow.scale = 2*Vector2(1/$Camera2D.zoom.x, 1/$Camera2D.zoom.y)
@@ -125,11 +139,6 @@ func _process(delta: float) -> void:
 			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
 				if wheel.speed > -max_speed:
 					wheel.speed -= dv
-		# Update free-moving wheels to current ground speed in their direction.
-		elif false:
-			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-				var rot: float = wheel.global_rotation + PI/2
-				wheel.speed = linear_velocity.dot(Vector2.from_angle(rot))
 		else:
 			var dv: float = deceleration * delta
 			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
@@ -184,6 +193,18 @@ func _process(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if not moveable: return
+	# If colliding with a surface, then apply some extra forces to help get
+	# *off* of that surface.
+	# Without this code, the car has a tendency to align itself perpendicular to
+	# the collision surface, and getting stuck there until backing up (which
+	# can take a while for the wheels to slow down and reverse).
+	if _contact:
+		apply_impulse(mass*max_speed*0.1*_contact_normal)
+		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+			if abs(wheel.speed) > max_speed * 0.01:
+				wheel.speed *= 0.5
+		_contact = false
+		return
 	#######################################################
 	# Calculate movement (based on wheel speed and ground friction)
 	# Also handle wheel skidding effect here.
@@ -193,7 +214,14 @@ func _physics_process(delta: float) -> void:
 		# Orientation of wheel.
 		var rot: float = wheel.global_rotation + PI/2
 		# Velocity of wheel axis (on car) w.r.t. ground.
-		var car_v: Vector2 = linear_velocity + wheel.position.rotated(rotation+PI/2) * angular_velocity
+		# If car has just crashed into something, then allow some angular velocity reglardless
+		# of friction force (allow car to spin a bit).
+		var car_v: Vector2
+		if _crashing:
+			car_v = linear_velocity + 0.1*wheel.position.rotated(rotation+PI/2) * angular_velocity
+		# Otherwise, under normal circumstances car should avoid spinning freely.
+		else:
+			car_v = linear_velocity + wheel.position.rotated(rotation+PI/2) * angular_velocity
 		# Velocity of wheel spinning (opposite to direction that car motion will be).
 		var wheel_v: Vector2 = wheel.speed * -Vector2.from_angle(rot)
 		# Net velocity of wheel against ground.
@@ -223,6 +251,13 @@ func _physics_process(delta: float) -> void:
 			$TireSquealSound.stop()
 
 		apply_force(f, wheel.position.rotated(rotation))
+
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	if state.get_contact_count() > 0:
+		_contact = true
+		_contact_normal = state.get_contact_local_normal(0)
+	else:
+		_contact = false
 
 func _on_body_entered(_body: Node) -> void:
 	if _crashing: return  # Only play sound once during a crashing period.

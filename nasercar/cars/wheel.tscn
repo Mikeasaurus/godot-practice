@@ -6,5 +6,5 @@
 [node name="Wheel" type="Node2D"]
 script = ExtResource("1_kvm5h")
 
-[node name="ColorRect" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_dld2u")
