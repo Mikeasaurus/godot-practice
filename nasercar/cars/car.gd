@@ -20,13 +20,14 @@ extends RigidBody2D
 
 ## Coefficient of friction for wheels.  Relative to acceleration force.
 ## Should be > 1.0 or car will always be skidding.
-@export var friction: float = 10
-
-## Whether this car is user controllable.
-@export var controllable: bool = false
+@export var friction: float = 2.0
 
 ## Whether this car is allowed to move.
 var moveable: bool = false
+
+enum CarType {PLAYER, CPU}
+## Type of car
+@export var type: CarType = CarType.CPU
 
 ## The path to follow if this is a CPU.
 @export var path: Path2D = null
@@ -46,7 +47,7 @@ func _ready() -> void:
 
 # Let this car be playable by the local user.
 func make_playable () -> void:
-	controllable = true
+	type = CarType.PLAYER
 	$Camera2D.enabled = true
 	$Arrow.show()
 	# Make own engine sound louder.
@@ -55,8 +56,7 @@ func make_playable () -> void:
 # Make this car follow a predetermined path
 # (as local CPU).
 func make_cpu (track_path: Path2D) -> void:
-	# Make a copy of the track path, so we can add our own PathFollow2D.
-	#path = track_path.duplicate()
+	type = CarType.CPU
 	path = track_path
 	_pathfollow = PathFollow2D.new()
 	path.add_child(_pathfollow)
@@ -71,21 +71,7 @@ func go () -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	# Zoom out camera the faster the car is going.
-	var z: float = 2.0 / (1 + 2*abs($Wheels/FrontLeft.speed) / max_speed)
-	var zoom_limit: float = 0.1 * delta
-	if z < $Camera2D.zoom.x:
-		$Camera2D.zoom.x = z
-		$Camera2D.zoom.y = z
-	# When car slowing down, zoom back in.
-	# But limit speed of zoom to avoid issues when speed suddenly drops.
-	elif z-zoom_limit > $Camera2D.zoom.x:
-		$Camera2D.zoom.x += zoom_limit
-		$Camera2D.zoom.y += zoom_limit
-	else:
-		$Camera2D.zoom.x = z
-		$Camera2D.zoom.y = z
-		
+
 	# Arrow pointing to player needs to stay oriented upward.
 	$Arrow.global_rotation = 0
 	$Arrow.scale = 2*Vector2(1/$Camera2D.zoom.x, 1/$Camera2D.zoom.y)
@@ -94,10 +80,36 @@ func _process(delta: float) -> void:
 	var dr: float = wheel_turn_speed * delta / 180 * PI
 	var max_r: float = max_wheel_angle / 180 * PI
 
-	if controllable and moveable:
-		#######################################################
-		# Wheel turning
-		#######################################################
+	#######################################################
+	# Path-following for CPUs
+	#######################################################
+	if type == CarType.CPU and _pathfollow != null:
+		# Make sure our target point is far enough ahead.
+		var target_direction: Vector2 = _pathfollow.global_position - global_position
+		var dx: float = target_direction.length()
+		if dx < 10:
+			_pathfollow.progress += 300
+		else:
+			_pathfollow.progress += (300/dx) * linear_velocity.length() * delta
+		var angle: float = target_direction.angle() - global_rotation
+		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
+			# Target angle of wheel (from wheel frame of reference).
+			var target_angle: float = target_direction.angle() - PI/2 - rotation
+			# Difference in angle between wheel and target path.
+			var angle_diff: float = target_angle - wheel.rotation
+			if angle_diff >= PI: angle_diff -= 2*PI
+			elif angle_diff <= -PI: angle_diff += 2*PI
+			if angle_diff < 0:
+				if wheel.rotation > -max_r:
+					wheel.rotation -= dr
+			elif angle_diff > 0:
+				if wheel.rotation < max_r:
+					wheel.rotation += dr
+
+	#######################################################
+	# Wheel-turning for player
+	#######################################################
+	if type == CarType.PLAYER:
 		# Turn left
 		if Input.is_action_pressed("turn_left"):
 			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
@@ -118,137 +130,106 @@ func _process(delta: float) -> void:
 				if abs(wheel.rotation) <= 2*dr:
 					wheel.rotation = 0
 
-		#######################################################
-		# Acceleration from wheels
-		#######################################################
-		if Input.is_action_pressed("go"):
-			var dv: float = acceleration * delta
-			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-				if wheel.speed < max_speed:
-					wheel.speed += dv
-		elif Input.is_action_pressed("stop"):
-			var dv: float = brakes * delta
-			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-				if wheel.speed > 0:
-					wheel.speed -= dv
-				elif wheel.speed < 0:
-					wheel.speed += dv
-				if abs(wheel.speed) <= dv:
-					wheel.speed = 0
-		elif Input.is_action_pressed("reverse"):
-			var dv: float = acceleration * delta
-			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-				if wheel.speed > -max_speed:
-					wheel.speed -= dv
-		else:
-			var dv: float = deceleration * delta
-			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-				if wheel.speed > 0:
-					wheel.speed -= dv
-				elif wheel.speed < 0:
-					wheel.speed += dv
-				if abs(wheel.speed) <= dv:
-					wheel.speed = 0
-
 	#######################################################
-	# Path following for CPUs
+	# Movement
 	#######################################################
-	if _pathfollow != null and moveable:
-		# Make sure our target point is far enough ahead.
-		var target_direction: Vector2 = _pathfollow.global_position - global_position
-		var dx: float = target_direction.length()
-		if dx < 10:
-			_pathfollow.progress += 300
-		else:
-			_pathfollow.progress += (300/dx) * linear_velocity.length() * delta
-		# Go go go
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			if wheel.speed < max_speed:
-				wheel.speed += acceleration * delta
-		# ... in right direction
-		var angle: float = target_direction.angle() - global_rotation
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
-			# Target angle of wheel (from wheel frame of reference).
-			var target_angle: float = target_direction.angle() - PI/2 - rotation
-			# Difference in angle between wheel and target path.
-			var angle_diff: float = target_angle - wheel.rotation
-			if angle_diff >= PI: angle_diff -= 2*PI
-			elif angle_diff <= -PI: angle_diff += 2*PI
-			if angle_diff < 0:
-				if wheel.rotation > -max_r:
-					wheel.rotation -= dr
-			elif angle_diff > 0:
-				if wheel.rotation < max_r:
-					wheel.rotation += dr
-	#######################################################
-	# Engine sound
-	#######################################################
-	var speed: float = 0.
-	for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-		speed += wheel.speed
-	speed = abs(speed)/4
-	if speed <= 0.05 * max_speed:
-		$EngineSound.pitch_scale = 0.5
-	else:
-		$EngineSound.pitch_scale = 1 + speed / max_speed
-
-func _physics_process(delta: float) -> void:
-	if not moveable: return
-	# If colliding with a surface, then apply some extra forces to help get
-	# *off* of that surface.
-	# Without this code, the car has a tendency to align itself perpendicular to
-	# the collision surface, and getting stuck there until backing up (which
-	# can take a while for the wheels to slow down and reverse).
-	if _contact:
-		apply_impulse(mass*max_speed*0.1*_contact_normal)
-		_contact = false
-		return
-	#######################################################
-	# Calculate movement (based on wheel speed and ground friction)
-	# Also handle wheel skidding effect here.
-	#######################################################
+	var go_pressed: bool = Input.is_action_pressed("go")
+	var stop_pressed: bool = Input.is_action_pressed("stop")
+	var reverse_pressed: bool = Input.is_action_pressed("reverse")
+	# Keep track of how fast wheels are spinning (fastest one).
+	# Value is used for things like zoom level and engine pitch.
+	var fastest_wheel_speed: float = 0.0
+	# Check if any wheels end up skidding, so a sound can play.
 	var skidding: bool = false
 	for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-		# Orientation of wheel.
-		var rot: float = wheel.global_rotation + PI/2
-		# Velocity of wheel axis (on car) w.r.t. ground.
-		# If car has just crashed into something, then allow some angular velocity reglardless
-		# of friction force (allow car to spin a bit).
-		var car_v: Vector2
-		if _crashing:
-			car_v = linear_velocity + 0.5*wheel.position.rotated(rotation+PI/2) * angular_velocity
-		# Otherwise, under normal circumstances car should avoid spinning freely.
-		else:
-			car_v = linear_velocity + wheel.position.rotated(rotation+PI/2) * angular_velocity
-		# Velocity of wheel spinning (opposite to direction that car motion will be).
-		var wheel_v: Vector2 = wheel.speed * -Vector2.from_angle(rot)
-		# Net velocity of wheel against ground.
-		var net_v: Vector2 = car_v + wheel_v
-		# Force of friction should counteract this force.
-		var f: Vector2 = mass/4.0/delta * -net_v
-		# Cap the static friction force.
-		var mag: float = f.length()
-		if mag > mass * acceleration * friction:
-			mag = mass * acceleration * friction
-			f = f.limit_length(mag)
-			# If static friction force was maxxed out, then there's some skidding
-			# for the wheel.
+		# Velocity of point where wheel connects to car
+		var wheel_velocity: Vector2 = linear_velocity + wheel.position.rotated(rotation+PI/2) * angular_velocity
+		# Direction that wheel is pointing.
+		var wheel_direction: Vector2 = Vector2.from_angle(wheel.global_rotation + PI/2)
+		var wheel_orthogonal_direction: Vector2 = Vector2.from_angle(wheel.global_rotation)
+		# Infer current wheel speed based on speed w.r.t. ground.
+		var current_speed: float = wheel_velocity.dot(wheel_direction)
+		# Update speed based on user input.
+		var new_speed: float = current_speed
+		# Player hitting the gas, or CPU (which always hits gas).
+		var f: Vector2 = Vector2.ZERO
+		if moveable:
+			if (type == CarType.PLAYER and go_pressed) or type == CarType.CPU:
+				new_speed += acceleration * delta
+			# Player hitting the brakes?
+			elif (type == CarType.PLAYER and stop_pressed):
+				if new_speed > 0: new_speed -= brakes * delta
+				elif new_speed < 0: new_speed += brakes * delta
+				# To avoid "quivering"
+				if abs(new_speed) < brakes * delta: new_speed = current_speed * 0.5
+			# Player backing up?
+			elif (type == CarType.PLAYER and reverse_pressed):
+				new_speed -= acceleration * delta
+			# Slow down from air drag.
+			else:
+				if new_speed > 0: new_speed -= deceleration * delta
+				elif new_speed < 0: new_speed += deceleration * delta
+				# To avoid "quivering"
+				if abs(new_speed) < deceleration * delta: new_speed = current_speed * 0.5
+			# Keep track of fastest wheel, the speed will be used for other things
+			# further down.
+			if abs(new_speed) > fastest_wheel_speed:
+				fastest_wheel_speed = abs(new_speed)
+			# Calculate the force to apply to get the wheel to the new speed.
+			f = mass/4.0 * (new_speed-current_speed) / delta * wheel_direction
+		
+		# Apply friction force orthogonal to wheel direction.
+		current_speed = wheel_velocity.dot(wheel_orthogonal_direction)
+		var mag: float = mass/4.0 * current_speed/delta
+		# Dampen the magnitude so it's not a completely sudden stop in a single timestep.
+		# That would case some weird glitching.
+		mag *= 0.5
+		# Combine static friction force and force of motion from engine.
+		f += mag * -wheel_orthogonal_direction
+
+		# Limit the static friction force magnitude.
+		if f.length() > mass*acceleration*friction:
+			f = f.limit_length(mass*acceleration*friction)
 			skidding = true
 			if wheel._current_skidmark == null:
 				wheel._current_skidmark = load("res://cars/skid_mark.tscn").instantiate()
 				add_sibling(wheel._current_skidmark)
 			wheel._current_skidmark.add_skid(wheel.global_position)
-		# If static force was sufficient to stick wheel to ground, then there
-		# is no skidding.
 		else:
 			wheel._current_skidmark = null
 
-		if skidding and not $TireSquealSound.playing:
-			$TireSquealSound.play(2.0)
-		if not skidding and $TireSquealSound.playing:
-			$TireSquealSound.stop()
-
 		apply_force(f, wheel.position.rotated(rotation))
+
+	if skidding and not $TireSquealSound.playing:
+		$TireSquealSound.play(2.0)
+	if not skidding and $TireSquealSound.playing:
+		$TireSquealSound.stop()
+
+	#######################################################
+	# Zoom out camera the faster the car is going.
+	#######################################################
+	var z: float = 2.0 / (1 + 2*fastest_wheel_speed / max_speed)
+	var zoom_limit: float = 0.1 * delta
+	if z < $Camera2D.zoom.x:
+		$Camera2D.zoom.x = z
+		$Camera2D.zoom.y = z
+	# When car slowing down, zoom back in.
+	# But limit speed of zoom to avoid issues when speed suddenly drops.
+	elif z-zoom_limit > $Camera2D.zoom.x:
+		$Camera2D.zoom.x += zoom_limit
+		$Camera2D.zoom.y += zoom_limit
+	else:
+		$Camera2D.zoom.x = z
+		$Camera2D.zoom.y = z
+		
+
+	#######################################################
+	# Engine sound
+	#######################################################
+	if fastest_wheel_speed <= 0.05 * max_speed:
+		$EngineSound.pitch_scale = 0.5
+	else:
+		$EngineSound.pitch_scale = 1 + fastest_wheel_speed / max_speed
 
 # Detect collision with an obstacle.
 # Triggers code above for moving around the obstacle.
@@ -262,12 +243,6 @@ func _on_body_entered(body: Node) -> void:
 	$CrashSound.play()
 	$CrashSoundTimer.start()
 	_crashing = true
-	# If crashing into a solid object (not another car), then cut down the
-	# wheel speed.
-	if "max_speed" not in body:
-		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
-			if abs(wheel.speed) > max_speed * 0.01:
-				wheel.speed *= 0.5
 
 func _on_crash_sound_timer_timeout() -> void:
 	_crashing = false
