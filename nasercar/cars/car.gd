@@ -20,7 +20,7 @@ extends RigidBody2D
 
 ## Coefficient of friction for wheels.  Relative to acceleration force.
 ## Should be > 1.0 or car will always be skidding.
-@export var friction: float = 2.0
+@export var friction: float = 3.0
 
 ## Whether this car is allowed to move.
 var moveable: bool = false
