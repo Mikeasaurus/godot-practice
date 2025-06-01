@@ -3,15 +3,15 @@ extends Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	$Cars/NaserCar.make_playable()
+	$Cars/NaserCar.make_playable($TrackPath, $Ground, $Road)
 	$Cars/NaserCar/Camera2D.limit_top = $Marker2D.position.y
-	$Cars/FangCar.make_cpu($TrackPath)
-	$Cars/NaomiCar.make_cpu($TrackPath)
-	$Cars/StellaCar.make_cpu($TrackPath)
-	$Cars/TrishCar.make_cpu($TrackPath)
-	$Cars/ReedCar.make_cpu($TrackPath)
-	$Cars/SageCar.make_cpu($TrackPath)
-	$Cars/RosaCar.make_cpu($TrackPath)
+	$Cars/FangCar.make_cpu($TrackPath, $Ground, $Road)
+	$Cars/NaomiCar.make_cpu($TrackPath, $Ground, $Road)
+	$Cars/StellaCar.make_cpu($TrackPath, $Ground, $Road)
+	$Cars/TrishCar.make_cpu($TrackPath, $Ground, $Road)
+	$Cars/ReedCar.make_cpu($TrackPath, $Ground, $Road)
+	$Cars/SageCar.make_cpu($TrackPath, $Ground, $Road)
+	$Cars/RosaCar.make_cpu($TrackPath, $Ground, $Road)
 	# Start of race.
 	$CanvasLayer/FadeIn.show()
 	var fadein: Tween = create_tween()

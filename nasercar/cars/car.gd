@@ -18,9 +18,11 @@ extends RigidBody2D
 ## How fast the wheels can turn (degrees/sec)
 @export var wheel_turn_speed: float = 120.0
 
-## Coefficient of friction for wheels.  Relative to acceleration force.
-## Should be > 1.0 or car will always be skidding.
-@export var friction: float = 3.0
+# Reference to ground tiles (to get friction and other information).
+var _ground: TileMapLayer = null
+# Similarly, keep reference to road tiles (whose information takes precedence
+# over ground tiles).
+var _road: TileMapLayer = null
 
 # Friction modifier (for changing value during a collision.)
 var _friction_modifier: float = 1.0
@@ -46,7 +48,9 @@ func _ready() -> void:
 	z_index = 1
 
 # Let this car be playable by the local user.
-func make_playable () -> void:
+func make_playable (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer) -> void:
+	_ground = ground
+	_road = road
 	type = CarType.PLAYER
 	$Camera2D.enabled = true
 	$Arrow.show()
@@ -55,13 +59,13 @@ func make_playable () -> void:
 
 # Make this car follow a predetermined path
 # (as local CPU).
-func make_cpu (track_path: Path2D) -> void:
+func make_cpu (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer) -> void:
+	_ground = ground
+	_road = road
 	type = CarType.CPU
-	path = track_path
 	_pathfollow = PathFollow2D.new()
-	path.add_child(_pathfollow)
-	#_pathfollow.add_child(_rect)
-	var offset: Vector2 = global_position - path.curve.get_point_position(0)
+	track_path.add_child(_pathfollow)
+	var offset: Vector2 = global_position - track_path.curve.get_point_position(0)
 	#TODO: more robost with starting orientation.
 	_pathfollow.v_offset = offset.x
 
@@ -188,6 +192,14 @@ func _process(delta: float) -> void:
 		f += mag * -wheel_orthogonal_direction
 
 		# Limit the static friction force magnitude.
+		# First, get auxiliary data about the ground surface.
+		var friction: float = 1.0
+		for tilesource in [_ground, _road]:
+			if tilesource != null:
+				var tilepos: Vector2i = tilesource.local_to_map(wheel.global_position/tilesource.scale.x)
+				var tiledata: TileData = tilesource.get_cell_tile_data(tilepos)
+				if tiledata != null:
+					friction = tiledata.get_custom_data("friction")
 		if f.length() > mass*acceleration*friction*_friction_modifier:
 			f = f.limit_length(mass*acceleration*friction*_friction_modifier)
 			skidding = true
