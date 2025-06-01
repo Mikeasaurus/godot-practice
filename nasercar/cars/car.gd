@@ -22,6 +22,9 @@ extends RigidBody2D
 ## Should be > 1.0 or car will always be skidding.
 @export var friction: float = 3.0
 
+# Friction modifier (for changing value during a collision.)
+var _friction_modifier: float = 1.0
+
 ## Whether this car is allowed to move.
 var moveable: bool = false
 
@@ -35,9 +38,6 @@ var _pathfollow: PathFollow2D = null
 
 # For playing crashing sound.
 var _crashing: bool = false
-
-var _contact: bool = false
-var _contact_normal: Vector2 = Vector2.ZERO
 
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -188,8 +188,8 @@ func _process(delta: float) -> void:
 		f += mag * -wheel_orthogonal_direction
 
 		# Limit the static friction force magnitude.
-		if f.length() > mass*acceleration*friction:
-			f = f.limit_length(mass*acceleration*friction)
+		if f.length() > mass*acceleration*friction*_friction_modifier:
+			f = f.limit_length(mass*acceleration*friction*_friction_modifier)
 			skidding = true
 			if wheel._current_skidmark == null:
 				wheel._current_skidmark = load("res://cars/skid_mark.tscn").instantiate()
@@ -231,17 +231,13 @@ func _process(delta: float) -> void:
 	else:
 		$EngineSound.pitch_scale = 1 + fastest_wheel_speed / max_speed
 
-# Detect collision with an obstacle.
-# Triggers code above for moving around the obstacle.
-func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	if state.get_contact_count() > 0:
-		_contact = true
-		_contact_normal = state.get_contact_local_normal(0)
-
-func _on_body_entered(body: Node) -> void:
+func _on_body_entered(_body: Node) -> void:
 	if _crashing: return  # Only play sound once during a crashing period.
 	$CrashSound.play()
 	$CrashSoundTimer.start()
+	var tween: Tween = create_tween()
+	_friction_modifier = 0.0
+	tween.tween_property(self, "_friction_modifier", 1.0, 1.0)
 	_crashing = true
 
 func _on_crash_sound_timer_timeout() -> void:
