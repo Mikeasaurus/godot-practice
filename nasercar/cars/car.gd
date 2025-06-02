@@ -159,7 +159,8 @@ func _process(delta: float) -> void:
 		var f: Vector2 = Vector2.ZERO
 		if moveable:
 			if (type == CarType.PLAYER and go_pressed) or type == CarType.CPU:
-				new_speed += acceleration * delta
+				if new_speed < max_speed:
+					new_speed += acceleration * delta
 			# Player hitting the brakes?
 			elif (type == CarType.PLAYER and stop_pressed):
 				if new_speed > 0: new_speed -= brakes * delta
@@ -168,7 +169,8 @@ func _process(delta: float) -> void:
 				if abs(new_speed) < brakes * delta: new_speed = current_speed * 0.5
 			# Player backing up?
 			elif (type == CarType.PLAYER and reverse_pressed):
-				new_speed -= acceleration * delta
+				if new_speed > -max_speed:
+					new_speed -= acceleration * delta
 			# Slow down from air drag.
 			else:
 				if new_speed > 0: new_speed -= deceleration * delta
