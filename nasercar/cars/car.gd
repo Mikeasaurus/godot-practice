@@ -196,13 +196,29 @@ func _process(delta: float) -> void:
 		var friction: float = 1.0
 		var skidmark_colour: Color = Color.TRANSPARENT
 		for tilesource in [_ground, _road]:
-			if tilesource != null:
-				var tilepos: Vector2i = tilesource.local_to_map(wheel.global_position/tilesource.scale.x)
-				var tiledata: TileData = tilesource.get_cell_tile_data(tilepos)
-				if tiledata != null:
-					friction = tiledata.get_custom_data("friction")
-					if tiledata.get_custom_data("has_skidmarks"):
-						skidmark_colour = tiledata.get_custom_data("skidmark_colour")
+			if tilesource == null: continue
+			var tilepos: Vector2i = tilesource.local_to_map(wheel.global_position/tilesource.scale.x)
+			var tiledata: TileData = tilesource.get_cell_tile_data(tilepos)
+			if tiledata == null: continue
+			if tiledata.get_custom_data("has_skidmarks"):
+				# Handle tiles that only give partial coverage.
+				if tiledata.get_custom_data("is_partial"):
+					var partial_type: int = tiledata.get_custom_data("partial_type")
+					var dx: float = tilesource.tile_set.tile_size.x * tilesource.scale.x
+					var origin: Vector2
+					# 1,2,3,4 = quarter circles
+					if partial_type == 1:
+						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(dx/2,dx/2)
+					if partial_type == 2:
+						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(-dx/2,dx/2)
+					if partial_type == 3:
+						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(dx/2,-dx/2)
+					if partial_type == 4:
+						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(-dx/2,-dx/2)
+					if (wheel.global_position - origin).length() > dx:
+						continue
+				skidmark_colour = tiledata.get_custom_data("skidmark_colour")
+			friction = tiledata.get_custom_data("friction")
 		var max_static_friction = mass*acceleration*friction*_friction_modifier
 		if f.length() > max_static_friction:
 			f = f.limit_length(max_static_friction)
