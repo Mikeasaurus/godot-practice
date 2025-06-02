@@ -194,19 +194,27 @@ func _process(delta: float) -> void:
 		# Limit the static friction force magnitude.
 		# First, get auxiliary data about the ground surface.
 		var friction: float = 1.0
+		var skidmark_colour: Color = Color.TRANSPARENT
 		for tilesource in [_ground, _road]:
 			if tilesource != null:
 				var tilepos: Vector2i = tilesource.local_to_map(wheel.global_position/tilesource.scale.x)
 				var tiledata: TileData = tilesource.get_cell_tile_data(tilepos)
 				if tiledata != null:
 					friction = tiledata.get_custom_data("friction")
-		if f.length() > mass*acceleration*friction*_friction_modifier:
-			f = f.limit_length(mass*acceleration*friction*_friction_modifier)
-			skidding = true
-			if wheel._current_skidmark == null:
-				wheel._current_skidmark = load("res://cars/skid_mark.tscn").instantiate()
-				add_sibling(wheel._current_skidmark)
-			wheel._current_skidmark.add_skid(wheel.global_position)
+					if tiledata.get_custom_data("has_skidmarks"):
+						skidmark_colour = tiledata.get_custom_data("skidmark_colour")
+		var max_static_friction = mass*acceleration*friction*_friction_modifier
+		if f.length() > max_static_friction:
+			f = f.limit_length(max_static_friction)
+			if skidmark_colour != Color.TRANSPARENT:
+				skidding = true
+				if wheel._current_skidmark == null or wheel._current_skidmark.default_color != skidmark_colour:
+					wheel._current_skidmark = load("res://cars/skid_mark.tscn").instantiate()
+					wheel._current_skidmark.default_color = skidmark_colour
+					add_sibling(wheel._current_skidmark)
+				wheel._current_skidmark.add_point(wheel.global_position)
+			else:
+				wheel._current_skidmark = null
 		else:
 			wheel._current_skidmark = null
 
