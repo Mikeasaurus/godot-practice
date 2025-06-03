@@ -197,6 +197,8 @@ func _process(delta: float) -> void:
 		# First, get auxiliary data about the ground surface.
 		var friction: float = 1.0
 		var skidmark_colour: Color = Color.TRANSPARENT
+		var particle_colour_1: Color = Color.TRANSPARENT
+		var particle_colour_2: Color = Color.TRANSPARENT
 		for tilesource in [_ground, _road]:
 			if tilesource == null: continue
 			var tilepos: Vector2i = tilesource.local_to_map(wheel.global_position/tilesource.scale.x)
@@ -220,8 +222,19 @@ func _process(delta: float) -> void:
 					if (wheel.global_position - origin).length() > dx:
 						continue
 				skidmark_colour = tiledata.get_custom_data("skidmark_colour")
+			if tiledata.get_custom_data("has_particles"):
+				particle_colour_1 = tiledata.get_custom_data("particle_colour_1")
+				particle_colour_2 = tiledata.get_custom_data("particle_colour_2")
+			else:
+				# Turn off particles if layer on top doesn't have them.
+				# E.g., paved road on top of grass tile.
+				particle_colour_1 = Color.TRANSPARENT
+				particle_colour_2 = Color.TRANSPARENT
 			friction = tiledata.get_custom_data("friction")
+		# Add skid marks and particle effects.
 		var max_static_friction = mass*acceleration*friction*_friction_modifier
+		var p1: CPUParticles2D = wheel.get_node("Particles1")
+		var p2: CPUParticles2D = wheel.get_node("Particles2")
 		if f.length() > max_static_friction:
 			f = f.limit_length(max_static_friction)
 			if skidmark_colour != Color.TRANSPARENT:
@@ -233,8 +246,20 @@ func _process(delta: float) -> void:
 				wheel._current_skidmark.add_point(wheel.global_position)
 			else:
 				wheel._current_skidmark = null
+			if particle_colour_1 != Color.TRANSPARENT:
+				p1.color = particle_colour_1
+				p1.emitting = true
+			else:
+				p1.emitting = false
+			if particle_colour_2 != Color.TRANSPARENT:
+				p2.color = particle_colour_2
+				p2.emitting = true
+			else:
+				p2.emitting = false
 		else:
 			wheel._current_skidmark = null
+			p1.emitting = false
+			p2.emitting = false
 
 		apply_force(f, wheel.position.rotated(rotation))
 
