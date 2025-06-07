@@ -35,7 +35,7 @@ position = Vector2(40, -36)
 [node name="RearRight" parent="Wheels" instance=ExtResource("1_41m3k")]
 position = Vector2(-40, -36)
 
-[node name="Sprite2D" type="Sprite2D" parent="Wheels"]
+[node name="Body" type="Sprite2D" parent="."]
 texture_filter = 1
 scale = Vector2(2, 2)
 

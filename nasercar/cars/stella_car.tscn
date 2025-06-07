@@ -5,5 +5,5 @@
 
 [node name="StellaCar" instance=ExtResource("1_mmlhy")]
 
-[node name="Sprite2D" parent="Wheels" index="4"]
+[node name="Body" parent="." index="2"]
 texture = ExtResource("2_bsrsc")
