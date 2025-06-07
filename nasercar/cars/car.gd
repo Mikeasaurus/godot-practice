@@ -219,6 +219,7 @@ func _process(delta: float) -> void:
 		var skidmark_colour: Color = Color.TRANSPARENT
 		var particle_colour_1: Color = Color.TRANSPARENT
 		var particle_colour_2: Color = Color.TRANSPARENT
+		var dust_colour: Color = Color.TRANSPARENT
 		var wheel_sinking: bool
 		for tilesource in [_ground, _road]:
 			if tilesource == null: continue
@@ -251,6 +252,10 @@ func _process(delta: float) -> void:
 				# E.g., paved road on top of grass tile.
 				particle_colour_1 = Color.TRANSPARENT
 				particle_colour_2 = Color.TRANSPARENT
+			if tiledata.get_custom_data("is_dusty"):
+				dust_colour = tiledata.get_custom_data("dust_colour")
+			else:
+				dust_colour = Color.TRANSPARENT
 			friction = tiledata.get_custom_data("friction")
 			# Check if wheel is in water.
 			if tiledata.get_custom_data("is_water"):
@@ -261,6 +266,7 @@ func _process(delta: float) -> void:
 		var max_static_friction = mass*acceleration*friction*_friction_modifier
 		var p1: CPUParticles2D = wheel.get_node("Particles1")
 		var p2: CPUParticles2D = wheel.get_node("Particles2")
+		var dust: CPUParticles2D = wheel.get_node("Dust")
 		if f.length() > max_static_friction:
 			f = f.limit_length(max_static_friction)
 			if skidmark_colour != Color.TRANSPARENT:
@@ -282,10 +288,19 @@ func _process(delta: float) -> void:
 				p2.emitting = true
 			else:
 				p2.emitting = false
+			if dust_colour != Color.TRANSPARENT:
+				dust.color_ramp.colors[0] = dust_colour
+				dust.color_ramp.colors[1] = dust_colour
+				dust.color_ramp.colors[0].a = 0.1
+				dust.color_ramp.colors[1].a = 0.0
+				dust.emitting = true
+			else:
+				dust.emitting = false
 		else:
 			wheel._current_skidmark = null
 			p1.emitting = false
 			p2.emitting = false
+			dust.emitting = false
 
 		if not wheel_sinking:
 			sinking = false  # car not sinking if any wheel is on solid ground.
