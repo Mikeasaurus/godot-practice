@@ -37,9 +37,13 @@ enum CarType {PLAYER, CPU}
 ## The path to follow if this is a CPU.
 @export var path: Path2D = null
 var _pathfollow: PathFollow2D = null
+# For tracking player progress along path.
+var _old_path_pos: Vector2 = Vector2.ZERO
 
 # For playing crashing sound.
 var _crashing: bool = false
+# For sinking into water and playing splash sound.
+var _splashing: bool = false
 
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -52,6 +56,8 @@ func make_playable (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer
 	_ground = ground
 	_road = road
 	type = CarType.PLAYER
+	_pathfollow = PathFollow2D.new()
+	track_path.add_child(_pathfollow)
 	$Camera2D.enabled = true
 	$Arrow.show()
 	# Make own engine sound louder.
@@ -111,6 +117,16 @@ func _process(delta: float) -> void:
 					wheel.rotation += dr
 
 	#######################################################
+	# Path-tracking for player
+	#######################################################
+	# (So player can be returned to road when something happens to their car).
+	if type == CarType.PLAYER and _pathfollow != null:
+		# Check if "progress" is needed for updating the path.
+		if (global_position-_pathfollow.global_position).length() < (global_position-_old_path_pos).length():
+			_old_path_pos = _pathfollow.global_position
+			_pathfollow.progress += 300
+
+	#######################################################
 	# Wheel-turning for player
 	#######################################################
 	if type == CarType.PLAYER:
@@ -145,6 +161,7 @@ func _process(delta: float) -> void:
 	var fastest_wheel_speed: float = 0.0
 	# Check if any wheels end up skidding, so a sound can play.
 	var skidding: bool = false
+	var sinking: bool = true  # becomes false if any wheel on solid ground.
 	for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
 		# Velocity of point where wheel connects to car
 		var wheel_velocity: Vector2 = linear_velocity + wheel.position.rotated(rotation+PI/2) * angular_velocity
@@ -193,12 +210,16 @@ func _process(delta: float) -> void:
 		# Combine static friction force and force of motion from engine.
 		f += mag * -wheel_orthogonal_direction
 
+		#######################################################
+		# Skid marks / special effects for wheel.
+		#######################################################
 		# Limit the static friction force magnitude.
 		# First, get auxiliary data about the ground surface.
 		var friction: float = 1.0
 		var skidmark_colour: Color = Color.TRANSPARENT
 		var particle_colour_1: Color = Color.TRANSPARENT
 		var particle_colour_2: Color = Color.TRANSPARENT
+		var wheel_sinking: bool
 		for tilesource in [_ground, _road]:
 			if tilesource == null: continue
 			var tilepos: Vector2i = tilesource.local_to_map(wheel.global_position/tilesource.scale.x)
@@ -231,6 +252,11 @@ func _process(delta: float) -> void:
 				particle_colour_1 = Color.TRANSPARENT
 				particle_colour_2 = Color.TRANSPARENT
 			friction = tiledata.get_custom_data("friction")
+			# Check if wheel is in water.
+			if tiledata.get_custom_data("is_water"):
+				wheel_sinking = true
+			else:
+				wheel_sinking = false
 		# Add skid marks and particle effects.
 		var max_static_friction = mass*acceleration*friction*_friction_modifier
 		var p1: CPUParticles2D = wheel.get_node("Particles1")
@@ -261,12 +287,18 @@ func _process(delta: float) -> void:
 			p1.emitting = false
 			p2.emitting = false
 
+		if not wheel_sinking:
+			sinking = false  # car not sinking if any wheel is on solid ground.
+
 		apply_force(f, wheel.position.rotated(rotation))
 
 	if skidding and not $TireSquealSound.playing:
 		$TireSquealSound.play(2.0)
 	if not skidding and $TireSquealSound.playing:
 		$TireSquealSound.stop()
+
+	if sinking:
+		_kersplash()
 
 	#######################################################
 	# Zoom out camera the faster the car is going.
@@ -305,3 +337,66 @@ func _on_body_entered(_body: Node) -> void:
 
 func _on_crash_sound_timer_timeout() -> void:
 	_crashing = false
+
+# Make car splash into water
+func _kersplash () -> void:
+	# Only run this once when sinking, not on every tick.
+	if _splashing: return
+	_splashing = true
+	# Stop car from moving any further during this sequence.
+	freeze = true
+	# Car not moveable (turns off other skidding / particle effects from friction).
+	moveable = false
+	# Start showing ripple of water when car is sinking.
+	# Also fade the car into the water.
+	$Splash.global_rotation = 0
+	$Splash/Ripple.show()
+	var dr: float = 0.20
+	var tween: Tween = create_tween()
+	var start: PackedFloat32Array = PackedFloat32Array([0,1-2*dr,1-dr,1,1])
+	var almost: PackedFloat32Array = PackedFloat32Array([0,0,dr,2*dr,1])
+	var finish: PackedFloat32Array = PackedFloat32Array([0,0,0,dr,1])
+	$Splash/Ripple/Dark.texture.gradient.offsets = start
+	$Splash/Ripple/Light.texture.gradient.offsets = start
+	var dt: float = 0.3
+	tween.tween_property($Splash/Ripple/Dark.texture.gradient, "offsets", almost, dt)
+	tween.parallel().tween_property($Splash/Ripple/Light.texture.gradient, "offsets", almost, dt)
+	var modulated_stuff: Array = [$Body, $Wheels/FrontLeft/Sprite2D, $Wheels/FrontRight/Sprite2D, $Wheels/RearLeft/Sprite2D, $Wheels/RearRight/Sprite2D]
+	for m in modulated_stuff:
+		tween.parallel().tween_property(m, "modulate", Color.hex(0x00000000), dt)
+	# Start playing splashing sound as well.
+	$Splash/SplashSound.play(0.3)
+	await tween.finished
+	# Near end of inward convergence of water, show spray of water particles.
+	$Splash/Particles.emitting = true
+	tween = create_tween()
+	tween.tween_property($Splash/Ripple/Dark.texture.gradient, "offsets", finish, dt*dr*2)
+	tween.parallel().tween_property($Splash/Ripple/Light.texture.gradient, "offsets", finish, dt*dr*2)
+	tween.parallel().tween_property($Splash/Ripple/Dark, "modulate", Color.TRANSPARENT, dt*dr*2)
+	tween.parallel().tween_property($Splash/Ripple/Light, "modulate", Color.TRANSPARENT, dt*dr*2)
+	await tween.finished
+	$Splash/Ripple.hide()
+	$Splash/Particles.emitting = false
+	# Move car back onto the road.
+	_move_to_road ()
+	# Cut off sound before second splash in the .wav file.
+	await get_tree().create_timer(1.0).timeout
+	$Splash/SplashSound.stop()
+	# Restore visibility of car, and make mobile again.
+	for m in modulated_stuff:
+		m.modulate = Color.WHITE
+	$Splash/Ripple/Dark.modulate = Color.WHITE
+	$Splash/Ripple/Light.modulate = Color.WHITE
+	freeze = false
+	moveable = true
+	# Done
+	_splashing = false
+
+func _move_to_road () -> void:
+	freeze = true # Rigid bodies don't like being relocated when they're undergoing physics.
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "global_position", _pathfollow.global_position, 1.0)
+	await tween.finished
+	global_rotation = (_pathfollow.global_position - _old_path_pos).angle() - PI/2
+	freeze = false
