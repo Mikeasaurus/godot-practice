@@ -287,4 +287,4 @@ stream = ExtResource("10_leqvv")
 
 [node name="Beep2" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("11_l7rta")
-pitch_scale = 2.0
+pitch_scale = 1.8

@@ -34,6 +34,7 @@ func _ready() -> void:
 	var go: Tween = create_tween()
 	go.tween_property($CanvasLayer/GoLabel,"modulate",Color.TRANSPARENT,1.0)
 	go.parallel().tween_property($CanvasLayer/GoLabel,"scale",Vector2(20,20),1.0)
+	go.parallel().tween_property($CanvasLayer/GoLabel,"position", Vector2(400,1),1.0)
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
