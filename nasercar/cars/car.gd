@@ -161,6 +161,7 @@ func _process(delta: float) -> void:
 	var fastest_wheel_speed: float = 0.0
 	# Check if any wheels end up skidding, so a sound can play.
 	var skidding: bool = false
+	var skid_sounds: Array[bool] = [false,false,false]
 	var sinking: bool = true  # becomes false if any wheel on solid ground.
 	for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
 		# Velocity of point where wheel connects to car
@@ -221,6 +222,7 @@ func _process(delta: float) -> void:
 		var particle_colour_2: Color = Color.TRANSPARENT
 		var dust_colour: Color = Color.TRANSPARENT
 		var wheel_sinking: bool
+		var skid_sound: int
 		for tilesource in [_ground, _road]:
 			if tilesource == null: continue
 			var tilepos: Vector2i = tilesource.local_to_map(wheel.global_position/tilesource.scale.x)
@@ -256,6 +258,7 @@ func _process(delta: float) -> void:
 				dust_colour = tiledata.get_custom_data("dust_colour")
 			else:
 				dust_colour = Color.TRANSPARENT
+			skid_sound = tiledata.get_custom_data("skid_sound")
 			friction = tiledata.get_custom_data("friction")
 			# Check if wheel is in water.
 			if tiledata.get_custom_data("is_water"):
@@ -307,10 +310,20 @@ func _process(delta: float) -> void:
 
 		apply_force(f, wheel.position.rotated(rotation))
 
-	if skidding and not $TireSquealSound.playing:
-		$TireSquealSound.play(2.0)
-	if not skidding and $TireSquealSound.playing:
-		$TireSquealSound.stop()
+		skid_sounds[skid_sound] = true
+
+	if skidding and skid_sounds[1]:
+		if not $TireSquealSound.playing:
+			$TireSquealSound.play(2.0)
+	if skidding and skid_sounds[2]:
+		if not $GravelSound.playing:
+			$GravelSound.play()
+	if not skidding or not skid_sounds[1]:
+		if $TireSquealSound.playing:
+			$TireSquealSound.stop()
+	if not skidding or not skid_sounds[2]:
+		if $GravelSound.playing:
+			$GravelSound.stop()
 
 	if sinking:
 		_kersplash()
