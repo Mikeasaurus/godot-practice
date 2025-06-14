@@ -41,5 +41,39 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
+# Indicate if player already has an item or is getting an item.
+# So if they touch another item block while holding an item, nothing new happens.
+var _has_item: bool = false
+# Description of item
+enum ItemType {SLIME}
+
 func _itemblock (car: Node2D) -> void:
-	pass #TODO
+	if car.type == car.CarType.PLAYER and not _has_item:
+		_get_item()
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("use_item") and _has_item:
+		_use_item()
+
+func _get_item() -> void:
+	if _has_item: return
+	_has_item = true
+	$ItemSelect.show()
+	$ItemSelect/CenterContainer/ScrollContainer.scroll_vertical = 0
+	$ItemSelect/D20Sound.play()
+	var tween: Tween = create_tween()
+	tween.tween_interval(0.4)
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property($ItemSelect/CenterContainer/ScrollContainer,"scroll_vertical",5*256,0.75)
+
+func _use_item() -> void:
+	if not _has_item: return
+	$ItemSelect/WhooshSound.play()
+	var tween: Tween = create_tween()
+	tween.tween_property($ItemSelect/CenterContainer,"scale",Vector2(1.0,1.0),0.2)
+	tween.parallel().tween_property($ItemSelect/CenterContainer,"modulate",Color.hex(0xffffff00),0.2)
+	await tween.finished
+	_has_item = false
+	$ItemSelect.hide()
+	$ItemSelect/CenterContainer.scale = Vector2(0.5,0.5)
+	$ItemSelect/CenterContainer.modulate = Color.WHITE
