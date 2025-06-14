@@ -18,6 +18,9 @@ extends RigidBody2D
 ## How fast the wheels can turn (degrees/sec)
 @export var wheel_turn_speed: float = 120.0
 
+## Emit signal when an item block is touched.
+signal itemblock
+
 # Reference to ground tiles (to get friction and other information).
 var _ground: TileMapLayer = null
 # Similarly, keep reference to road tiles (whose information takes precedence
@@ -30,12 +33,13 @@ var _friction_modifier: float = 1.0
 ## Whether this car is allowed to move.
 var moveable: bool = false
 
-enum CarType {PLAYER, CPU}
+enum CarType {PLAYER, CPU, REMOTE}
+
 ## Type of car
-@export var type: CarType = CarType.CPU
+var type
 
 ## The path to follow if this is a CPU.
-@export var path: Path2D = null
+var path: Path2D = null
 var _pathfollow: PathFollow2D = null
 # For tracking player progress along path.
 var _old_path_pos: Vector2 = Vector2.ZERO
@@ -51,13 +55,20 @@ func _ready() -> void:
 	# Raise the z_index so effects like skid marks appear beneath it.
 	z_index = 1
 
-# Let this car be playable by the local user.
-func make_playable (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer) -> void:
+# Add track information (world tiles, path from start to finish of race).
+func add_to_track (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer) -> void:
 	_ground = ground
 	_road = road
-	type = CarType.PLAYER
+	type = CarType.REMOTE
 	_pathfollow = PathFollow2D.new()
 	track_path.add_child(_pathfollow)
+	var offset: Vector2 = global_position - track_path.curve.get_point_position(0)
+	#TODO: more robost with starting orientation.
+	_pathfollow.v_offset = offset.x
+
+# Let this car be playable by the local user.
+func make_playable () -> void:
+	type = CarType.PLAYER
 	$Camera2D.enabled = true
 	$Arrow.show()
 	# Make own engine sound louder.
@@ -65,15 +76,8 @@ func make_playable (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer
 
 # Make this car follow a predetermined path
 # (as local CPU).
-func make_cpu (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer) -> void:
-	_ground = ground
-	_road = road
+func make_cpu () -> void:
 	type = CarType.CPU
-	_pathfollow = PathFollow2D.new()
-	track_path.add_child(_pathfollow)
-	var offset: Vector2 = global_position - track_path.curve.get_point_position(0)
-	#TODO: more robost with starting orientation.
-	_pathfollow.v_offset = offset.x
 
 # Allow this car to start moving.
 func go () -> void:

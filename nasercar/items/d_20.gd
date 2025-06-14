@@ -13,6 +13,8 @@ func _on_body_entered(body: Node2D) -> void:
 	$ParticleTimer.start()
 	$RespawnTimer.start()
 	$AudioStreamPlayer2D.play()
+	if "itemblock" in body:
+		body.itemblock.emit()
 
 func _on_particle_timer_timeout() -> void:
 	$CPUParticles2D.emitting = false
