@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=4 uid="uid://b4tklj1nsft7a"]
+[gd_scene load_steps=32 format=4 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_5oo6t"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://ground.png" id="1_cexhq"]
@@ -16,7 +16,10 @@
 [ext_resource type="AudioStream" uid="uid://dgii4vaux02bg" path="res://audio/196236__alienxxx__long-beep_011.wav" id="11_l7rta"]
 [ext_resource type="PackedScene" uid="uid://dsew28lh05yyv" path="res://cars/rosa_car.tscn" id="11_w11g2"]
 [ext_resource type="Texture2D" uid="uid://cfhya08sd73lc" path="res://items/mangoslime.png" id="16_4ogqs"]
+[ext_resource type="Texture2D" uid="uid://co8nl3wxthqgo" path="res://items/lavajava.png" id="17_4hydi"]
 [ext_resource type="Texture2D" uid="uid://dl8nm3d0gagqq" path="res://items/itembox.png" id="17_851se"]
+[ext_resource type="Texture2D" uid="uid://qri1ymcgcnnj" path="res://items/meteor.png" id="17_fpwx0"]
+[ext_resource type="Texture2D" uid="uid://c75py8357paxe" path="res://items/nailpolish.png" id="17_oey53"]
 [ext_resource type="AudioStream" uid="uid://sb6b80flvtof" path="res://audio/744985__aalorv__dice-rolls-d20-big.wav" id="18_6u6mv"]
 [ext_resource type="AudioStream" uid="uid://yl6b31bsw74b" path="res://audio/9509__petenice__whoosh.wav" id="19_v8dck"]
 
@@ -332,25 +335,25 @@ layout_mode = 2
 custom_minimum_size = Vector2(256, 256)
 layout_mode = 2
 
-[node name="Rando1" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
+[node name="MangoSlime" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 texture = ExtResource("16_4ogqs")
 
-[node name="Rando2" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
+[node name="NailPolish" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-texture = ExtResource("16_4ogqs")
+texture = ExtResource("17_oey53")
 
-[node name="Rando3" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
+[node name="Coffee" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-texture = ExtResource("16_4ogqs")
+texture = ExtResource("17_4hydi")
 
-[node name="Rando4" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
+[node name="Meteor" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-texture = ExtResource("16_4ogqs")
+texture = ExtResource("17_fpwx0")
 
-[node name="Item" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
+[node name="TODO" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-texture = ExtResource("16_4ogqs")
+texture = ExtResource("17_oey53")
 
 [node name="TextureRect" type="TextureRect" parent="ItemSelect/CenterContainer"]
 layout_mode = 2

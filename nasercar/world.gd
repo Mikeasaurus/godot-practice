@@ -64,7 +64,7 @@ func _get_item() -> void:
 	var tween: Tween = create_tween()
 	tween.tween_interval(0.4)
 	tween.set_ease(Tween.EASE_IN)
-	tween.tween_property($ItemSelect/CenterContainer/ScrollContainer,"scroll_vertical",5*256,0.75)
+	tween.tween_property($ItemSelect/CenterContainer/ScrollContainer,"scroll_vertical",5*256+20,0.75)
 
 func _use_item() -> void:
 	if not _has_item: return
