@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=4 uid="uid://b4tklj1nsft7a"]
+[gd_scene load_steps=33 format=4 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_5oo6t"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://ground.png" id="1_cexhq"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://c75py8357paxe" path="res://items/nailpolish.png" id="17_oey53"]
 [ext_resource type="AudioStream" uid="uid://sb6b80flvtof" path="res://audio/744985__aalorv__dice-rolls-d20-big.wav" id="18_6u6mv"]
 [ext_resource type="AudioStream" uid="uid://yl6b31bsw74b" path="res://audio/9509__petenice__whoosh.wav" id="19_v8dck"]
+[ext_resource type="Texture2D" uid="uid://dhkns5jdsokx5" path="res://items/beetle.png" id="20_2txdk"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fosln"]
 texture = ExtResource("1_cexhq")
@@ -351,9 +352,9 @@ texture = ExtResource("17_4hydi")
 layout_mode = 2
 texture = ExtResource("17_fpwx0")
 
-[node name="TODO" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
+[node name="Beetle" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-texture = ExtResource("17_oey53")
+texture = ExtResource("20_2txdk")
 
 [node name="TextureRect" type="TextureRect" parent="ItemSelect/CenterContainer"]
 layout_mode = 2
