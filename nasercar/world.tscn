@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=4 uid="uid://b4tklj1nsft7a"]
+[gd_scene load_steps=42 format=4 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_5oo6t"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://ground.png" id="1_cexhq"]
@@ -23,6 +23,12 @@
 [ext_resource type="AudioStream" uid="uid://sb6b80flvtof" path="res://audio/744985__aalorv__dice-rolls-d20-big.wav" id="18_6u6mv"]
 [ext_resource type="AudioStream" uid="uid://yl6b31bsw74b" path="res://audio/9509__petenice__whoosh.wav" id="19_v8dck"]
 [ext_resource type="Texture2D" uid="uid://dhkns5jdsokx5" path="res://items/beetle.png" id="20_2txdk"]
+[ext_resource type="Texture2D" uid="uid://djp4ddgp1u356" path="res://items/mangojumpscare1.png" id="24_agiui"]
+[ext_resource type="Texture2D" uid="uid://chgkx7ospw7nq" path="res://items/mangojumpscare2.png" id="25_i4jp1"]
+[ext_resource type="Texture2D" uid="uid://ri5uq3ksqa3o" path="res://items/slimedscreen1.png" id="26_ftddp"]
+[ext_resource type="Texture2D" uid="uid://ik57hsfx7nxe" path="res://items/slimedscreen2.png" id="27_mxj7h"]
+[ext_resource type="AudioStream" uid="uid://yggwxfin8it2" path="res://audio/352402__noahpardo__npx-throat-gathering-spit-2.wav" id="28_iaess"]
+[ext_resource type="AudioStream" uid="uid://ck8qxnm7h80pv" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="29_xj85u"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fosln"]
 texture = ExtResource("1_cexhq")
@@ -210,6 +216,43 @@ _data = {
 }
 point_count = 21
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_vjn0m"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("24_agiui")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("25_i4jp1")
+}],
+"loop": true,
+"name": &"mouth_open",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_m0kfm"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("26_ftddp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_mxj7h")
+}],
+"loop": false,
+"name": &"default",
+"speed": 7.0
+}]
+
+[sub_resource type="Curve" id="Curve_3box1"]
+_data = [Vector2(0, 100), 0.0, 0.0, 0, 0, Vector2(1, 300), 0.0, 0.0, 0, 0]
+point_count = 2
+
 [node name="World" type="Node2D"]
 script = ExtResource("1_5oo6t")
 
@@ -365,3 +408,47 @@ stream = ExtResource("18_6u6mv")
 
 [node name="WhooshSound" type="AudioStreamPlayer" parent="ItemSelect"]
 stream = ExtResource("19_v8dck")
+
+[node name="ScreenEffects" type="CanvasLayer" parent="."]
+
+[node name="MangoSlime" type="Node2D" parent="ScreenEffects"]
+visible = false
+
+[node name="Mango" type="AnimatedSprite2D" parent="ScreenEffects/MangoSlime"]
+texture_filter = 1
+position = Vector2(-200, 1080)
+scale = Vector2(9, 9)
+sprite_frames = SubResource("SpriteFrames_vjn0m")
+centered = false
+offset = Vector2(0, -108)
+
+[node name="Slime" type="AnimatedSprite2D" parent="ScreenEffects/MangoSlime"]
+visible = false
+texture_filter = 1
+position = Vector2(960, 0)
+scale = Vector2(10, 10)
+sprite_frames = SubResource("SpriteFrames_m0kfm")
+offset = Vector2(0, 54)
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="ScreenEffects/MangoSlime"]
+position = Vector2(441, 752)
+emitting = false
+amount = 100
+lifetime = 0.4
+one_shot = true
+emission_shape = 1
+emission_sphere_radius = 50.0
+direction = Vector2(1, -0.5)
+spread = 30.0
+initial_velocity_min = 2000.0
+initial_velocity_max = 2000.0
+angular_velocity_max = 100.0
+angle_max = 45.0
+scale_amount_curve = SubResource("Curve_3box1")
+color = Color(0.686275, 0.862745, 0.243137, 1)
+
+[node name="HorkSound" type="AudioStreamPlayer" parent="ScreenEffects/MangoSlime"]
+stream = ExtResource("28_iaess")
+
+[node name="SplatSound" type="AudioStreamPlayer" parent="ScreenEffects/MangoSlime"]
+stream = ExtResource("29_xj85u")
