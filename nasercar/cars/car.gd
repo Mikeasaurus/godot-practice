@@ -464,13 +464,14 @@ func _move_to_road () -> void:
 func _get_slimed (delay: float, full_slime_duration: float, end: float) -> void:
 	# Wait a bit for Mango to spit the slime (same timing as screen slime).
 	await get_tree().create_timer(delay).timeout
-	$Slime.modulate = Color.hex(0xffffffcc)
-	$Slime.show()
+	var slime: Sprite2D = $Body/Slime
+	slime.modulate = Color.hex(0xffffffcc)
+	slime.show()
 	effects[EffectType.SLIMED] = true
 	var slimefade: Tween = create_tween()
 	slimefade.set_ease(Tween.EASE_OUT)
 	slimefade.tween_interval(full_slime_duration)
-	slimefade.tween_property($Slime, "modulate", Color.hex(0xffffff00), end)
+	slimefade.tween_property(slime, "modulate", Color.hex(0xffffff00), end)
 	await slimefade.finished
 	effects.erase(EffectType.SLIMED)
-	$Slime.hide()
+	slime.hide()

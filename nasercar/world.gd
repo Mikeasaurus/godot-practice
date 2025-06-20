@@ -13,11 +13,18 @@ var _meteor: bool = false
 
 # Helper method - get all cars in this track.
 # Omits other non-car entities that the cars may spawn as siblings.
-func _cars () -> Array[Node2D]:
-	var cars: Array[Node2D] = []
+func _cars () -> Array[Car]:
+	var cars: Array[Car] = []
 	for car in $Cars.get_children():
 		if "CarType" in car:
 			cars.append(car)
+	return cars
+# Helper method - get all cars in front of the specified car.
+func _cars_in_front_of (car: Car) -> Array[Car]:
+	var cars: Array[Car] = []
+	for other_car in _cars():
+		if other_car._pathfollow.progress > car._pathfollow.progress:
+			cars.append(other_car)
 	return cars
 
 # Called when the node enters the scene tree for the first time.
@@ -78,7 +85,7 @@ func _input(event: InputEvent) -> void:
 		_use_item()
 	if event.is_action_pressed("slime_test"):
 		#_slime_screen()
-		for car in _cars():
+		for car in _cars_in_front_of(player_car):
 			car._get_slimed(0.7+0.4, 4.0, 2.0)
 
 func _get_item(car) -> void:

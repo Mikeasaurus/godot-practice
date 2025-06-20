@@ -215,11 +215,10 @@ position = Vector2(-40, -36)
 texture_filter = 1
 scale = Vector2(2, 2)
 
-[node name="Slime" type="Sprite2D" parent="."]
+[node name="Slime" type="Sprite2D" parent="Body"]
 visible = false
 modulate = Color(1, 1, 1, 0.8)
 texture_filter = 1
-scale = Vector2(2, 2)
 texture = ExtResource("3_2eyeq")
 
 [node name="Camera2D" type="Camera2D" parent="."]
