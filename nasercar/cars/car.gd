@@ -146,9 +146,17 @@ func _process(delta: float) -> void:
 	# (So player can be returned to road when something happens to their car).
 	if type == CarType.PLAYER and _pathfollow != null:
 		# Check if "progress" is needed for updating the path.
-		if (global_position-_pathfollow.global_position).length() < (global_position-_old_path_pos).length():
+		var distance_to_path: float = (global_position-_pathfollow.global_position).length()
+		if distance_to_path < (global_position-_old_path_pos).length():
 			_old_path_pos = _pathfollow.global_position
 			_pathfollow.progress += 300
+		# Point to where player was last on the path, if they wandered too far.
+		$LostArrow.global_rotation = (_pathfollow.global_position-global_position).angle() + PI/2
+		if distance_to_path > 2000:
+			if not $LostArrow.visible:
+				$LostArrow/Fade.play("fade_in")
+		elif distance_to_path < 500 and $LostArrow.visible:
+			$LostArrow/Fade.play("fade_out")
 
 	#######################################################
 	# Wheel-turning for player
