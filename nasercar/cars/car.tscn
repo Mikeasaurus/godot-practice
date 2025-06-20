@@ -1,7 +1,8 @@
-[gd_scene load_steps=14 format=3 uid="uid://xkg3ucnitsra"]
+[gd_scene load_steps=15 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
 [ext_resource type="Script" path="res://cars/car.gd" id="1_88aey"]
+[ext_resource type="Texture2D" uid="uid://rtfavhcxxo25" path="res://cars/carslime.png" id="3_2eyeq"]
 [ext_resource type="AudioStream" uid="uid://dxqavad1nchgy" path="res://audio/158728__erdie__engine04-loop.wav" id="3_5h513"]
 [ext_resource type="AudioStream" uid="uid://c32p6fxjy0hxb" path="res://audio/659463__diogorusso__shoot-car-door-slam.wav" id="4_af8g7"]
 [ext_resource type="AudioStream" uid="uid://n06h5klivc0s" path="res://audio/71739__audible-edge__chrysler-lhs-tire-squeal-04-04-25-2009.wav" id="5_n08ew"]
@@ -64,6 +65,13 @@ position = Vector2(-40, -36)
 [node name="Body" type="Sprite2D" parent="."]
 texture_filter = 1
 scale = Vector2(2, 2)
+
+[node name="Slime" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0.8)
+texture_filter = 1
+scale = Vector2(2, 2)
+texture = ExtResource("3_2eyeq")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 enabled = false

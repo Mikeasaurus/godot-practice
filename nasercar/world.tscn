@@ -379,10 +379,6 @@ layout_mode = 2
 custom_minimum_size = Vector2(256, 256)
 layout_mode = 2
 
-[node name="MangoSlime" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
-layout_mode = 2
-texture = ExtResource("16_4ogqs")
-
 [node name="NailPolish" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 texture = ExtResource("17_oey53")
@@ -394,6 +390,10 @@ texture = ExtResource("17_4hydi")
 [node name="Meteor" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 texture = ExtResource("17_fpwx0")
+
+[node name="MangoSlime" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("16_4ogqs")
 
 [node name="Beetle" type="TextureRect" parent="ItemSelect/CenterContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2

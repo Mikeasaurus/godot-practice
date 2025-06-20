@@ -21,6 +21,14 @@ extends RigidBody2D
 ## Emit signal when an item block is touched.
 signal itemblock
 
+## Indicates the car has touched an item block, and has not yet used the item.
+## Not used interally, but used by parent scene for bookkeeping.
+@export var has_item: bool = false
+
+## Effects currently applied to the car
+enum EffectType {SLIMED}
+var effects: Dictionary = {}
+
 # Reference to ground tiles (to get friction and other information).
 var _ground: TileMapLayer = null
 # Similarly, keep reference to road tiles (whose information takes precedence
@@ -43,6 +51,8 @@ var path: Path2D = null
 var _pathfollow: PathFollow2D = null
 # For tracking player progress along path.
 var _old_path_pos: Vector2 = Vector2.ZERO
+# For restoring proper offset after wavering effect
+var _path_offset: float
 
 # For playing crashing sound.
 var _crashing: bool = false
@@ -65,6 +75,8 @@ func add_to_track (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer)
 	var offset: Vector2 = global_position - track_path.curve.get_point_position(0)
 	#TODO: more robost with starting orientation.
 	_pathfollow.v_offset = offset.x
+	# Remember this offset in case we need to shift the path for wavering effect.
+	_path_offset = _pathfollow.v_offset
 
 # Let this car be playable by the local user.
 func make_playable () -> void:
@@ -85,12 +97,20 @@ func go () -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-
 	# Arrow pointing to player needs to stay oriented upward.
 	$Arrow.global_rotation = 0
 	$Arrow.scale = 2*Vector2(1/$Camera2D.zoom.x, 1/$Camera2D.zoom.y)
 	$Arrow.offset.y = -60*$Camera2D.zoom.y
 
+	#######################################################
+	# Apply effects
+	#######################################################
+	# CPU cars waver around when slimed.
+	if EffectType.SLIMED in effects:
+		_pathfollow.v_offset = _path_offset + 200*sin((Time.get_ticks_msec()%1000)/1000. * 2*PI)
+	else:
+		_pathfollow.v_offset = _path_offset
+	
 	var dr: float = wheel_turn_speed * delta / 180 * PI
 	var max_r: float = max_wheel_angle / 180 * PI
 
@@ -432,3 +452,17 @@ func _move_to_road () -> void:
 	await tween.finished
 	global_rotation = (_pathfollow.global_position - _old_path_pos).angle() - PI/2
 	freeze = false
+
+func _get_slimed (delay: float, full_slime_duration: float, end: float) -> void:
+	# Wait a bit for Mango to spit the slime (same timing as screen slime).
+	await get_tree().create_timer(delay).timeout
+	$Slime.modulate = Color.hex(0xffffffcc)
+	$Slime.show()
+	effects[EffectType.SLIMED] = true
+	var slimefade: Tween = create_tween()
+	slimefade.set_ease(Tween.EASE_OUT)
+	slimefade.tween_interval(full_slime_duration)
+	slimefade.tween_property($Slime, "modulate", Color.hex(0xffffff00), end)
+	await slimefade.finished
+	effects.erase(EffectType.SLIMED)
+	$Slime.hide()
