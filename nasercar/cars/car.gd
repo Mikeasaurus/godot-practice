@@ -461,9 +461,13 @@ func _move_to_road () -> void:
 func _get_slimed (delay: float, full_slime_duration: float, end: float) -> void:
 	# Wait a bit for Mango to spit the slime (same timing as screen slime).
 	await get_tree().create_timer(delay).timeout
-	var slime: Sprite2D = $Body/Slime
+	var slime: Sprite2D = $Slimed/Slime
 	slime.modulate = Color.hex(0xffffffcc)
 	slime.show()
+	# Player will already heaar the splat sound from the screen effect, so skip it here.
+	if type == CarType.CPU:
+		$Slimed/SplatSound.play()
+	$Slimed/CPUParticles2D.emitting = true
 	effects[EffectType.SLIMED] = true
 	var slimefade: Tween = create_tween()
 	slimefade.set_ease(Tween.EASE_OUT)
