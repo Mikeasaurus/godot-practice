@@ -38,3 +38,20 @@ func _process(delta: float) -> void:
 	#TODO
 	velocity = new_velocity
 	global_position += velocity * delta
+
+
+func _on_body_entered(body: Node2D) -> void:
+	if not active: return
+	if "_crash_effect" in body:
+		if "apply_impulse" in body:
+			body.apply_impulse(0.5*velocity)
+		if "apply_torque_impulse" in body:
+			body.apply_torque_impulse(20000)
+		body._crash_effect()
+		active = false
+		target = $FlyAway
+		var tween: Tween = create_tween()
+		tween.tween_property(self, "modulate", Color.hex(0xffffff00), 1.0)
+		tween.parallel().tween_property($BuzzSound, "volume_db", -10, 1.0)
+		await tween.finished
+		queue_free()

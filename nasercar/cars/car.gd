@@ -385,12 +385,15 @@ func _process(delta: float) -> void:
 
 func _on_body_entered(_body: Node) -> void:
 	if _crashing: return  # Only play sound once during a crashing period.
+	await _crash_effect()
+	_crashing = true
+
+func _crash_effect(stun_duration: float = 1.0) -> void:
 	$CrashSound.play()
 	$CrashSoundTimer.start()
 	var tween: Tween = create_tween()
 	_friction_modifier = 0.0
-	tween.tween_property(self, "_friction_modifier", 1.0, 1.0)
-	_crashing = true
+	tween.tween_property(self, "_friction_modifier", 1.0, stun_duration)
 
 func _on_crash_sound_timer_timeout() -> void:
 	_crashing = false
