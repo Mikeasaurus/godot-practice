@@ -102,7 +102,7 @@ func _input(event: InputEvent) -> void:
 		for car in _cars_in_front_of(player_car):
 			car._get_slimed(0.7+0.4, 4.0, 2.0)
 
-func _get_item(car) -> void:
+func _get_item(car: Car) -> void:
 	# First, select an item.
 	# Put stub entry for this car, to prevent getting another item while this
 	# item is arriving.
@@ -144,6 +144,7 @@ func _get_item(car) -> void:
 			break
 		choice -= likelihood[item_type]
 	# An item should now be selected.
+	#print (car, ' got ', item_pics[item])
 
 	# Some item types are exclusive (only one available at a time).
 	if item == ItemType.METEOR:
@@ -166,9 +167,13 @@ func _get_item(car) -> void:
 	else:
 		await get_tree().create_timer(2.0).timeout
 	_current_items[car] = item
+	# CPUs use items right away.
+	if car.type == car.CarType.CPU:
+		_use_item(car)
 
 func _use_item(car: Car) -> void:
 	if car not in _current_items: return
+	#print (car, ' used ', item_pics[_current_items[car]])
 	var item: ItemType = _current_items.get(car)
 	if item == ItemType.NONE: return  # Item not available yet.
 	_current_items.erase(car)
@@ -186,6 +191,9 @@ func _use_item(car: Car) -> void:
 			c._get_slimed(0.7+0.4, 4.0, 2.0)
 			if c.type == c.CarType.PLAYER:
 				_slime_screen()
+		# Allow slime item to be obtained again after slime has faded.
+		await get_tree().create_timer(7.1).timeout
+		_sliming = false
 
 func _slime_screen() -> void:
 	$ScreenEffects/MangoSlime.show()
