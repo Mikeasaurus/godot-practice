@@ -11,6 +11,9 @@ var _sliming: bool = false
 # Indicates that someone already has possession of the meteor.
 var _meteor: bool = false
 
+# Keep track of which cars are carrying which items.
+var _current_items: Dictionary = {}
+
 # Helper method - get all cars in this track.
 # Omits other non-car entities that the cars may spawn as siblings.
 func _cars () -> Array[Car]:
@@ -67,22 +70,21 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	pass
 
-var _current_item: ItemType
-# Description of item
-enum ItemType {SLIME}
+# All available item types.
+enum ItemType {NONE,SLIME}
 # Map the item types to the visual representations.
 @onready var item_pics: Dictionary = {
 	ItemType.SLIME: $ItemSelect/CenterContainer/ScrollContainer/VBoxContainer/MangoSlime,
 }
 
-func _itemblock (car: Node2D) -> void:
-	if not car.has_item:
+func _itemblock (car: Car) -> void:
+	if car not in _current_items:
 		_get_item(car)
 	
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("use_item") and player_car.has_item:
-		_use_item()
+	if event.is_action_pressed("use_item"):
+		_use_item(player_car)
 	if event.is_action_pressed("slime_test"):
 		#_slime_screen()
 		for car in _cars_in_front_of(player_car):
@@ -90,7 +92,8 @@ func _input(event: InputEvent) -> void:
 
 func _get_item(car) -> void:
 	# First, select an item.
-	car.has_item = true
+	# Put stub entry for this car, to prevent getting another item.
+	_current_items[car] = ItemType.NONE
 	var item: ItemType = ItemType.SLIME
 	#TODO: remove this hard-coded selection of Mango slime.
 	_sliming = true
@@ -105,17 +108,30 @@ func _get_item(car) -> void:
 		tween.tween_interval(0.4)
 		tween.set_ease(Tween.EASE_IN)
 		tween.tween_property($ItemSelect/CenterContainer/ScrollContainer,"scroll_vertical",5*256+20,0.75)
+		await tween.finished
+	else:
+		await get_tree().create_timer(2.0).timeout
+	_current_items[car] = item
 
-func _use_item() -> void:
-	$ItemSelect/WhooshSound.play()
-	var tween: Tween = create_tween()
-	tween.tween_property($ItemSelect/CenterContainer,"scale",Vector2(1.0,1.0),0.2)
-	tween.parallel().tween_property($ItemSelect/CenterContainer,"modulate",Color.hex(0xffffff00),0.2)
-	await tween.finished
-	player_car.has_item = false
-	$ItemSelect.hide()
-	$ItemSelect/CenterContainer.scale = Vector2(0.5,0.5)
-	$ItemSelect/CenterContainer.modulate = Color.WHITE
+func _use_item(car: Car) -> void:
+	if car not in _current_items: return
+	var item: ItemType = _current_items.get(car)
+	if item == ItemType.NONE: return  # Item not available yet.
+	_current_items.erase(car)
+	if car.type == car.CarType.PLAYER:
+		$ItemSelect/WhooshSound.play()
+		var tween: Tween = create_tween()
+		tween.tween_property($ItemSelect/CenterContainer,"scale",Vector2(1.0,1.0),0.2)
+		tween.parallel().tween_property($ItemSelect/CenterContainer,"modulate",Color.hex(0xffffff00),0.2)
+		await tween.finished
+		$ItemSelect.hide()
+		$ItemSelect/CenterContainer.scale = Vector2(0.5,0.5)
+		$ItemSelect/CenterContainer.modulate = Color.WHITE
+	if item == ItemType.SLIME:
+		for c in _cars_in_front_of(car):
+			c._get_slimed(0.7+0.4, 4.0, 2.0)
+			if c.type == c.CarType.PLAYER:
+				_slime_screen()
 
 func _slime_screen() -> void:
 	$ScreenEffects/MangoSlime.show()

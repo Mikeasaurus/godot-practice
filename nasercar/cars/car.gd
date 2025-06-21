@@ -1,4 +1,5 @@
 extends RigidBody2D
+class_name Car
 
 ## Top speed of car (pixels/second)
 @export var max_speed: float = 1500.0
@@ -20,10 +21,6 @@ extends RigidBody2D
 
 ## Emit signal when an item block is touched.
 signal itemblock
-
-## Indicates the car has touched an item block, and has not yet used the item.
-## Not used interally, but used by parent scene for bookkeeping.
-@export var has_item: bool = false
 
 ## Effects currently applied to the car
 enum EffectType {SLIMED}
