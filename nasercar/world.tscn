@@ -316,9 +316,6 @@ tile_set = SubResource("TileSet_3v7t6")
 [node name="TrackPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_2l6ov")
 
-[node name="Marker2D" type="Marker2D" parent="."]
-position = Vector2(5375, -5986)
-
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="GoLabel" type="Label" parent="CanvasLayer"]

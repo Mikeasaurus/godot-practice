@@ -333,6 +333,7 @@ volume_db = 8.0
 
 [node name="LostArrow" type="Polygon2D" parent="."]
 visible = false
+z_index = 10
 color = Color(1, 1, 0.501961, 0.8)
 polygon = PackedVector2Array(-24, -129, -23, -193, -42, -194, 2, -248, 46, -198, 25, -196, 24, -130)
 

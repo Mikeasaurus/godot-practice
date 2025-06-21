@@ -29,6 +29,16 @@ func _cars_in_front_of (car: Car) -> Array[Car]:
 		if other_car._pathfollow.progress > car._pathfollow.progress:
 			cars.append(other_car)
 	return cars
+# Helper method - get the car immediately in front of the specified car.
+# Returns null if there are no cars in front.
+func _car_in_front_of (car: Car) -> Car:
+	var front: Car = null
+	var front_progress: float = -1
+	for other_car in _cars_in_front_of(car):
+		if other_car._pathfollow.progress < front_progress or front_progress < 0:
+			front = other_car
+			front_progress = other_car._pathfollow.progress
+	return front
 # Helper method - get number of cars behind the specified car.
 func _num_cars_behind (car: Car) -> int:
 	var num: int = 0
@@ -97,10 +107,8 @@ func _itemblock (car: Car) -> void:
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("use_item"):
 		_use_item(player_car)
-	if event.is_action_pressed("slime_test"):
-		#_slime_screen()
-		for car in _cars_in_front_of(player_car):
-			car._get_slimed(0.7+0.4, 4.0, 2.0)
+	if event.is_action_pressed("debug"):
+		_launch_beetle(player_car, $Cars/NaomiCar)
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
@@ -194,6 +202,10 @@ func _use_item(car: Car) -> void:
 		# Allow slime item to be obtained again after slime has faded.
 		await get_tree().create_timer(7.1).timeout
 		_sliming = false
+	if item == ItemType.BEETLE:
+		# Target the car in front.
+		var target: Car = _car_in_front_of(car)
+		_launch_beetle(car, target)
 
 func _slime_screen() -> void:
 	$ScreenEffects/MangoSlime.show()
@@ -236,3 +248,14 @@ func _slime_screen() -> void:
 	slime.scale.y = 10
 	slime.modulate = Color.WHITE
 	$ScreenEffects/MangoSlime.hide()
+
+func _launch_beetle (from: Car, to: Car) -> void:
+	var beetle = load("res://items/beetle.tscn").instantiate()
+	add_child(beetle)
+	beetle.z_index = 10
+	beetle.global_position = from.global_position
+	beetle.velocity = from.linear_velocity
+	if to != null:	
+		beetle.set_target(to)
+	else:
+		beetle.buzz_off()

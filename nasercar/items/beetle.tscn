@@ -1,0 +1,43 @@
+[gd_scene load_steps=7 format=3 uid="uid://cxnaar8r01bmv"]
+
+[ext_resource type="Texture2D" uid="uid://rlsdrl53homd" path="res://items/beetle1.png" id="1_17cmk"]
+[ext_resource type="Script" path="res://items/beetle.gd" id="1_pajmo"]
+[ext_resource type="Texture2D" uid="uid://bbcfvwa73cxg4" path="res://items/beetle2.png" id="2_bvuwg"]
+[ext_resource type="AudioStream" uid="uid://2nb6tycovwnp" path="res://audio/650750__tedoo__bee-in-a-mug.mp3" id="4_545dp"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3dxge"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_17cmk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_bvuwg")
+}],
+"loop": true,
+"name": &"default",
+"speed": 20.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_sbts0"]
+radius = 59.0
+height = 182.0
+
+[node name="Beetle" type="Area2D"]
+rotation = -1.5708
+scale = Vector2(0.4, 0.4)
+script = ExtResource("1_pajmo")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_3dxge")
+offset = Vector2(-5, -40)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_sbts0")
+
+[node name="BuzzSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_545dp")
+volume_db = 20.0
+
+[node name="FlyAway" type="Marker2D" parent="."]
+position = Vector2(0, 300)
