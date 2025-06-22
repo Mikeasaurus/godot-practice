@@ -303,6 +303,7 @@ position = Vector2(630, 418)
 rotation = 3.14159
 
 [node name="Items" type="TileMapLayer" parent="."]
+z_index = 1
 tile_map_data = PackedByteArray("AAAfAPz/AAAAAAAAAQAfAP3/AAAAAAAAAQAfAP7/AAAAAAAAAQAfAP//AAAAAAAAAQA=")
 tile_set = SubResource("TileSet_sxxqc")
 

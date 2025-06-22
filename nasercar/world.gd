@@ -108,7 +108,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("use_item"):
 		_use_item(player_car)
 	if event.is_action_pressed("debug"):
-		_launch_beetle(player_car, $Cars/NaomiCar)
+		_release_nailpolish(player_car)
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
@@ -186,7 +186,10 @@ func _use_item(car: Car) -> void:
 	if item == ItemType.NONE: return  # Item not available yet.
 	_current_items.erase(car)
 	if car.type == car.CarType.PLAYER:
-		$ItemSelect/WhooshSound.play()
+		# Play item activation sound.
+		# Skipped for certain items which have their own distinct sound.
+		if item not in [ItemType.NAILPOLISH]:
+			$ItemSelect/WhooshSound.play()
 		var tween: Tween = create_tween()
 		tween.tween_property($ItemSelect/CenterContainer,"scale",Vector2(1.0,1.0),0.2)
 		tween.parallel().tween_property($ItemSelect/CenterContainer,"modulate",Color.hex(0xffffff00),0.2)
@@ -196,7 +199,7 @@ func _use_item(car: Car) -> void:
 		$ItemSelect/CenterContainer.modulate = Color.WHITE
 	if item == ItemType.SLIME:
 		for c in _cars_in_front_of(car):
-			c._get_slimed(0.7+0.4, 4.0, 2.0)
+			c.get_slimed(0.7+0.4, 4.0, 2.0)
 			if c.type == c.CarType.PLAYER:
 				_slime_screen()
 		# Allow slime item to be obtained again after slime has faded.
@@ -206,6 +209,8 @@ func _use_item(car: Car) -> void:
 		# Target the car in front.
 		var target: Car = _car_in_front_of(car)
 		_launch_beetle(car, target)
+	if item == ItemType.NAILPOLISH:
+		_release_nailpolish(car)
 
 func _slime_screen() -> void:
 	$ScreenEffects/MangoSlime.show()
@@ -259,3 +264,9 @@ func _launch_beetle (from: Car, to: Car) -> void:
 		beetle.set_target(to)
 	else:
 		beetle.buzz_off()
+
+func _release_nailpolish (from: Car) -> void:
+	var nailpolish = load("res://items/nail_polish.tscn").instantiate()
+	add_child(nailpolish)
+	nailpolish.global_position = from.global_position
+	nailpolish.z_index = 0  # Under item blocks and things.

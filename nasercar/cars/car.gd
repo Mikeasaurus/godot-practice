@@ -23,8 +23,13 @@ class_name Car
 signal itemblock
 
 ## Effects currently applied to the car
-enum EffectType {SLIMED}
+enum EffectType {SLIMED,NAILPOLISHED}
 var effects: Dictionary = {}
+
+## Effects applied to individual wheels.
+@onready var wheels: Array[Node2D] = [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]
+var wheel_skidmarks: Array[SkidMark] = [null, null, null, null]
+var wheel_effects: Array[Dictionary] = [{},{},{},{}]
 
 # Reference to ground tiles (to get friction and other information).
 var _ground: TileMapLayer = null
@@ -192,7 +197,8 @@ func _process(delta: float) -> void:
 	var skidding: bool = false
 	var skid_sounds: Array[bool] = [false,false,false]
 	var sinking: bool = true  # becomes false if any wheel on solid ground.
-	for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight, $Wheels/RearLeft, $Wheels/RearRight]:
+	for w in range(len(wheels)):
+		var wheel: Node2D = wheels[w]
 		# Velocity of point where wheel connects to car
 		var wheel_velocity: Vector2 = linear_velocity + wheel.position.rotated(rotation+PI/2) * angular_velocity
 		# Direction that wheel is pointing.
@@ -243,6 +249,24 @@ func _process(delta: float) -> void:
 		#######################################################
 		# Skid marks / special effects for wheel.
 		#######################################################
+		# Get wheel special effects.
+		# Check if car is currently in a nail polish puddle.
+		# If it is, check which wheels are in the puddle.
+		var t: float = Time.get_ticks_msec()
+		if EffectType.NAILPOLISHED in effects:
+			for np in effects[EffectType.NAILPOLISHED].values():
+				var pos: Vector2 = np[0]
+				var rad: float = np[1]
+				var c: Color = np[2]
+				if (wheel.global_position-pos).length() <= rad:
+					wheel_effects[w][EffectType.NAILPOLISHED] = [c,t]
+		# Clear out old wheel effects.
+		if EffectType.NAILPOLISHED in wheel_effects[w]:
+			# Nail polish wears off after 1 second.
+			var expire: float = wheel_effects[w][EffectType.NAILPOLISHED][1]+1000.0
+			if t >= expire:
+				wheel_effects[w].erase(EffectType.NAILPOLISHED)
+				
 		# Limit the static friction force magnitude.
 		# First, get auxiliary data about the ground surface.
 		var friction: float = 1.0
@@ -294,6 +318,11 @@ func _process(delta: float) -> void:
 				wheel_sinking = true
 			else:
 				wheel_sinking = false
+		# Special effects override the tile skidmarks and friction.
+		if EffectType.NAILPOLISHED in wheel_effects[w]:
+			skidmark_colour = wheel_effects[w][EffectType.NAILPOLISHED][0]
+			if w%2 == 1: friction = 0
+			else: friction = -0.3
 		# Add skid marks and particle effects.
 		var max_static_friction = mass*acceleration*friction*_friction_modifier
 		var p1: CPUParticles2D = wheel.get_node("Particles1")
@@ -303,13 +332,13 @@ func _process(delta: float) -> void:
 			f = f.limit_length(max_static_friction)
 			if skidmark_colour != Color.TRANSPARENT:
 				skidding = true
-				if wheel._current_skidmark == null or wheel._current_skidmark.default_color != skidmark_colour:
-					wheel._current_skidmark = load("res://cars/skid_mark.tscn").instantiate()
-					wheel._current_skidmark.default_color = skidmark_colour
-					add_sibling(wheel._current_skidmark)
-				wheel._current_skidmark.add_point(wheel.global_position)
+				if wheel_skidmarks[w] == null or wheel_skidmarks[w].default_color != skidmark_colour:
+					wheel_skidmarks[w] = load("res://cars/skid_mark.tscn").instantiate()
+					wheel_skidmarks[w].default_color = skidmark_colour
+					add_sibling(wheel_skidmarks[w])
+				wheel_skidmarks[w].add_point(wheel.global_position)
 			else:
-				wheel._current_skidmark = null
+				wheel_skidmarks[w] = null
 			if particle_colour_1 != Color.TRANSPARENT:
 				p1.color = particle_colour_1
 				p1.emitting = true
@@ -329,7 +358,7 @@ func _process(delta: float) -> void:
 			else:
 				dust.emitting = false
 		else:
-			wheel._current_skidmark = null
+			wheel_skidmarks[w] = null
 			p1.emitting = false
 			p2.emitting = false
 			dust.emitting = false
@@ -385,7 +414,7 @@ func _process(delta: float) -> void:
 
 func _on_body_entered(_body: Node) -> void:
 	if _crashing: return  # Only play sound once during a crashing period.
-	await _crash_effect()
+	_crash_effect()
 	_crashing = true
 
 func _crash_effect(stun_duration: float = 1.0) -> void:
@@ -461,7 +490,7 @@ func _move_to_road () -> void:
 	global_rotation = (_pathfollow.global_position - _old_path_pos).angle() - PI/2
 	freeze = false
 
-func _get_slimed (delay: float, full_slime_duration: float, end: float) -> void:
+func get_slimed (delay: float, full_slime_duration: float, end: float) -> void:
 	# Wait a bit for Mango to spit the slime (same timing as screen slime).
 	await get_tree().create_timer(delay).timeout
 	var slime: Sprite2D = $Slimed/Slime
@@ -479,3 +508,13 @@ func _get_slimed (delay: float, full_slime_duration: float, end: float) -> void:
 	await slimefade.finished
 	effects.erase(EffectType.SLIMED)
 	slime.hide()
+
+func entered_nailpolish (obj: Node2D, nailpolish_position: Vector2, radius: float, colour: Color) -> void:
+	if EffectType.NAILPOLISHED not in effects:
+		effects[EffectType.NAILPOLISHED] = {}
+	var np: Dictionary = effects[EffectType.NAILPOLISHED]
+	np[obj] = [nailpolish_position, radius, colour]
+
+func exited_nailpolish (obj: Node2D) -> void:
+	if EffectType.NAILPOLISHED not in effects: return
+	effects[EffectType.NAILPOLISHED].erase(obj)
