@@ -65,7 +65,7 @@ var _splashing: bool = false
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	# Raise the z_index so effects like skid marks appear beneath it.
-	z_index = 1
+	z_index = 2
 
 # Add track information (world tiles, path from start to finish of race).
 func add_to_track (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer) -> void:
@@ -336,6 +336,7 @@ func _process(delta: float) -> void:
 					wheel_skidmarks[w] = load("res://cars/skid_mark.tscn").instantiate()
 					wheel_skidmarks[w].default_color = skidmark_colour
 					add_sibling(wheel_skidmarks[w])
+					wheel_skidmarks[w].z_index = 1
 				wheel_skidmarks[w].add_point(wheel.global_position)
 			else:
 				wheel_skidmarks[w] = null
