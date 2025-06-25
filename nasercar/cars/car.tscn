@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://xkg3ucnitsra"]
+[gd_scene load_steps=26 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
 [ext_resource type="Script" path="res://cars/car.gd" id="1_88aey"]
@@ -10,6 +10,7 @@
 [ext_resource type="AudioStream" uid="uid://bpo6mxi5kkuy3" path="res://audio/251661__obxjohn__tires-on-gravel-road-1.mp3" id="6_cuk5v"]
 [ext_resource type="AudioStream" uid="uid://04tvpxlw4ukb" path="res://audio/320185__robinhood76__05966-water-surfacing-splashes.wav" id="7_xb7e0"]
 [ext_resource type="AudioStream" uid="uid://ck8qxnm7h80pv" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="9_x1whg"]
+[ext_resource type="AudioStream" uid="uid://88hgpp0mmg15" path="res://audio/348645__redafs__slurping-sipping-and-gulp-4.mp3" id="11_myl1q"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4ldm1"]
 radius = 35.0
@@ -42,6 +43,10 @@ height = 32
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_ohobg"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.282353, 0.145098, 0, 1, 0.282353, 0.145098, 0, 0)
 
 [sub_resource type="Animation" id="Animation_yp50d"]
 length = 0.001
@@ -330,6 +335,24 @@ texture = SubResource("GradientTexture2D_pfulr")
 [node name="SplashSound" type="AudioStreamPlayer2D" parent="Splash"]
 stream = ExtResource("7_xb7e0")
 volume_db = 8.0
+
+[node name="Coffee" type="Node2D" parent="."]
+
+[node name="SippingSound" type="AudioStreamPlayer2D" parent="Coffee"]
+stream = ExtResource("11_myl1q")
+volume_db = 8.0
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="Coffee"]
+position = Vector2(0, -1)
+emitting = false
+amount = 25
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 200.0
+initial_velocity_max = 200.0
+scale_amount_min = 16.0
+scale_amount_max = 16.0
+color_ramp = SubResource("Gradient_ohobg")
 
 [node name="LostArrow" type="Polygon2D" parent="."]
 visible = false

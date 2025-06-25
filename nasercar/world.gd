@@ -108,7 +108,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("use_item"):
 		_use_item(player_car)
 	if event.is_action_pressed("debug"):
-		_release_nailpolish(player_car)
+		player_car.sip_coffee()
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
@@ -188,7 +188,7 @@ func _use_item(car: Car) -> void:
 	if car.type == car.CarType.PLAYER:
 		# Play item activation sound.
 		# Skipped for certain items which have their own distinct sound.
-		if item not in [ItemType.NAILPOLISH]:
+		if item not in [ItemType.NAILPOLISH, ItemType.COFFEE]:
 			$ItemSelect/WhooshSound.play()
 		var tween: Tween = create_tween()
 		tween.tween_property($ItemSelect/CenterContainer,"scale",Vector2(1.0,1.0),0.2)
@@ -211,6 +211,8 @@ func _use_item(car: Car) -> void:
 		_launch_beetle(car, target)
 	if item == ItemType.NAILPOLISH:
 		_release_nailpolish(car)
+	if item == ItemType.COFFEE:
+		car.sip_coffee()
 
 func _slime_screen() -> void:
 	$ScreenEffects/MangoSlime.show()

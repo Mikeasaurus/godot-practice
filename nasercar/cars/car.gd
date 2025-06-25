@@ -23,7 +23,7 @@ class_name Car
 signal itemblock
 
 ## Effects currently applied to the car
-enum EffectType {SLIMED,NAILPOLISHED}
+enum EffectType {SLIMED,NAILPOLISHED,CAFFEINATED}
 var effects: Dictionary = {}
 
 ## Effects applied to individual wheels.
@@ -38,7 +38,7 @@ var _ground: TileMapLayer = null
 var _road: TileMapLayer = null
 
 # Friction modifier (for changing value during a collision.)
-var _friction_modifier: float = 1.0
+var collision_friction_modifier: float = 1.0
 
 ## Whether this car is allowed to move.
 var moveable: bool = false
@@ -190,6 +190,18 @@ func _process(delta: float) -> void:
 	var go_pressed: bool = Input.is_action_pressed("go")
 	var stop_pressed: bool = Input.is_action_pressed("stop")
 	var reverse_pressed: bool = Input.is_action_pressed("reverse")
+	# Check for speed modifiers.
+	var acceleration_modifier: float = 1.0
+	var max_speed_modifier: float = 1.0
+	var friction_modifier: float = 1.0
+	if EffectType.CAFFEINATED in effects:
+		if Time.get_ticks_msec() <= effects[EffectType.CAFFEINATED] + 5000:
+			acceleration_modifier *= 5.0
+			max_speed_modifier *= 2.0
+			friction_modifier *= 2.0
+		else:
+			$Coffee/CPUParticles2D.emitting = false
+			effects.erase(EffectType.CAFFEINATED)
 	# Keep track of how fast wheels are spinning (fastest one).
 	# Value is used for things like zoom level and engine pitch.
 	var fastest_wheel_speed: float = 0.0
@@ -212,8 +224,8 @@ func _process(delta: float) -> void:
 		var f: Vector2 = Vector2.ZERO
 		if moveable:
 			if (type == CarType.PLAYER and go_pressed) or type == CarType.CPU:
-				if new_speed < max_speed:
-					new_speed += acceleration * delta
+				if new_speed < max_speed * max_speed_modifier:
+					new_speed += acceleration * acceleration_modifier * delta
 			# Player hitting the brakes?
 			elif (type == CarType.PLAYER and stop_pressed):
 				if new_speed > 0: new_speed -= brakes * delta
@@ -222,8 +234,8 @@ func _process(delta: float) -> void:
 				if abs(new_speed) < brakes * delta: new_speed = current_speed * 0.5
 			# Player backing up?
 			elif (type == CarType.PLAYER and reverse_pressed):
-				if new_speed > -max_speed:
-					new_speed -= acceleration * delta
+				if new_speed > -max_speed * max_speed_modifier:
+					new_speed -= acceleration * acceleration_modifier * delta
 			# Slow down from air drag.
 			else:
 				if new_speed > 0: new_speed -= deceleration * delta
@@ -324,7 +336,7 @@ func _process(delta: float) -> void:
 			if w%2 == 1: friction = 0
 			else: friction = -0.3
 		# Add skid marks and particle effects.
-		var max_static_friction = mass*acceleration*friction*_friction_modifier
+		var max_static_friction = mass*acceleration*friction*friction_modifier*collision_friction_modifier
 		var p1: CPUParticles2D = wheel.get_node("Particles1")
 		var p2: CPUParticles2D = wheel.get_node("Particles2")
 		var dust: CPUParticles2D = wheel.get_node("Dust")
@@ -422,8 +434,8 @@ func _crash_effect(stun_duration: float = 1.0) -> void:
 	$CrashSound.play()
 	$CrashSoundTimer.start()
 	var tween: Tween = create_tween()
-	_friction_modifier = 0.0
-	tween.tween_property(self, "_friction_modifier", 1.0, stun_duration)
+	collision_friction_modifier = 0.0
+	tween.tween_property(self, "collision_friction_modifier", 1.0, stun_duration)
 
 func _on_crash_sound_timer_timeout() -> void:
 	_crashing = false
@@ -519,3 +531,8 @@ func entered_nailpolish (obj: Node2D, nailpolish_position: Vector2, radius: floa
 func exited_nailpolish (obj: Node2D) -> void:
 	if EffectType.NAILPOLISHED not in effects: return
 	effects[EffectType.NAILPOLISHED].erase(obj)
+
+func sip_coffee () -> void:
+	$Coffee/SippingSound.play()
+	effects[EffectType.CAFFEINATED] = Time.get_ticks_msec()
+	$Coffee/CPUParticles2D.emitting = true
