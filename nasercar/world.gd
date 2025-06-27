@@ -60,7 +60,7 @@ func _num_cars_behind (car: Car) -> int:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	for car in _cars():
-		car.add_to_track($TrackPath, $Ground, $Road)
+		car.add_to_track($TrackPath, [$Ground, $Road])
 		car.itemblock.connect(func():
 			_itemblock(car)
 		)

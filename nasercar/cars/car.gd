@@ -34,11 +34,9 @@ var effects: Dictionary = {}
 var wheel_skidmarks: Array[SkidMark] = [null, null, null, null]
 var wheel_effects: Array[Dictionary] = [{},{},{},{}]
 
-# Reference to ground tiles (to get friction and other information).
-var _ground: TileMapLayer = null
-# Similarly, keep reference to road tiles (whose information takes precedence
-# over ground tiles).
-var _road: TileMapLayer = null
+# Tilesets of the world.
+# Need a reference to them to query for physics parameters and other effects.
+var _tilesets: Array[TileMapLayer]
 
 # Friction modifier (for changing value during a collision.)
 var collision_friction_modifier: float = 1.0
@@ -71,9 +69,8 @@ func _ready() -> void:
 	z_index = 2
 
 # Add track information (world tiles, path from start to finish of race).
-func add_to_track (track_path: Path2D, ground: TileMapLayer, road: TileMapLayer) -> void:
-	_ground = ground
-	_road = road
+func add_to_track (track_path: Path2D, tilesets: Array[TileMapLayer]) -> void:
+	_tilesets = tilesets
 	type = CarType.REMOTE
 	_pathfollow = PathFollow2D.new()
 	track_path.add_child(_pathfollow)
@@ -315,7 +312,7 @@ func _process(delta: float) -> void:
 		var dust_colour: Color = Color.TRANSPARENT
 		var wheel_sinking: bool
 		var skid_sound: int
-		for tilesource in [_ground, _road]:
+		for tilesource in _tilesets:
 			if tilesource == null: continue
 			var tilepos: Vector2i = tilesource.local_to_map(wheel.global_position/tilesource.scale.x)
 			var tiledata: TileData = tilesource.get_cell_tile_data(tilepos)
