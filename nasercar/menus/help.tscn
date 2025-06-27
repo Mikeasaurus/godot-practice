@@ -1,0 +1,138 @@
+[gd_scene load_steps=8 format=3 uid="uid://culfs1hcaohhm"]
+
+[ext_resource type="Texture2D" uid="uid://dhkns5jdsokx5" path="res://items/beetle.png" id="1_fs3b4"]
+[ext_resource type="Script" path="res://menus/help.gd" id="1_hpd5p"]
+[ext_resource type="Texture2D" uid="uid://co8nl3wxthqgo" path="res://items/lavajava.png" id="2_qey5n"]
+[ext_resource type="Texture2D" uid="uid://c75py8357paxe" path="res://items/nailpolish.png" id="3_pif1m"]
+[ext_resource type="Texture2D" uid="uid://cfhya08sd73lc" path="res://items/mangoslime.png" id="4_xwx7c"]
+[ext_resource type="Texture2D" uid="uid://qri1ymcgcnnj" path="res://items/meteor.png" id="5_g2o11"]
+[ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="6_shoa8"]
+
+[node name="Help" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hpd5p")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="MarginContainer"]
+layout_mode = 2
+color = Color(0, 0, 0, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 50
+
+[node name="Label" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Help Menu"
+horizontal_alignment = 1
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+current_tab = 0
+
+[node name="Items" type="MarginContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer"]
+custom_minimum_size = Vector2(1200, 500)
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+metadata/_tab_index = 0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 50
+theme_override_constants/v_separation = 50
+columns = 2
+
+[node name="Beetle" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+layout_mode = 2
+texture = ExtResource("1_fs3b4")
+expand_mode = 4
+
+[node name="BeetleText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Beetle:
+This friendly little guy just wants to say hello."
+
+[node name="Coffee" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+layout_mode = 2
+texture = ExtResource("2_qey5n")
+expand_mode = 4
+
+[node name="CoffeeText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Coffee:
+A cup of LJ's special blend will give you the boost you need."
+
+[node name="NailPolish" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+layout_mode = 2
+texture = ExtResource("3_pif1m")
+expand_mode = 4
+
+[node name="NailPolishText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Nail Polish:
+This stuff has a tendency to make a huge mess. 
+Cute color, though!"
+
+[node name="MangoSlime" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+layout_mode = 2
+texture = ExtResource("4_xwx7c")
+expand_mode = 4
+
+[node name="MangoSlimeText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Mango Slime:
+What is that OH GOD THE SMELL"
+
+[node name="Meteor" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+texture = ExtResource("5_g2o11")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="MeteorText" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "Space Rock:
+Don't worry, this is just a small piece that broke off the main asteroid.
+Technically, this one [i]is[/i] called a meteor!"
+fit_content = true
+
+[node name="Back" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 64
+text = "     Back     "
+
+[node name="FullScreenToggle" parent="." instance=ExtResource("6_shoa8")]
+
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/Back" to="." method="_on_back_pressed"]

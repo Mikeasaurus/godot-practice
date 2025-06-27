@@ -97,6 +97,10 @@ func make_cpu () -> void:
 func go () -> void:
 	moveable = true
 
+# Stop this car from moving.
+func stop () -> void:
+	moveable = false
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	# Arrow pointing to player needs to stay oriented upward.

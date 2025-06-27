@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://nvfby80br4pn"]
+[gd_scene load_steps=9 format=3 uid="uid://nvfby80br4pn"]
 
 [ext_resource type="Script" path="res://menus/title_screen.gd" id="1_26oih"]
 [ext_resource type="FontFile" uid="uid://ble5tl2cuo0pm" path="res://fonts/Hauser Italic.otf" id="1_ygr87"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c2tw0w1x6fm0b" path="res://menus/lines.png" id="3_xwgxp"]
 [ext_resource type="PackedScene" uid="uid://bx45dedd8jvb2" path="res://cars/naser_car.tscn" id="5_fxytf"]
 [ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="5_w0neb"]
+[ext_resource type="PackedScene" uid="uid://culfs1hcaohhm" path="res://menus/help.tscn" id="7_31u7g"]
 
 [sub_resource type="Curve2D" id="Curve2D_uem21"]
 _data = {
@@ -22,15 +23,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_26oih")
 
-[node name="ColorRect" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 1)
-
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -38,6 +30,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="MarginContainer"]
+layout_mode = 2
+color = Color(0, 0, 0, 1)
 
 [node name="CenterContainer" type="CenterContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -112,18 +108,18 @@ color = Color(1, 1, 1, 0)
 [node name="Solo" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 tooltip_text = "Race against CPU karts"
-theme_override_font_sizes/font_size = 96
+theme_override_font_sizes/font_size = 72
 text = "  Solo Race  "
 
 [node name="Team" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 96
+theme_override_font_sizes/font_size = 72
 text = "  Team Race  "
 
-[node name="About" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="Help" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 96
-text = "About"
+theme_override_font_sizes/font_size = 72
+text = "Help"
 
 [node name="Spacer2" type="ColorRect" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 75)
@@ -132,8 +128,18 @@ color = Color(1, 1, 1, 0)
 
 [node name="FullScreenToggle" parent="." instance=ExtResource("5_w0neb")]
 
+[node name="NaserCar" parent="." instance=ExtResource("5_fxytf")]
+
 [node name="Path2D" type="Path2D" parent="."]
 curve = SubResource("Curve2D_uem21")
 
-[node name="NaserCar" parent="." instance=ExtResource("5_fxytf")]
-position = Vector2(-53, -75)
+[node name="CarTimer" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true
+
+[node name="Help" parent="." instance=ExtResource("7_31u7g")]
+visible = false
+layout_mode = 1
+
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Help" to="." method="_on_help_pressed"]
+[connection signal="timeout" from="CarTimer" to="." method="_on_car_timer_timeout"]
