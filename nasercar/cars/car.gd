@@ -22,8 +22,11 @@ class_name Car
 ## Emit signal when an item block is touched.
 signal itemblock
 
+## Emit signal when meteor impacts.
+signal meteor_impact
+
 ## Effects currently applied to the car
-enum EffectType {SLIMED,NAILPOLISHED,CAFFEINATED}
+enum EffectType {SLIMED,NAILPOLISHED,CAFFEINATED,SMOULDERING}
 var effects: Dictionary = {}
 
 ## Effects applied to individual wheels.
@@ -103,6 +106,8 @@ func _process(delta: float) -> void:
 	$Arrow.global_rotation = 0
 	$Arrow.scale = 2*Vector2(1/$Camera2D.zoom.x, 1/$Camera2D.zoom.y)
 	$Arrow.offset.y = -60*$Camera2D.zoom.y
+	# Same with smouldering effects.
+	$Meteor.global_rotation = 0
 
 	#######################################################
 	# Apply effects
@@ -112,6 +117,27 @@ func _process(delta: float) -> void:
 		_pathfollow.v_offset = _path_offset + 200*sin((Time.get_ticks_msec()%1000)/1000. * 2*PI)
 	else:
 		_pathfollow.v_offset = _path_offset
+	# Smouldering cars have effects applied.
+	var smoulder_speed_limiter: float = 1.0
+	var smoulder_drag: float = 1.0
+	if EffectType.SMOULDERING in effects:
+		var smoulder_duration: float = Time.get_ticks_msec() - effects[EffectType.SMOULDERING]
+		if smoulder_duration < 3000:
+			$Body.modulate = Color.BLACK
+			$Wheels.modulate = Color.BLACK
+			if not $Meteor/CPUParticles2D.emitting:
+				$Meteor/CPUParticles2D.emitting = true
+			smoulder_speed_limiter = 0.0
+			smoulder_drag = 10.0
+		elif smoulder_duration < 6000:
+			var c: float = (smoulder_duration-3000)/3000
+			$Body.modulate = Color(c,c,c)
+			$Wheels.modulate = Color(c,c,c)
+			smoulder_speed_limiter = c
+		else:
+			$Body.modulate = Color.WHITE
+			$Meteor/CPUParticles2D.emitting = false
+			effects.erase(EffectType.SMOULDERING)
 	
 	var dr: float = wheel_turn_speed * delta / 180 * PI
 	var max_r: float = max_wheel_angle / 180 * PI
@@ -224,7 +250,7 @@ func _process(delta: float) -> void:
 		var f: Vector2 = Vector2.ZERO
 		if moveable:
 			if (type == CarType.PLAYER and go_pressed) or type == CarType.CPU:
-				if new_speed < max_speed * max_speed_modifier:
+				if new_speed < max_speed * max_speed_modifier * smoulder_speed_limiter:
 					new_speed += acceleration * acceleration_modifier * delta
 			# Player hitting the brakes?
 			elif (type == CarType.PLAYER and stop_pressed):
@@ -234,12 +260,13 @@ func _process(delta: float) -> void:
 				if abs(new_speed) < brakes * delta: new_speed = current_speed * 0.5
 			# Player backing up?
 			elif (type == CarType.PLAYER and reverse_pressed):
-				if new_speed > -max_speed * max_speed_modifier:
+				if new_speed > -max_speed * max_speed_modifier * smoulder_speed_limiter:
 					new_speed -= acceleration * acceleration_modifier * delta
 			# Slow down from air drag.
-			else:
-				if new_speed > 0: new_speed -= deceleration * delta
-				elif new_speed < 0: new_speed += deceleration * delta
+			#else:
+			if true:
+				if new_speed > 0: new_speed -= deceleration * smoulder_drag * delta
+				elif new_speed < 0: new_speed += deceleration * smoulder_drag * delta
 				# To avoid "quivering"
 				if abs(new_speed) < deceleration * delta: new_speed = current_speed * 0.5
 			# Keep track of fastest wheel, the speed will be used for other things
@@ -536,3 +563,25 @@ func sip_coffee () -> void:
 	$Coffee/SippingSound.play()
 	effects[EffectType.CAFFEINATED] = Time.get_ticks_msec()
 	$Coffee/CPUParticles2D.emitting = true
+
+func space_rock () -> void:
+	#meteor_impact.emit()
+	#return
+	var shadow: TextureRect = $Meteor/Shadow
+	shadow.show()
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	shadow.scale = Vector2(0.1,0.1)
+	shadow.position = Vector2(-5,-5)
+	shadow.modulate = Color.hex(0x00000000)
+	tween.tween_property(shadow, "scale", Vector2(10.0,10.0), 2.0)
+	tween.parallel().tween_property(shadow, "position", Vector2(-500,-500),2.0)
+	tween.parallel().tween_property(shadow, "modulate", Color.hex(0xffffffaa), 2.0)
+	$Meteor/WhooshSound.play()
+	await tween.finished
+	shadow.hide()
+	meteor_impact.emit()
+
+func smoulder () -> void:
+	effects[EffectType.SMOULDERING] = Time.get_ticks_msec()
+	$Meteor/CPUParticles2D.emitting = true

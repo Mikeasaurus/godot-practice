@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://bt70ftdpif78n"]
+
+[sub_resource type="Gradient" id="Gradient_5oacv"]
+colors = PackedColorArray(0.333333, 0.333333, 0.333333, 0.2, 0.333333, 0.333333, 0.333333, 0)
+
+[node name="Crater" type="Node2D"]
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+scale = Vector2(5, 5)
+emitting = false
+amount = 200
+lifetime = 10.0
+one_shot = true
+preprocess = 10.0
+emission_shape = 1
+emission_sphere_radius = 100.0
+gravity = Vector2(0, 0)
+angle_max = 90.0
+scale_amount_min = 200.0
+scale_amount_max = 200.0
+color_ramp = SubResource("Gradient_5oacv")

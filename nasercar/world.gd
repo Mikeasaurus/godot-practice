@@ -39,6 +39,15 @@ func _car_in_front_of (car: Car) -> Car:
 			front = other_car
 			front_progress = other_car._pathfollow.progress
 	return front
+# Helper method - get the car in first place.
+func _first_place_car () -> Car:
+	var progress: float = 0.0
+	var car: Car
+	for c in _cars():
+		if c._pathfollow.progress > progress:
+			car = c
+			progress = c._pathfollow.progress
+	return car
 # Helper method - get number of cars behind the specified car.
 func _num_cars_behind (car: Car) -> int:
 	var num: int = 0
@@ -54,6 +63,9 @@ func _ready() -> void:
 		car.add_to_track($TrackPath, $Ground, $Road)
 		car.itemblock.connect(func():
 			_itemblock(car)
+		)
+		car.meteor_impact.connect(func():
+			_big_badaboom(car)
 		)
 	player_car.make_playable()
 
@@ -108,7 +120,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("use_item"):
 		_use_item(player_car)
 	if event.is_action_pressed("debug"):
-		player_car.sip_coffee()
+		player_car.space_rock()
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
@@ -213,6 +225,8 @@ func _use_item(car: Car) -> void:
 		_release_nailpolish(car)
 	if item == ItemType.COFFEE:
 		car.sip_coffee()
+	if item == ItemType.METEOR:
+		_launch_meteor(car)
 
 func _slime_screen() -> void:
 	$ScreenEffects/MangoSlime.show()
@@ -267,8 +281,43 @@ func _launch_beetle (from: Car, to: Car) -> void:
 	else:
 		beetle.buzz_off()
 
+func _launch_meteor (from: Car) -> void:
+	var target: Car = _first_place_car()
+	# If player managed to get into first place, then don't launch the meteor at
+	# themselves!
+	if target == from: return
+	target.space_rock()
+
 func _release_nailpolish (from: Car) -> void:
 	var nailpolish = load("res://items/nail_polish.tscn").instantiate()
 	add_child(nailpolish)
 	nailpolish.global_position = from.global_position
 	nailpolish.z_index = 0  # Under item blocks and things.
+
+func _big_badaboom (car: Car) -> void:
+	# Flash of light
+	var boom: Node2D = load("res://effects/impact.tscn").instantiate()
+	add_child(boom)
+	boom.global_position = car.global_position
+	boom.z_index = 3
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(boom,"scale",Vector2(3,3),0.5)
+	tween.tween_interval(1.0)
+	tween.tween_property(boom,"modulate",Color.hex(0xffffff00),5.0)
+	tween.parallel().tween_property(boom,"scale",Vector2(9,9),5.0)
+	# Smoulder effect (and impedence) on all cars within the blast radius.
+	for c in $Cars.get_children():
+		if "smoulder" in c and (c.global_position-boom.global_position).length() <= 500:
+			c.smoulder()
+	# Smoking crater.
+	var crater: Node2D = load("res://effects/crater.tscn").instantiate()
+	add_child(crater)
+	crater.global_position = car.global_position
+	crater.z_index = 2
+	crater.get_node("CPUParticles2D").emitting = true
+	await tween.finished
+	_meteor = false
+	boom.queue_free()
+	await get_tree().create_timer(10.0).timeout
+	crater.queue_free()
