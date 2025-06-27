@@ -187,8 +187,9 @@ func _get_item(car: Car) -> void:
 	else:
 		await get_tree().create_timer(2.0).timeout
 	_current_items[car] = item
-	# CPUs use items right away.
+	# CPUs use items automatically after some random amount of time.
 	if car.type == car.CarType.CPU:
+		await get_tree().create_timer(randf()*5).timeout
 		_use_item(car)
 
 func _use_item(car: Car) -> void:
