@@ -1,0 +1,121 @@
+[gd_scene load_steps=4 format=3 uid="uid://nvfby80br4pn"]
+
+[ext_resource type="FontFile" uid="uid://ble5tl2cuo0pm" path="res://fonts/Hauser Italic.otf" id="1_ygr87"]
+[ext_resource type="FontFile" uid="uid://c2i81u5hcckps" path="res://fonts/Hauser Bold Italic.otf" id="2_4f3c5"]
+[ext_resource type="Texture2D" uid="uid://c2tw0w1x6fm0b" path="res://menus/lines.png" id="3_xwgxp"]
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="Title" type="HBoxContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ColorRect" type="ColorRect" parent="MarginContainer/CenterContainer/VBoxContainer/Title"]
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+color = Color(0.329412, 0.32549, 0.345098, 1)
+
+[node name="ColorRect2" type="ColorRect" parent="MarginContainer/CenterContainer/VBoxContainer/Title"]
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+color = Color(0.329412, 0.32549, 0.345098, 1)
+
+[node name="ColorRect3" type="ColorRect" parent="MarginContainer/CenterContainer/VBoxContainer/Title"]
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(35, 0)
+layout_mode = 2
+color = Color(0.443137, 0.458824, 0.470588, 1)
+
+[node name="ColorRect4" type="ColorRect" parent="MarginContainer/CenterContainer/VBoxContainer/Title"]
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(35, 0)
+layout_mode = 2
+color = Color(0.443137, 0.458824, 0.470588, 1)
+
+[node name="ColorRect5" type="ColorRect" parent="MarginContainer/CenterContainer/VBoxContainer/Title"]
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+color = Color(0.996078, 0.580392, 0.407843, 1)
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/Title"]
+custom_minimum_size = Vector2(1200, 0)
+layout_mode = 2
+theme_override_fonts/italics_font = ExtResource("1_ygr87")
+theme_override_fonts/bold_italics_font = ExtResource("2_4f3c5")
+theme_override_font_sizes/bold_italics_font_size = 96
+theme_override_font_sizes/italics_font_size = 240
+bbcode_enabled = true
+text = "[i]NASERCAR[/i]"
+fit_content = true
+
+[node name="Sprite2D" type="Sprite2D" parent="MarginContainer/CenterContainer/VBoxContainer/Title"]
+position = Vector2(134, 150)
+scale = Vector2(1, 0.785062)
+skew = 0.268781
+texture = ExtResource("3_xwgxp")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 50
+
+[node name="Spacer1" type="ColorRect" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+color = Color(1, 1, 1, 0)
+
+[node name="Solo" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+tooltip_text = "Race against CPU karts"
+theme_override_font_sizes/font_size = 96
+text = "  Solo Race  "
+
+[node name="Team" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 96
+text = "  Team Race  "
+
+[node name="About" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 96
+text = "About"
+
+[node name="Spacer2" type="ColorRect" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+color = Color(1, 1, 1, 0)
