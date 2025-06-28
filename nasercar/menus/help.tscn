@@ -210,6 +210,136 @@ Don't worry, this is just a small piece that broke off the main asteroid.
 Technically, this one [i]is[/i] called a meteor!"
 fit_content = true
 
+[node name="About" type="MarginContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer"]
+visible = false
+custom_minimum_size = Vector2(1200, 580)
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+metadata/_tab_index = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="Title" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "NASERCAR"
+fit_content = true
+
+[node name="Code" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "Code and Graphics by Mike
+Made with Godot
+Godot license: [url]https://godotengine.org/license[/url]"
+fit_content = true
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "Characters and game elements from [i]Goodbye Volcano High[/i] by KO_OP
+[url]https://goodbyevolcanohigh.com/[/url]"
+fit_content = true
+
+[node name="Font" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "
+Logo font: \"Hauser\" by Pixel Sagas
+[url]https://www.pixelsagas.com/?download=hauser[/url]"
+fit_content = true
+
+[node name="Audio" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "
+Audio files:
+
+engine04-loop.wav by Erdie
+[url]https://freesound.org/s/158728/[/url]
+License: Attribution 4.0
+
+Shoot - car door slam.wav by diogorusso
+[url]https://freesound.org/s/659463/[/url]
+License: Creative Commons 0
+
+beep pager.wav by AGFX
+[url]https://freesound.org/s/20440/[/url]
+License: Attribution 4.0
+
+Long beep_011.wav by AlienXXX
+[url]https://freesound.org/s/196236/[/url]
+License: Attribution 4.0
+
+Chrysler LHS tire squeal 04 (04-25-2009).wav by audible-edge
+[url][https://freesound.org/s/71739/[/url]
+License: Creative Commons 0
+
+05966 water surfacing splashes.wav by Robinhood76
+[url]https://freesound.org/s/320185/[/url]
+License: Attribution NonCommercial 4.0
+
+Tires on Gravel Road 1 by OBXJohn
+[url]https://freesound.org/s/251661/[/url]
+License: Creative Commons 0
+
+Success Jingle by JustInvoke
+[url]https://freesound.org/s/446111/[/url]
+License: Attribution 4.0
+
+dice-rolls-D20-big by aalorv
+[url]https://freesound.org/s/744985/[/url]
+License: Attribution 4.0
+
+whoosh.wav by petenice
+[url]https://freesound.org/s/9509/[/url]
+License: Creative Commons 0
+
+NPX Throat Gathering Spit 2.wav by noahpardo
+[url]https://freesound.org/s/352402/[/url]
+License: Creative Commons 0
+
+Wet Splat 1.mp3 by nebulasnails
+[url]https://freesound.org/s/495118/[/url]
+License: Creative Commons 0
+
+bee in a mug.wav by tedoo
+[url]https://freesound.org/s/650750/[/url]
+License: Creative Commons 0
+
+Bottle Squirt.wav by jimbo555
+[url]https://freesound.org/s/630484/[/url]
+License: Creative Commons 0
+
+Slurping, Sipping and Gulp 4 by redafs
+[url]https://freesound.org/s/348645/[/url]
+License: Attribution 4.0
+
+Thunder (Kraków, Poland, 20.05.2013) by vonz
+[url]https://freesound.org/s/188767/[/url]
+License: Creative Commons 0
+
+Jet_Whoosh.WAV by Benboncan
+[url]https://freesound.org/s/167563/[/url]
+License: Attribution 4.0"
+fit_content = true
+
 [node name="Back" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
