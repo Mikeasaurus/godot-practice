@@ -1,11 +1,16 @@
-[gd_scene load_steps=8 format=3 uid="uid://culfs1hcaohhm"]
+[gd_scene load_steps=13 format=3 uid="uid://culfs1hcaohhm"]
 
 [ext_resource type="Texture2D" uid="uid://dhkns5jdsokx5" path="res://items/beetle.png" id="1_fs3b4"]
 [ext_resource type="Script" path="res://menus/help.gd" id="1_hpd5p"]
 [ext_resource type="Texture2D" uid="uid://co8nl3wxthqgo" path="res://items/lavajava.png" id="2_qey5n"]
+[ext_resource type="Texture2D" uid="uid://cqmnccveeaxu5" path="res://menus/arrow_up.png" id="2_yngvg"]
 [ext_resource type="Texture2D" uid="uid://c75py8357paxe" path="res://items/nailpolish.png" id="3_pif1m"]
+[ext_resource type="Texture2D" uid="uid://cpxkmo6qnkb3k" path="res://menus/arrow_left.png" id="3_ve08x"]
+[ext_resource type="Texture2D" uid="uid://cxpjsdkmaqnw2" path="res://menus/arrow_right.png" id="4_4jp4b"]
 [ext_resource type="Texture2D" uid="uid://cfhya08sd73lc" path="res://items/mangoslime.png" id="4_xwx7c"]
+[ext_resource type="Texture2D" uid="uid://pb6vtc7ahlxk" path="res://menus/ctrlkey.png" id="5_f3ylw"]
 [ext_resource type="Texture2D" uid="uid://qri1ymcgcnnj" path="res://items/meteor.png" id="5_g2o11"]
+[ext_resource type="Texture2D" uid="uid://dj2ehw53ucubn" path="res://menus/spacebar.png" id="5_um2h5"]
 [ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="6_shoa8"]
 
 [node name="Help" type="Control"]
@@ -47,14 +52,92 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 48
 current_tab = 0
 
-[node name="Items" type="MarginContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer"]
-custom_minimum_size = Vector2(1200, 500)
+[node name="Controls" type="MarginContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer"]
+custom_minimum_size = Vector2(1200, 580)
 layout_mode = 2
 theme_override_constants/margin_left = 25
 theme_override_constants/margin_top = 25
 theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
 metadata/_tab_index = 0
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls"]
+layout_mode = 2
+theme_override_constants/h_separation = 50
+theme_override_constants/v_separation = 0
+columns = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer"]
+layout_mode = 2
+
+[node name="UpArrow" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer/CenterContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+texture = ExtResource("2_yngvg")
+expand_mode = 4
+stretch_mode = 4
+
+[node name="UpArrowText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Accelerate"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer"]
+layout_mode = 2
+
+[node name="LeftArrow" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer/HBoxContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+texture = ExtResource("3_ve08x")
+expand_mode = 4
+
+[node name="RightArrow" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer/HBoxContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+texture = ExtResource("4_4jp4b")
+expand_mode = 4
+
+[node name="LeftRightLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Turn the wheels"
+
+[node name="Spacebar" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer"]
+custom_minimum_size = Vector2(256, 128)
+layout_mode = 2
+texture = ExtResource("5_um2h5")
+expand_mode = 2
+stretch_mode = 4
+
+[node name="SpacebarText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Brake"
+
+[node name="CenterContainer2" type="CenterContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer"]
+layout_mode = 2
+
+[node name="Ctrl" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer/CenterContainer2"]
+custom_minimum_size = Vector2(192, 128)
+layout_mode = 2
+texture = ExtResource("5_f3ylw")
+expand_mode = 2
+stretch_mode = 4
+
+[node name="CtrlText" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Controls/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Use item"
+
+[node name="Items" type="MarginContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer"]
+visible = false
+custom_minimum_size = Vector2(1200, 580)
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+metadata/_tab_index = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items"]
 layout_mode = 2
