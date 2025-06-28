@@ -157,7 +157,7 @@ expand_mode = 4
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Beetle:
-This friendly little guy just wants to say hello."
+This friendly little bug just wants to say hello."
 
 [node name="Coffee" type="TextureRect" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/Items/ScrollContainer/GridContainer"]
 layout_mode = 2

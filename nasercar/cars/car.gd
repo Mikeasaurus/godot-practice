@@ -129,7 +129,7 @@ func _process(delta: float) -> void:
 			if not $Meteor/CPUParticles2D.emitting:
 				$Meteor/CPUParticles2D.emitting = true
 			smoulder_speed_limiter = 0.0
-			smoulder_drag = 10.0
+			smoulder_drag = 7.0
 		elif smoulder_duration < 6000:
 			var c: float = (smoulder_duration-3000)/3000
 			$Body.modulate = Color(c,c,c)
