@@ -47,7 +47,18 @@ var moveable: bool = false
 enum CarType {PLAYER, CPU, REMOTE}
 
 ## Type of car
-var type
+var type: CarType
+
+## Type of CPU movement.
+## Normally, always moving forward unless needing to get unstuck.
+enum CPU_Movement {FORWARD,BACKWARD}
+var cpu_movement: CPU_Movement = CPU_Movement.FORWARD
+enum CPU_Steer_Direction {PATH, LEFT, CENTRE, RIGHT}
+var cpu_steer_direction: CPU_Steer_Direction = CPU_Steer_Direction.PATH
+## Check if CPU car is stuck (not moving forward).
+var _is_stuck: bool = false
+var _stuck_since: float
+var _getting_unstuck: bool = false
 
 ## The path to follow if this is a CPU.
 var path: Path2D = null
@@ -144,9 +155,23 @@ func _process(delta: float) -> void:
 	var max_r: float = max_wheel_angle / 180 * PI
 
 	#######################################################
+	# Get CPUs unstuck.
+	#######################################################
+	if type == CarType.CPU and moveable and not _getting_unstuck:
+		if linear_velocity.length() < 10:
+			# Just starting to be stuck (or just speeding up from a stop)
+			if not _is_stuck:
+				_is_stuck = true
+				_stuck_since = Time.get_ticks_msec()
+			# If not moving for a while, then probably stuck.
+			elif Time.get_ticks_msec() - _stuck_since > 3000:
+				_get_unstuck()
+		else:
+			_is_stuck = false
+	#######################################################
 	# Path-following for CPUs
 	#######################################################
-	if type == CarType.CPU and _pathfollow != null:
+	if type == CarType.CPU and _pathfollow != null and cpu_steer_direction == CPU_Steer_Direction.PATH:
 		# Make sure our target point is far enough ahead.
 		var target_direction: Vector2 = _pathfollow.global_position - global_position
 		var dx: float = target_direction.length()
@@ -188,16 +213,16 @@ func _process(delta: float) -> void:
 			$LostArrow/Fade.play("fade_out")
 
 	#######################################################
-	# Wheel-turning for player
+	# Wheel-turning for player or override of regular CPU steering
 	#######################################################
-	if type == CarType.PLAYER:
+	if type == CarType.PLAYER or (type == CarType.CPU and cpu_steer_direction != CPU_Steer_Direction.PATH):
 		# Turn left
-		if Input.is_action_pressed("turn_left"):
+		if (type == CarType.PLAYER and Input.is_action_pressed("turn_left")) or cpu_steer_direction == CPU_Steer_Direction.LEFT:
 			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
 				if wheel.rotation > -max_r:
 					wheel.rotation -= dr
 		# Turn right
-		elif Input.is_action_pressed("turn_right"):
+		elif (type == CarType.PLAYER and Input.is_action_pressed("turn_right")) or cpu_steer_direction == CPU_Steer_Direction.RIGHT:
 			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
 				if wheel.rotation < max_r:
 					wheel.rotation += dr
@@ -250,7 +275,7 @@ func _process(delta: float) -> void:
 		# Player hitting the gas, or CPU (which always hits gas).
 		var f: Vector2 = Vector2.ZERO
 		if moveable:
-			if (type == CarType.PLAYER and go_pressed) or type == CarType.CPU:
+			if (type == CarType.PLAYER and go_pressed) or (type == CarType.CPU and cpu_movement == CPU_Movement.FORWARD):
 				if new_speed < max_speed * max_speed_modifier * smoulder_speed_limiter:
 					new_speed += acceleration * acceleration_modifier * delta
 			# Player hitting the brakes?
@@ -260,7 +285,7 @@ func _process(delta: float) -> void:
 				# To avoid "quivering"
 				if abs(new_speed) < brakes * delta: new_speed = current_speed * 0.5
 			# Player backing up?
-			elif (type == CarType.PLAYER and reverse_pressed):
+			elif (type == CarType.PLAYER and reverse_pressed) or (type == CarType.CPU and cpu_movement == CPU_Movement.BACKWARD):
 				if new_speed > -max_speed * max_speed_modifier * smoulder_speed_limiter:
 					new_speed -= acceleration * acceleration_modifier * delta
 			# Slow down from air drag.
@@ -586,3 +611,21 @@ func space_rock () -> void:
 func smoulder () -> void:
 	effects[EffectType.SMOULDERING] = Time.get_ticks_msec()
 	$Meteor/CPUParticles2D.emitting = true
+
+# Try getting a CPU car unstuck from an obstacle.
+func _get_unstuck () -> void:
+	_getting_unstuck = true
+	# Try backing up in one direction.
+	cpu_steer_direction = CPU_Steer_Direction.LEFT
+	cpu_movement = CPU_Movement.BACKWARD
+	await get_tree().create_timer(0.5).timeout
+	# Now try going forward after turning wheel in other direction.
+	cpu_steer_direction = CPU_Steer_Direction.RIGHT
+	cpu_movement = CPU_Movement.FORWARD
+	await get_tree().create_timer(0.5).timeout
+	# Hopefully that was enough to get unstuck?
+	cpu_steer_direction = CPU_Steer_Direction.PATH
+	# Reset the "stuck" state and see if that worked.
+	# Otherwise, this routine will get tried again after a brief time.
+	_is_stuck = false
+	_getting_unstuck = false
