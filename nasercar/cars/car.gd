@@ -532,11 +532,11 @@ func _kersplash () -> void:
 	await tween.finished
 	$Splash/Ripple.hide()
 	$Splash/Particles.emitting = false
-	# Move car back onto the road.
-	_move_to_road ()
 	# Cut off sound before second splash in the .wav file.
 	await get_tree().create_timer(1.0).timeout
 	$Splash/SplashSound.stop()
+	# Move car back onto the road.
+	await _move_to_road ()
 	# Restore visibility of car, and make mobile again.
 	for m in modulated_stuff:
 		m.modulate = Color.WHITE
