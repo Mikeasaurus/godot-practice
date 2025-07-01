@@ -1,9 +1,9 @@
 [gd_scene load_steps=42 format=4 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_5oo6t"]
-[ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://ground.png" id="1_cexhq"]
-[ext_resource type="Texture2D" uid="uid://chxeh0b48xusu" path="res://roads.png" id="2_dc0g2"]
-[ext_resource type="Texture2D" uid="uid://c0yw7rvucrjqq" path="res://obstacles.png" id="3_vv00q"]
+[ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://tiles/ground.png" id="1_cexhq"]
+[ext_resource type="Texture2D" uid="uid://chxeh0b48xusu" path="res://tiles/roads.png" id="2_dc0g2"]
+[ext_resource type="Texture2D" uid="uid://c0yw7rvucrjqq" path="res://tiles/obstacles.png" id="3_vv00q"]
 [ext_resource type="PackedScene" uid="uid://bx45dedd8jvb2" path="res://cars/naser_car.tscn" id="4_imiox"]
 [ext_resource type="PackedScene" uid="uid://cueu5a87cvopj" path="res://items/d_20.tscn" id="4_yknpy"]
 [ext_resource type="PackedScene" uid="uid://bimruttii2nbg" path="res://cars/fang_car.tscn" id="5_2cue5"]
