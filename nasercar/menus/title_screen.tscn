@@ -105,16 +105,16 @@ custom_minimum_size = Vector2(0, 75)
 layout_mode = 2
 color = Color(1, 1, 1, 0)
 
-[node name="Solo" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="SinglePlayer" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 tooltip_text = "Race against CPU karts"
 theme_override_font_sizes/font_size = 72
-text = "  Solo Race  "
+text = "  Single Player  "
 
-[node name="Team" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="Multiplayer" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 72
-text = "  Team Race  "
+text = "  Multiplayer  "
 
 [node name="Help" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2

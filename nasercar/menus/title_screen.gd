@@ -12,6 +12,7 @@ func _ready() -> void:
 func _reset_car() -> void:
 	$NaserCar.set_deferred("global_position",Vector2(-53,-75))
 	$NaserCar.set_deferred("linear_velocity",Vector2.ZERO)
+	$NaserCar.freeze = true
 	$NaserCar.stop()
 	$CarTimer.stop()
 	$CarTimer.start()
@@ -22,4 +23,5 @@ func _on_help_pressed() -> void:
 	MenuHandler.activate_menu($Help)
 
 func _on_car_timer_timeout() -> void:
+	$NaserCar.freeze = false
 	$NaserCar.go()

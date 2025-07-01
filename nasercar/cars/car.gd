@@ -201,6 +201,7 @@ func _process(delta: float) -> void:
 	if type == CarType.PLAYER and _pathfollow != null:
 		# Check if "progress" is needed for updating the path.
 		var distance_to_path: float = (global_position-_pathfollow.global_position).length()
+		# If next point along path is closer to player than previous point, then update to that point.
 		if distance_to_path < (global_position-_old_path_pos).length():
 			_old_path_pos = _pathfollow.global_position
 			_pathfollow.progress += 300
