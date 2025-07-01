@@ -121,7 +121,7 @@ func _check_place (car: Car) -> void:
 	var dt: float = abs(current_place - _place) * 0.5
 	var tween: Tween = create_tween()
 	tween.set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property($CanvasLayer/Place, "scroll_vertical", (current_place-1)*175, dt)
+	tween.tween_property($CanvasLayer/Place, "scroll_vertical", (current_place-1)*176/4, dt)
 	await tween.finished
 	_place = current_place
 	_updating_place = false

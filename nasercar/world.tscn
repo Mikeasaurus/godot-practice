@@ -344,15 +344,20 @@ grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
 [node name="Place" type="ScrollContainer" parent="CanvasLayer"]
+texture_filter = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -261.0
-offset_top = -175.0
+offset_left = -329.0
+offset_top = -184.0
+offset_right = -249.0
+offset_bottom = -140.0
 grow_horizontal = 0
 grow_vertical = 0
+scale = Vector2(4, 4)
+horizontal_scroll_mode = 3
 vertical_scroll_mode = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Place"]
@@ -369,111 +374,111 @@ columns = 2
 [node name="Fir" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 128
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
 text = "1"
 
 [node name="St" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 96
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
 text = "st"
 
 [node name="Seco" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.768627, 0.768627, 0.768627, 1)
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 128
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
 text = "2"
 
 [node name="Nd" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(0.768627, 0.768627, 0.768627, 1)
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 96
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
 text = "nd"
 
 [node name="Thi" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.501961, 0.501961, 0, 1)
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 128
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
 text = "3"
 
 [node name="Rd" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(0.501961, 0.501961, 0, 1)
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 96
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
 text = "rd"
 
 [node name="Four" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 128
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
 text = "4"
 
 [node name="Th4" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 1
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 96
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
 text = "th"
 
 [node name="Fif" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 128
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
 text = "5"
 
 [node name="Th5" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 1
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 96
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
 text = "th"
 
 [node name="Six" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 128
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
 text = "6"
 
 [node name="Th6" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 1
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 96
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
 text = "th"
 
 [node name="Seven" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 128
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
 text = "7"
 
 [node name="Th7" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 1
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 96
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
 text = "th"
 
 [node name="Eigh" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 128
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 32
 text = "8"
 
 [node name="Th8" type="Label" parent="CanvasLayer/Place/MarginContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 1
-theme_override_constants/outline_size = 32
-theme_override_font_sizes/font_size = 96
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
 text = "th"
 
 [node name="Beep1" type="AudioStreamPlayer" parent="."]
