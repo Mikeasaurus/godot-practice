@@ -11,6 +11,11 @@ var _sliming: bool = false
 # Indicates that someone already has possession of the meteor.
 var _meteor: bool = false
 
+# Keep track of player's place in the race.
+var _place: int = 0
+# This flag is set when the displayed place is being updated.
+var _updating_place: bool = false
+
 # Keep track of which cars are carrying which items.
 var _current_items: Dictionary = {}
 
@@ -75,6 +80,7 @@ func _ready() -> void:
 
 	# Start of race.
 	$CanvasLayer/FadeIn.show()
+	$CanvasLayer/Place.modulate = Color.hex(0xffffff00)
 	var fadein: Tween = create_tween()
 	fadein.tween_property($CanvasLayer/FadeIn, "modulate", Color.TRANSPARENT, 1.0)
 	await fadein.finished
@@ -96,9 +102,29 @@ func _ready() -> void:
 	go.tween_property($CanvasLayer/GoLabel,"modulate",Color.TRANSPARENT,1.0)
 	go.parallel().tween_property($CanvasLayer/GoLabel,"scale",Vector2(20,20),1.0)
 	go.parallel().tween_property($CanvasLayer/GoLabel,"position", Vector2(400,1),1.0)
+	# Show place after the cars have starting racing a bit.
+	await get_tree().create_timer(3.0).timeout
+	var place_tween: Tween = create_tween()
+	place_tween.set_ease(Tween.EASE_IN)
+	place_tween.tween_property($CanvasLayer/Place, "modulate", Color.WHITE, 1.0)
+	await place_tween.finished
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	pass
+	# Check place of the car, and update as necessary.
+	_check_place (player_car)
+
+func _check_place (car: Car) -> void:
+	if _updating_place: return
+	var current_place: int = len(_cars_in_front_of(car)) + 1
+	if current_place == _place: return
+	_updating_place = true
+	var dt: float = abs(current_place - _place) * 0.5
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property($CanvasLayer/Place, "scroll_vertical", (current_place-1)*175, dt)
+	await tween.finished
+	_place = current_place
+	_updating_place = false
 
 # All available item types.
 enum ItemType {NONE,NAILPOLISH,COFFEE,METEOR,SLIME,BEETLE}
