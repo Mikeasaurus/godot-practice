@@ -161,10 +161,10 @@ func _get_item(car: Car) -> void:
 	# But not available if someone else already has it / is using it.
 	if not _sliming:
 		if len(cars_in_front) > 0:
-			likelihood[ItemType.SLIME] = len(cars_in_front)*10
+			likelihood[ItemType.SLIME] = len(cars_in_front)*5
 	# Coffee also becomes more likely the further behind (at least a few cars behind?)
 	if len(cars_in_front) >= 3:
-		likelihood[ItemType.COFFEE] = len(cars_in_front)*10
+		likelihood[ItemType.COFFEE] = len(cars_in_front)*15
 	# Similarly, probability of meteor increases with number of cars in front.
 	# But relatively less likely overall.
 	if not _meteor:
