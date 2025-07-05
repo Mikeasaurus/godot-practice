@@ -134,20 +134,22 @@ func _process(delta: float) -> void:
 	var smoulder_drag: float = 1.0
 	if EffectType.SMOULDERING in effects:
 		var smoulder_duration: float = Time.get_ticks_msec() - effects[EffectType.SMOULDERING]
+		var modulated_stuff: Array = [$Body, $Wheels/FrontLeft/Sprite2D, $Wheels/FrontRight/Sprite2D, $Wheels/RearLeft/Sprite2D, $Wheels/RearRight/Sprite2D]
 		if smoulder_duration < 3000:
-			$Body.modulate = Color.BLACK
-			$Wheels.modulate = Color.BLACK
+			for m in modulated_stuff:
+				m.modulate = Color.BLACK
 			if not $Meteor/CPUParticles2D.emitting:
 				$Meteor/CPUParticles2D.emitting = true
 			smoulder_speed_limiter = 0.0
 			smoulder_drag = 7.0
 		elif smoulder_duration < 6000:
 			var c: float = (smoulder_duration-3000)/3000
-			$Body.modulate = Color(c,c,c)
-			$Wheels.modulate = Color(c,c,c)
+			for m in modulated_stuff:
+				m.modulate = Color(c,c,c)
 			smoulder_speed_limiter = c
 		else:
-			$Body.modulate = Color.WHITE
+			for m in modulated_stuff:
+				m.modulate = Color.WHITE
 			$Meteor/CPUParticles2D.emitting = false
 			effects.erase(EffectType.SMOULDERING)
 	
@@ -262,6 +264,7 @@ func _process(delta: float) -> void:
 	var skidding: bool = false
 	var skid_sounds: Array[bool] = [false,false,false]
 	var sinking: bool = true  # becomes false if any wheel on solid ground.
+	var liquid_type: int  # Type of liquid the car is sinking into (if sinking).
 	for w in range(len(wheels)):
 		var wheel: Node2D = wheels[w]
 		# Velocity of point where wheel connects to car
@@ -380,8 +383,9 @@ func _process(delta: float) -> void:
 			skid_sound = tiledata.get_custom_data("skid_sound")
 			friction = tiledata.get_custom_data("friction")
 			# Check if wheel is in water.
-			if tiledata.get_custom_data("is_water"):
+			if tiledata.get_custom_data("is_liquid"):
 				wheel_sinking = true
+				liquid_type = tiledata.get_custom_data("liquid_type")
 			else:
 				wheel_sinking = false
 		# Special effects override the tile skidmarks and friction.
@@ -451,7 +455,7 @@ func _process(delta: float) -> void:
 			$GravelSound.stop()
 
 	if sinking:
-		_kersplash()
+		_kersplash(liquid_type)
 
 	#######################################################
 	# Zoom out camera the faster the car is going.
@@ -495,7 +499,31 @@ func _on_crash_sound_timer_timeout() -> void:
 	_crashing = false
 
 # Make car splash into water
-func _kersplash () -> void:
+func _kersplash (liquid_type: int) -> void:
+	var splash: Node2D
+	var ripple: Node2D
+	var ripple_light: TextureRect
+	var ripple_dark: TextureRect
+	var sound: AudioStreamPlayer2D
+	var particles: CPUParticles2D
+	var dt: float
+	match liquid_type:
+		0:
+			splash = $WaterSplash
+			ripple = $WaterSplash/Ripple
+			ripple_light = $WaterSplash/Ripple/Light
+			ripple_dark = $WaterSplash/Ripple/Dark
+			sound = $WaterSplash/SplashSound
+			particles = $WaterSplash/Particles
+			dt = 0.3
+		1:
+			splash = $LavaSplash
+			ripple = $LavaSplash/Ripple
+			ripple_light = $LavaSplash/Ripple/Light
+			ripple_dark = $LavaSplash/Ripple/Dark
+			sound = $LavaSplash/SplashSound
+			particles = $LavaSplash/Particles
+			dt = 0.6
 	# Only run this once when sinking, not on every tick.
 	if _splashing: return
 	_splashing = true
@@ -505,44 +533,48 @@ func _kersplash () -> void:
 	moveable = false
 	# Start showing ripple of water when car is sinking.
 	# Also fade the car into the water.
-	$Splash.global_rotation = 0
-	$Splash/Ripple.show()
+	splash.global_rotation = 0
+	ripple.show()
 	var dr: float = 0.20
 	var tween: Tween = create_tween()
 	var start: PackedFloat32Array = PackedFloat32Array([0,1-2*dr,1-dr,1,1])
 	var almost: PackedFloat32Array = PackedFloat32Array([0,0,dr,2*dr,1])
 	var finish: PackedFloat32Array = PackedFloat32Array([0,0,0,dr,1])
-	$Splash/Ripple/Dark.texture.gradient.offsets = start
-	$Splash/Ripple/Light.texture.gradient.offsets = start
-	var dt: float = 0.3
-	tween.tween_property($Splash/Ripple/Dark.texture.gradient, "offsets", almost, dt)
-	tween.parallel().tween_property($Splash/Ripple/Light.texture.gradient, "offsets", almost, dt)
+	ripple_dark.texture.gradient.offsets = start
+	ripple_light.texture.gradient.offsets = start
+	tween.tween_property(ripple_dark.texture.gradient, "offsets", almost, dt)
+	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", almost, dt)
 	var modulated_stuff: Array = [$Body, $Wheels/FrontLeft/Sprite2D, $Wheels/FrontRight/Sprite2D, $Wheels/RearLeft/Sprite2D, $Wheels/RearRight/Sprite2D]
 	for m in modulated_stuff:
 		tween.parallel().tween_property(m, "modulate", Color.hex(0x00000000), dt)
 	# Start playing splashing sound as well.
-	$Splash/SplashSound.play(0.3)
+	sound.play(0.3)
 	await tween.finished
 	# Near end of inward convergence of water, show spray of water particles.
-	$Splash/Particles.emitting = true
+	particles.emitting = true
 	tween = create_tween()
-	tween.tween_property($Splash/Ripple/Dark.texture.gradient, "offsets", finish, dt*dr*2)
-	tween.parallel().tween_property($Splash/Ripple/Light.texture.gradient, "offsets", finish, dt*dr*2)
-	tween.parallel().tween_property($Splash/Ripple/Dark, "modulate", Color.TRANSPARENT, dt*dr*2)
-	tween.parallel().tween_property($Splash/Ripple/Light, "modulate", Color.TRANSPARENT, dt*dr*2)
+	tween.tween_property(ripple_dark.texture.gradient, "offsets", finish, dt*dr*2)
+	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", finish, dt*dr*2)
+	tween.parallel().tween_property(ripple_dark, "modulate", Color.TRANSPARENT, dt*dr*2)
+	tween.parallel().tween_property(ripple_light, "modulate", Color.TRANSPARENT, dt*dr*2)
 	await tween.finished
-	$Splash/Ripple.hide()
-	$Splash/Particles.emitting = false
+	ripple.hide()
+	particles.emitting = false
 	# Cut off sound before second splash in the .wav file.
 	await get_tree().create_timer(1.0).timeout
-	$Splash/SplashSound.stop()
+	sound.stop()
 	# Move car back onto the road.
 	await _move_to_road ()
-	# Restore visibility of car, and make mobile again.
-	for m in modulated_stuff:
-		m.modulate = Color.WHITE
-	$Splash/Ripple/Dark.modulate = Color.WHITE
-	$Splash/Ripple/Light.modulate = Color.WHITE
+	# Post-splash effects?
+	if liquid_type == 1:
+		smoulder()
+	# Otherwise, just restore normal modulation.
+	else:
+		for m in modulated_stuff:
+			m.modulate = Color.WHITE
+	ripple_dark.modulate = Color.WHITE
+	ripple_light.modulate = Color.WHITE
+	# Make car mobile again.
 	freeze = false
 	moveable = true
 	# Done

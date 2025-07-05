@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://xkg3ucnitsra"]
+[gd_scene load_steps=35 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
 [ext_resource type="Script" path="res://cars/car.gd" id="1_88aey"]
@@ -39,6 +39,30 @@ colors = PackedColorArray(0.705882, 0.878431, 1, 0, 0.705882, 0.878431, 1, 0, 0.
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_pfulr"]
 gradient = SubResource("Gradient_vum66")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_5mwrh"]
+offsets = PackedFloat32Array(0, 0.25, 0.5, 0.75, 1)
+colors = PackedColorArray(0.870588, 0.223529, 0, 0, 0.870588, 0.223529, 0, 0, 0.870588, 0.223529, 0, 1, 0.870588, 0.223529, 0, 0, 0.870588, 0.223529, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_eqlvp"]
+gradient = SubResource("Gradient_5mwrh")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_fe6vg"]
+offsets = PackedFloat32Array(0, 0.25, 0.5, 0.75, 1)
+colors = PackedColorArray(1, 0.537255, 0, 0, 1, 0.537255, 0, 0, 1, 0.537255, 0, 1, 1, 0.537255, 0, 0, 1, 0.537255, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_bkyo7"]
+gradient = SubResource("Gradient_fe6vg")
 width = 32
 height = 32
 fill = 1
@@ -302,9 +326,9 @@ scale_amount_max = 8.0
 color = Color(0.686275, 0.862745, 0.243137, 0.8)
 color_ramp = SubResource("Gradient_hwaf6")
 
-[node name="Splash" type="Node2D" parent="."]
+[node name="WaterSplash" type="Node2D" parent="."]
 
-[node name="Particles" type="CPUParticles2D" parent="Splash"]
+[node name="Particles" type="CPUParticles2D" parent="WaterSplash"]
 emitting = false
 amount = 500
 lifetime = 1.2
@@ -318,10 +342,10 @@ scale_amount_min = 10.0
 scale_amount_max = 10.0
 color = Color(0.705882, 0.878431, 1, 1)
 
-[node name="Ripple" type="Node2D" parent="Splash"]
+[node name="Ripple" type="Node2D" parent="WaterSplash"]
 visible = false
 
-[node name="Dark" type="TextureRect" parent="Splash/Ripple"]
+[node name="Dark" type="TextureRect" parent="WaterSplash/Ripple"]
 texture_filter = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -337,7 +361,7 @@ grow_vertical = 2
 scale = Vector2(8, 8)
 texture = SubResource("GradientTexture2D_gn1ql")
 
-[node name="Light" type="TextureRect" parent="Splash/Ripple"]
+[node name="Light" type="TextureRect" parent="WaterSplash/Ripple"]
 texture_filter = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -353,9 +377,65 @@ grow_vertical = 2
 scale = Vector2(8, 8)
 texture = SubResource("GradientTexture2D_pfulr")
 
-[node name="SplashSound" type="AudioStreamPlayer2D" parent="Splash"]
+[node name="SplashSound" type="AudioStreamPlayer2D" parent="WaterSplash"]
 stream = ExtResource("7_xb7e0")
 volume_db = 8.0
+
+[node name="LavaSplash" type="Node2D" parent="."]
+
+[node name="Particles" type="CPUParticles2D" parent="LavaSplash"]
+emitting = false
+amount = 500
+lifetime = 1.2
+emission_shape = 1
+emission_sphere_radius = 50.0
+direction = Vector2(0, -1)
+spread = 30.0
+initial_velocity_min = 500.0
+initial_velocity_max = 750.0
+scale_amount_min = 10.0
+scale_amount_max = 10.0
+color = Color(1, 0.537255, 0, 1)
+
+[node name="Ripple" type="Node2D" parent="LavaSplash"]
+visible = false
+
+[node name="Dark" type="TextureRect" parent="LavaSplash/Ripple"]
+texture_filter = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -124.0
+offset_top = -124.0
+offset_right = -92.0
+offset_bottom = -92.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(8, 8)
+texture = SubResource("GradientTexture2D_eqlvp")
+
+[node name="Light" type="TextureRect" parent="LavaSplash/Ripple"]
+texture_filter = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -132.0
+offset_top = -132.0
+offset_right = -100.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(8, 8)
+texture = SubResource("GradientTexture2D_bkyo7")
+
+[node name="SplashSound" type="AudioStreamPlayer2D" parent="LavaSplash"]
+stream = ExtResource("7_xb7e0")
+volume_db = 8.0
+pitch_scale = 0.2
 
 [node name="Coffee" type="Node2D" parent="."]
 
