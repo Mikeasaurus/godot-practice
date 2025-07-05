@@ -262,7 +262,7 @@ func _process(delta: float) -> void:
 	var fastest_wheel_speed: float = 0.0
 	# Check if any wheels end up skidding, so a sound can play.
 	var skidding: bool = false
-	var skid_sounds: Array[bool] = [false,false,false]
+	var skid_sounds: Array[bool] = [false,false,false,false]
 	var sinking: bool = true  # becomes false if any wheel on solid ground.
 	var liquid_type: int  # Type of liquid the car is sinking into (if sinking).
 	for w in range(len(wheels)):
@@ -447,12 +447,18 @@ func _process(delta: float) -> void:
 	if skidding and skid_sounds[2]:
 		if not $GravelSound.playing:
 			$GravelSound.play()
+	if skidding and skid_sounds[3]:
+		if not $GratingSound.playing:
+			$GratingSound.play()
 	if not skidding or not skid_sounds[1]:
 		if $TireSquealSound.playing:
 			$TireSquealSound.stop()
 	if not skidding or not skid_sounds[2]:
 		if $GravelSound.playing:
 			$GravelSound.stop()
+	if not skidding or not skid_sounds[3]:
+		if $GratingSound.playing:
+			$GratingSound.stop()
 
 	if sinking:
 		_kersplash(liquid_type)

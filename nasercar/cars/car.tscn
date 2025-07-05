@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://xkg3ucnitsra"]
+[gd_scene load_steps=36 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
 [ext_resource type="Script" path="res://cars/car.gd" id="1_88aey"]
@@ -8,6 +8,7 @@
 [ext_resource type="AudioStream" uid="uid://n06h5klivc0s" path="res://audio/71739__audible-edge__chrysler-lhs-tire-squeal-04-04-25-2009.wav" id="5_n08ew"]
 [ext_resource type="Texture2D" uid="uid://cqesv3ttvdhap" path="res://cars/arrow.png" id="5_sxyoi"]
 [ext_resource type="AudioStream" uid="uid://bpo6mxi5kkuy3" path="res://audio/251661__obxjohn__tires-on-gravel-road-1.mp3" id="6_cuk5v"]
+[ext_resource type="AudioStream" uid="uid://cwa27fwp1fu21" path="res://audio/128690__be-steele__metal-rub-10.mp3" id="7_6nyvj"]
 [ext_resource type="AudioStream" uid="uid://04tvpxlw4ukb" path="res://audio/320185__robinhood76__05966-water-surfacing-splashes.wav" id="7_xb7e0"]
 [ext_resource type="AudioStream" uid="uid://ck8qxnm7h80pv" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="9_x1whg"]
 [ext_resource type="AudioStream" uid="uid://88hgpp0mmg15" path="res://audio/348645__redafs__slurping-sipping-and-gulp-4.mp3" id="11_myl1q"]
@@ -290,6 +291,9 @@ stream = ExtResource("5_n08ew")
 
 [node name="GravelSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("6_cuk5v")
+
+[node name="GratingSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_6nyvj")
 
 [node name="Arrow" type="Sprite2D" parent="."]
 visible = false
