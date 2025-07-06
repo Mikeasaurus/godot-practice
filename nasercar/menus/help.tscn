@@ -246,7 +246,13 @@ Made with Godot
 Godot license: [url]https://godotengine.org/license[/url]"
 fit_content = true
 
-[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About/ScrollContainer/VBoxContainer"]
+[node name="Naomi" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 32
+text = "\"You can now play as Naomi\" meme created by Wolf Nanaki."
+fit_content = true
+
+[node name="GVH" type="RichTextLabel" parent="MarginContainer/CenterContainer/VBoxContainer/TabContainer/About/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/italics_font_size = 32
 theme_override_font_sizes/normal_font_size = 32
