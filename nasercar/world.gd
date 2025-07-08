@@ -31,33 +31,36 @@ func _cars () -> Array[Car]:
 func _cars_in_front_of (car: Car) -> Array[Car]:
 	var cars: Array[Car] = []
 	for other_car in _cars():
-		if other_car._pathfollow.progress > car._pathfollow.progress:
+		if other_car.progress() > car.progress():
 			cars.append(other_car)
 	return cars
+# Helper method - get place of the specified car.
+func _car_place (car: Car) -> int:
+	return len(_cars_in_front_of(car)) + 1
 # Helper method - get the car immediately in front of the specified car.
 # Returns null if there are no cars in front.
 func _car_in_front_of (car: Car) -> Car:
 	var front: Car = null
 	var front_progress: float = -1
 	for other_car in _cars_in_front_of(car):
-		if other_car._pathfollow.progress < front_progress or front_progress < 0:
+		if other_car.progress() < front_progress or front_progress < 0:
 			front = other_car
-			front_progress = other_car._pathfollow.progress
+			front_progress = other_car.progress()
 	return front
 # Helper method - get the car in first place.
 func _first_place_car () -> Car:
 	var progress: float = 0.0
 	var car: Car
 	for c in _cars():
-		if c._pathfollow.progress > progress:
+		if c.progress() > progress:
 			car = c
-			progress = c._pathfollow.progress
+			progress = c.progress()
 	return car
 # Helper method - get number of cars behind the specified car.
 func _num_cars_behind (car: Car) -> int:
 	var num: int = 0
 	for other_car in _cars():
-		if other_car._pathfollow.progress < car._pathfollow.progress:
+		if other_car.progress() < car.progress():
 			num += 1
 	return num
 
@@ -71,6 +74,9 @@ func _ready() -> void:
 		)
 		car.meteor_impact.connect(func():
 			_big_badaboom(car)
+		)
+		car.lap_completed.connect(func(lap:int):
+			_lap_completed(car,lap)
 		)
 	player_car.make_playable()
 
@@ -115,7 +121,7 @@ func _process(_delta: float) -> void:
 
 func _check_place (car: Car) -> void:
 	if _updating_place: return
-	var current_place: int = len(_cars_in_front_of(car)) + 1
+	var current_place: int = _car_place(car)
 	if current_place == _place: return
 	_updating_place = true
 	var dt: float = abs(current_place - _place) * 0.5
@@ -146,7 +152,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("use_item"):
 		_use_item(player_car)
 	if event.is_action_pressed("debug"):
-		player_car.space_rock()
+		_lap_announce(1)
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
@@ -348,3 +354,20 @@ func _big_badaboom (car: Car) -> void:
 	boom.queue_free()
 	await get_tree().create_timer(10.0).timeout
 	crater.queue_free()
+
+# Called when a car has just completed a lap.
+func _lap_completed (car: Car, lap: int) -> void:
+	if car.type == car.CarType.PLAYER:
+		_lap_announce(lap+1)
+# Announce the player's new lap on the screen.
+func _lap_announce (lap: int):
+	var t: Label = $CanvasLayer/LapFinished
+	t.text = "Lap %d"%lap
+	t.global_position = Vector2(-t.size.x*t.scale.x,0)
+	t.show()
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property(t,"global_position", Vector2(960-t.size.x*t.scale.x/2,0),0.5)
+	tween.tween_interval(0.5)
+	tween.tween_property(t,"global_position", Vector2(1920,0),0.5)
+	await tween.finished

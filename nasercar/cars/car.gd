@@ -25,6 +25,13 @@ signal itemblock
 ## Emit signal when meteor impacts.
 signal meteor_impact
 
+## Emit signal when completing a lap.
+signal lap_completed (lap: int)
+var _current_lap: int
+# Remember previous progress along the track, to help detect when a lap is completed
+# (when the PathFollow2D progress loops around).
+var _last_progress: float
+
 ## Effects currently applied to the car
 enum EffectType {SLIMED,NAILPOLISHED,CAFFEINATED,SMOULDERING}
 var effects: Dictionary = {}
@@ -90,6 +97,9 @@ func add_to_track (track_path: Path2D, tilesets: Array[TileMapLayer]) -> void:
 	_pathfollow.v_offset = offset.x
 	# Remember this offset in case we need to shift the path for wavering effect.
 	_path_offset = _pathfollow.v_offset
+	# Starting on first lap.
+	_current_lap = 1
+	_last_progress = 0
 
 # Let this car be playable by the local user.
 func make_playable () -> void:
@@ -112,6 +122,15 @@ func go () -> void:
 func stop () -> void:
 	moveable = false
 
+# Get current progress of the car, taking laps into account.
+func progress () -> float:
+	var lap: int = _current_lap
+	var prog1: float = _last_progress
+	var prog2: float = _pathfollow.progress_ratio
+	if prog2 < prog1:
+		lap += 1
+	return (lap-1) + prog2
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	# Arrow pointing to player needs to stay oriented upward.
@@ -120,6 +139,14 @@ func _process(delta: float) -> void:
 	$Arrow.offset.y = -60*$Camera2D.zoom.y
 	# Same with smouldering effects.
 	$Meteor.global_rotation = 0
+
+	#######################################################
+	# Check if a lap was just completed.
+	#######################################################
+	if _last_progress > _pathfollow.progress_ratio:
+		lap_completed.emit(_current_lap)
+		set_deferred("_current_lap", _current_lap+1)
+	_last_progress = _pathfollow.progress_ratio
 
 	#######################################################
 	# Apply effects
