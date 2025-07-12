@@ -1,6 +1,9 @@
 extends RigidBody2D
 class_name Car
 
+## What name to use for display on screen.
+@export var display_name: String = "???"
+
 ## Top speed of car (pixels/second)
 @export var max_speed: float = 1500.0
 
@@ -108,6 +111,12 @@ func make_playable () -> void:
 	$Arrow.show()
 	# Make own engine sound louder.
 	$EngineSound.volume_db = 1.0
+
+# Override player controls with autopilot.
+# (for after end of race).
+func autopilot () -> void:
+	type = CarType.CPU
+	$Arrow.hide()
 
 # Make this car follow a predetermined path
 # (as local CPU).

@@ -3,7 +3,13 @@ extends Node2D
 # Player car
 @onready var player_car = $Cars/NaserCar
 
+## Number of laps for the track.
+var laps: int = 3
+
 # Current game state (for applied effects, etc.)
+
+# Time of start of race.
+var _start_time: float
 
 # Indicates that people are already slimed right now, or at least that someone
 # has possession of the slime item.
@@ -15,6 +21,8 @@ var _meteor: bool = false
 var _place: int = 0
 # This flag is set when the displayed place is being updated.
 var _updating_place: bool = false
+# Shortcut for updating results for the stats page.
+var _places: Array[ResultLine] = []
 
 # Keep track of which cars are carrying which items.
 var _current_items: Dictionary = {}
@@ -67,6 +75,25 @@ func _num_cars_behind (car: Car) -> int:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# Prepare final stats screen with placeholder values.
+	var result_scene: PackedScene = load("res://menus/result_line.tscn")
+	var places_vbox: VBoxContainer = $CanvasLayer/Stats/CenterContainer/Places
+	for car in _cars():
+		var result_line: ResultLine = result_scene.instantiate()
+		result_line.set_results(-1, null, "", -1, Color.hex(0x555555ff))
+		places_vbox.add_child(result_line)
+		_places.append(result_line)
+		var hsep: HSeparator = HSeparator.new()
+		hsep.add_theme_constant_override("separation",5)
+		var stylebox: StyleBoxLine = StyleBoxLine.new()
+		stylebox.color = Color.hex(0x777777ff)
+		stylebox.thickness = 3
+		hsep.add_theme_stylebox_override("separator", stylebox)
+		places_vbox.add_child(hsep)
+		
+
+	# Add the cars to the track.
+	# (Let the cars know what path to follow, and whether they are CPU or player controlled).
 	for car in _cars():
 		car.add_to_track($TrackPath, [$Ground, $Road])
 		car.itemblock.connect(func():
@@ -104,6 +131,7 @@ func _ready() -> void:
 	$Beep2.play()
 	for car in _cars():
 		car.go()
+	_start_time = Time.get_ticks_msec() / 1000.
 	var go: Tween = create_tween()
 	go.tween_property($CanvasLayer/GoLabel,"modulate",Color.TRANSPARENT,1.0)
 	go.parallel().tween_property($CanvasLayer/GoLabel,"scale",Vector2(20,20),1.0)
@@ -357,8 +385,11 @@ func _big_badaboom (car: Car) -> void:
 
 # Called when a car has just completed a lap.
 func _lap_completed (car: Car, lap: int) -> void:
-	if car.type == car.CarType.PLAYER:
-		_lap_announce(lap+1)
+	if lap < laps:
+		if car.type == car.CarType.PLAYER:
+			_lap_announce(lap+1)
+	elif lap == laps:
+		_finished(car)
 # Announce the player's new lap on the screen.
 func _lap_announce (lap: int):
 	var t: Label = $CanvasLayer/LapFinished
@@ -370,4 +401,32 @@ func _lap_announce (lap: int):
 	tween.tween_property(t,"global_position", Vector2(960-t.size.x*t.scale.x/2,0),0.5)
 	tween.tween_interval(0.5)
 	tween.tween_property(t,"global_position", Vector2(1920,0),0.5)
+	await tween.finished
+	t.hide()
+# End of the race (player crossed finish line).
+func _finished (car: Car) -> void:
+	# Add this car to the displayed stats.
+	var place: int = _car_place(car)
+	var time: float = Time.get_ticks_msec()/1000. - _start_time
+	if car == player_car:
+		_places[place-1].set_results(place, car, "Player", time, Color.GREEN)
+	else:
+		_places[place-1].set_results(place, car, car.display_name+" (CPU)", time, Color.WHITE)
+		return
+	# Rest of this is for the player's screen.
+	# CPU takes control of car after race, so cars are still moving in the background
+	# while the player reads the final results.
+	car.autopilot()
+	$CanvasLayer/Place.hide()
+	var t: Label = $CanvasLayer/LapFinished
+	t.text = "FINISHED"
+	t.global_position = Vector2(-t.size.x*t.scale.x,0)
+	t.show()
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property(t,"global_position", Vector2(960-t.size.x*t.scale.x/2,0),0.5)
+	tween.tween_interval(0.5)
+	$CanvasLayer/Stats.modulate = Color.hex(0xffffff00)
+	$CanvasLayer/Stats.show()
+	tween.tween_property($CanvasLayer/Stats,"modulate",Color.WHITE,0.5)
 	await tween.finished

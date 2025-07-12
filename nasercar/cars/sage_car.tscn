@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dxbrsu6d40dpw" path="res://cars/sagecar.png" id="2_worvs"]
 
 [node name="SageCar" instance=ExtResource("1_weuxx")]
+display_name = "Sage"
 
 [node name="Body" parent="." index="2"]
 texture = ExtResource("2_worvs")
