@@ -22,6 +22,11 @@ func _on_help_pressed() -> void:
 	$CarTimer.stop()
 	MenuHandler.activate_menu($Help)
 
+func _on_single_player_pressed() -> void:
+	_reset_car()
+	$CarTimer.stop()
+	MenuHandler.activate_menu($CarSelection)
+
 func _on_car_timer_timeout() -> void:
 	$NaserCar.freeze = false
 	$NaserCar.go()

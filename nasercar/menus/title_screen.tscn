@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://nvfby80br4pn"]
+[gd_scene load_steps=10 format=3 uid="uid://nvfby80br4pn"]
 
 [ext_resource type="Script" path="res://menus/title_screen.gd" id="1_26oih"]
 [ext_resource type="FontFile" uid="uid://ble5tl2cuo0pm" path="res://fonts/Hauser Italic.otf" id="1_ygr87"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bx45dedd8jvb2" path="res://cars/naser_car.tscn" id="5_fxytf"]
 [ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="5_w0neb"]
 [ext_resource type="PackedScene" uid="uid://culfs1hcaohhm" path="res://menus/help.tscn" id="7_31u7g"]
+[ext_resource type="PackedScene" uid="uid://0dummt6q0fyv" path="res://menus/car_selection.tscn" id="8_82lv5"]
 
 [sub_resource type="Curve2D" id="Curve2D_uem21"]
 _data = {
@@ -114,6 +115,7 @@ text = "  Single Player  "
 [node name="Multiplayer" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 72
+disabled = true
 text = "  Multiplayer  "
 
 [node name="Help" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
@@ -141,5 +143,10 @@ one_shot = true
 visible = false
 layout_mode = 1
 
+[node name="CarSelection" parent="." instance=ExtResource("8_82lv5")]
+visible = false
+layout_mode = 1
+
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/SinglePlayer" to="." method="_on_single_player_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Help" to="." method="_on_help_pressed"]
 [connection signal="timeout" from="CarTimer" to="." method="_on_car_timer_timeout"]
