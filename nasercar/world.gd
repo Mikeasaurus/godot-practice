@@ -23,6 +23,7 @@ var _place: int = 0
 var _updating_place: bool = false
 # Shortcut for updating results for the stats page.
 var _places: Array[ResultLine] = []
+var _finished_cars: Array[Car] = []
 
 # Keep track of which cars are carrying which items.
 var _current_items: Dictionary = {}
@@ -406,13 +407,20 @@ func _lap_announce (lap: int):
 # End of the race (player crossed finish line).
 func _finished (car: Car) -> void:
 	# Add this car to the displayed stats.
-	var place: int = _car_place(car)
 	var time: float = Time.get_ticks_msec()/1000. - _start_time
-	if car == player_car:
-		_places[place-1].set_results(place, car, "Player", time, Color.GREEN)
-	else:
-		_places[place-1].set_results(place, car, car.display_name+" (CPU)", time, Color.WHITE)
-		return
+	# First append this car to an array, then apply all the array elements to
+	# the stats page.
+	# This avoids a race condition when two cars finish at the same time and are both trying to
+	# update their stats.
+	_finished_cars.append(car)
+	for i in range(len(_finished_cars)):
+		if _finished_cars[i] == car:
+			var place: int = i+1
+			if car == player_car:
+				_places[i].set_results(place, car, "Player", time, Color.GREEN)
+			else:
+				_places[i].set_results(place, car, car.display_name+" (CPU)", time, Color.WHITE)
+				return
 	# Rest of this is for the player's screen.
 	# CPU takes control of car after race, so cars are still moving in the background
 	# while the player reads the final results.
