@@ -1,7 +1,8 @@
 extends Node2D
+class_name World
 
 # Player car
-@onready var player_car = $Cars/NaserCar
+var player_car: Car = null
 
 ## Number of laps for the track.
 var laps: int = 3
@@ -106,6 +107,8 @@ func _ready() -> void:
 		car.lap_completed.connect(func(lap:int):
 			_lap_completed(car,lap)
 		)
+	if player_car == null:
+		player_car = $Cars/NaserCar
 	player_car.make_playable()
 
 	for car in _cars():

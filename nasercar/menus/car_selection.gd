@@ -2,6 +2,9 @@ extends Control
 
 var selection: CarSelectionPanel = null
 
+# Signal that gets sent when the player is ready to start the race.
+signal race (car: Car)
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	for panel in $MarginContainer/CenterContainer/VBoxContainer/GridContainer.get_children() as Array[CarSelectionPanel]:
@@ -15,4 +18,13 @@ func _panel_selected (panel: CarSelectionPanel) -> void:
 		$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = false
 
 func _on_back_button_pressed() -> void:
+	MenuHandler.deactivate_menu()
+
+func _on_race_button_pressed() -> void:
+	var tween: Tween = create_tween()
+	tween.tween_property(self,"modulate",Color.BLACK,1.0)
+	await tween.finished
+	modulate = Color.WHITE
+	hide()
+	race.emit(selection.car)
 	MenuHandler.deactivate_menu()

@@ -4,10 +4,12 @@ class_name CarSelectionPanel
 @export var car_scene: PackedScene
 signal selected
 
+var car: Car
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if car_scene !=  null:
-		var car: Car = car_scene.instantiate()
+		car = car_scene.instantiate()
 		$SubViewportContainer/SubViewport.add_child(car)
 		car.position = Vector2(75,75)
 		car.process_mode = Node.PROCESS_MODE_DISABLED
