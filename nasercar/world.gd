@@ -92,7 +92,13 @@ func _ready() -> void:
 		stylebox.thickness = 3
 		hsep.add_theme_stylebox_override("separator", stylebox)
 		places_vbox.add_child(hsep)
-		
+
+	# Move the playable car to the front
+	var c: Car = _cars()[0]
+	if c != player_car and player_car != null:
+		var gp: Vector2 = c.global_position
+		c.global_position = player_car.global_position
+		player_car.global_position = gp
 
 	# Add the cars to the track.
 	# (Let the cars know what path to follow, and whether they are CPU or player controlled).
@@ -107,12 +113,14 @@ func _ready() -> void:
 		car.lap_completed.connect(func(lap:int):
 			_lap_completed(car,lap)
 		)
+
+	# Set up a car under player's control.
 	if player_car == null:
 		player_car = $Cars/NaserCar
 	player_car.make_playable()
 
 	for car in _cars():
-		if car.type != car.CarType.PLAYER:
+		if car != player_car:
 			car.make_cpu()
 
 	# Start of race.
