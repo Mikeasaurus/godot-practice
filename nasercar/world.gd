@@ -4,6 +4,9 @@ class_name World
 # Player car
 var player_car: Car = null
 
+# Signal that gets emitted when the game is finished and the player wishes to exit.
+signal quit
+
 ## Number of laps for the track.
 var laps: int = 3
 
@@ -448,4 +451,19 @@ func _finished (car: Car) -> void:
 	$CanvasLayer/Stats.modulate = Color.hex(0xffffff00)
 	$CanvasLayer/Stats.show()
 	tween.tween_property($CanvasLayer/Stats,"modulate",Color.WHITE,0.5)
+	$CanvasLayer/DoneButton.modulate = Color.hex(0xffffff00)
+	$CanvasLayer/DoneButton.show()
+	$CanvasLayer/DoneButton.disabled = true
+	tween.parallel().tween_property($CanvasLayer/DoneButton,"modulate",Color.WHITE,0.5)
 	await tween.finished
+	$CanvasLayer/DoneButton.disabled = false
+
+func _on_done_button_pressed() -> void:
+	$CanvasLayer/DoneButton.disabled = true
+	var tween: Tween = create_tween()
+	tween.tween_property(self,"modulate",Color.BLACK,1.0)
+	# Why do I need to modulate stats if I'm already modulating the whole scene???
+	tween.parallel().tween_property($CanvasLayer/Stats,"modulate",Color.BLACK,1.0)
+	tween.parallel().tween_property($CanvasLayer/LapFinished,"modulate",Color.BLACK,1.0)
+	await tween.finished
+	quit.emit()

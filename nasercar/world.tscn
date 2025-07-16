@@ -576,6 +576,22 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 0
 
+[node name="DoneButton" type="Button" parent="CanvasLayer"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -65.5
+offset_top = -105.0
+offset_right = 65.5
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 48
+text = "     Done     "
+
 [node name="Beep1" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_leqvv")
 
@@ -683,3 +699,5 @@ stream = ExtResource("28_iaess")
 
 [node name="SplatSound" type="AudioStreamPlayer" parent="ScreenEffects/MangoSlime"]
 stream = ExtResource("29_xj85u")
+
+[connection signal="pressed" from="CanvasLayer/DoneButton" to="." method="_on_done_button_pressed"]
