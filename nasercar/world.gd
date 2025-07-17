@@ -5,7 +5,7 @@ class_name World
 var player_car: Car = null
 
 # Signal that gets emitted when the game is finished and the player wishes to exit.
-signal quit
+signal quit (place: int)
 
 ## Number of laps for the track.
 var laps: int = 3
@@ -196,6 +196,7 @@ func _input(event: InputEvent) -> void:
 		_use_item(player_car)
 	if event.is_action_pressed("debug"):
 		_lap_announce(1)
+		quit.emit(1)
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
@@ -466,4 +467,4 @@ func _on_done_button_pressed() -> void:
 	tween.parallel().tween_property($CanvasLayer/Stats,"modulate",Color.BLACK,1.0)
 	tween.parallel().tween_property($CanvasLayer/LapFinished,"modulate",Color.BLACK,1.0)
 	await tween.finished
-	quit.emit()
+	quit.emit(_place)

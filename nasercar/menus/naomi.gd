@@ -7,6 +7,22 @@ func _ready() -> void:
 	$NaomiCar.make_cpu()
 	$NaomiCar.go()
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+var _ending: bool = false
+func _input(event: InputEvent) -> void:
+	if not visible: return
+	if _ending: return
+	if (event is InputEventKey and event.is_action_pressed("a_key")) or \
+	   (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed()):
+		_ending = true
+		var tween: Tween = create_tween()
+		tween.tween_property(self,"modulate",Color.BLACK,1.0)
+		await tween.finished
+		MenuHandler.deactivate_menu()
+		process_mode = PROCESS_MODE_DISABLED
+
+func _on_visibility_changed() -> void:
+	if not visible: return
+	modulate = Color.BLACK
+	var tween: Tween = create_tween()
+	tween.tween_property(self,"modulate",Color.WHITE,1.0)
+	await tween.finished

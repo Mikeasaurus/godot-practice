@@ -43,3 +43,5 @@ curve = SubResource("Curve2D_fnutc")
 
 [node name="NaomiCar" parent="." instance=ExtResource("3_7vw4a")]
 position = Vector2(-1051, 848)
+
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
