@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://dux0gd0slf1l5"]
+[gd_scene load_steps=5 format=3 uid="uid://dux0gd0slf1l5"]
 
 [ext_resource type="Texture2D" uid="uid://da341swyulgv7" path="res://cars/wheel.png" id="2_dld2u"]
 
@@ -7,7 +7,27 @@ _data = [Vector2(0, 50), 0.0, 0.0, 0, 0, Vector2(1, 500), 0.0, 0.0, 0, 0]
 point_count = 2
 
 [sub_resource type="Gradient" id="Gradient_ki2ey"]
-colors = PackedColorArray(0.996078, 1, 1, 0.0666667, 1, 1, 1, 0)
+colors = PackedColorArray(0.866667, 0.866667, 0.619608, 0.101961, 0.866667, 0.866667, 0.619608, 0)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_jmgio"]
+properties/0/path = NodePath("Sprite2D:modulate")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath("Particles1:color")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("Particles1:emitting")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("Particles2:color")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("Particles2:emitting")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath("Dust:emitting")
+properties/5/spawn = true
+properties/5/replication_mode = 2
 
 [node name="Wheel" type="Node2D"]
 
@@ -49,3 +69,6 @@ gravity = Vector2(0, 0)
 angle_max = 90.0
 scale_amount_curve = SubResource("Curve_on00f")
 color_ramp = SubResource("Gradient_ki2ey")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_jmgio")
