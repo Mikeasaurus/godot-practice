@@ -33,6 +33,10 @@ func _on_single_player_pressed() -> void:
 	_reset_car()
 	MenuHandler.activate_menu($CarSelection)
 
+func _on_multiplayer_pressed() -> void:
+	_reset_car()
+	MenuHandler.activate_menu($Multiplayer)
+
 func _on_car_timer_timeout() -> void:
 	$NaserCar.freeze = false
 	$NaserCar.go()
