@@ -13,6 +13,30 @@ func _ready() -> void:
 	$CarSelection.race.connect(start_race)
 	# Need to unlock Naomi kart.
 	_naomi.hide()
+	if DisplayServer.get_name() == "headless":
+		_make_server()
+
+# Multiplayer server setup.
+func _make_server () -> void:
+	multiplayer.multiplayer_peer = null
+	#multiplayer.peer_disconnected.connect(_on_client_disconnected)
+	var peer := WebSocketMultiplayerPeer.new()
+	if "--local" in OS.get_cmdline_user_args():
+		peer.create_server(1157)
+	else:
+		var key := load("res://cert/privkey.key")
+		var cert := load("res://cert/fullchain.crt")
+		var tls_options := TLSOptions.server(key,cert)
+		peer.create_server(1157,"*",tls_options)
+	multiplayer.multiplayer_peer = peer
+
+# Multiplayer client setup.
+#TODO
+# This is called when a server connection is no longer needed.
+func _disconnect_from_server() -> void:
+	pass
+func _join_multiplayer_race (race) -> void:
+	pass
 
 func _reset_car() -> void:
 	$NaserCar.set_deferred("global_position",Vector2(-53,-75))
@@ -33,7 +57,20 @@ func _on_single_player_pressed() -> void:
 	_reset_car()
 	MenuHandler.activate_menu($CarSelection)
 
+# When multiplayer is clicked, need to start a connection to the server.
 func _on_multiplayer_pressed() -> void:
+	multiplayer.multiplayer_peer = null
+	multiplayer.connected_to_server.connect(_launch_multiplayer_menu)
+	#multiplayer.connection_failed.connect(_on_connection_failed)
+	#multiplayer.server_disconnected.connect(_on_server_disconnected)
+	var peer := WebSocketMultiplayerPeer.new()
+	if "--local" in OS.get_cmdline_user_args():
+		peer.create_client("ws://localhost:1157")
+	else:
+		peer.create_client("wss://nasercar.mikeasaurus.ca:1157")
+	multiplayer.multiplayer_peer = peer
+# This is called once the server process is established.
+func _launch_multiplayer_menu() -> void:
 	_reset_car()
 	MenuHandler.activate_menu($Multiplayer)
 
