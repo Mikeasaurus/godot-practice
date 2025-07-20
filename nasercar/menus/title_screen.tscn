@@ -163,3 +163,4 @@ layout_mode = 1
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Multiplayer" to="." method="_on_multiplayer_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Help" to="." method="_on_help_pressed"]
 [connection signal="timeout" from="CarTimer" to="." method="_on_car_timer_timeout"]
+[connection signal="join_race" from="Multiplayer" to="." method="_on_multiplayer_join_race"]

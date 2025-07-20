@@ -30,14 +30,6 @@ func _make_server () -> void:
 		peer.create_server(1157,"*",tls_options)
 	multiplayer.multiplayer_peer = peer
 
-# Multiplayer client setup.
-#TODO
-# This is called when a server connection is no longer needed.
-func _disconnect_from_server() -> void:
-	pass
-func _join_multiplayer_race (race) -> void:
-	pass
-
 func _reset_car() -> void:
 	$NaserCar.set_deferred("global_position",Vector2(-53,-75))
 	$NaserCar.set_deferred("linear_velocity",Vector2.ZERO)
@@ -109,3 +101,8 @@ func start_race (player_car: Car) -> void:
 	else:
 		call_deferred("_reset_and_start_timer")
 	race.queue_free()
+
+# This is called once the player selects a multiplayer race to join.
+# This is called from peer instance.  Need to coordinate with the server.
+func _on_multiplayer_join_race(race_id: int, handle: String) -> void:
+	print ("Request to join race ", race_id, " from ", handle)

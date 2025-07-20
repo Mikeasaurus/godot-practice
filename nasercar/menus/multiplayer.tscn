@@ -56,6 +56,21 @@ theme_override_font_sizes/font_size = 36
 text = "No existing multiplayer games available to join.
 You can create a new one below."
 
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 50
+
+[node name="HandleLabel" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Your handle:"
+
+[node name="Handle" type="LineEdit" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Player"
+
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
@@ -69,7 +84,7 @@ text = "     Back     "
 [node name="NewButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
-text = "  Create New  "
+text = "  Create New Race  "
 
 [node name="FullScreenToggle" parent="." instance=ExtResource("2_mr17g")]
 
