@@ -28,3 +28,5 @@ func _on_race_button_pressed() -> void:
 	hide()
 	race.emit(selection.car)
 	MenuHandler.deactivate_menu()
+
+#TODO: timer for multiplayer kart selection (if not the host)

@@ -60,9 +60,8 @@ func _on_single_player_pressed() -> void:
 # When multiplayer is clicked, need to start a connection to the server.
 func _on_multiplayer_pressed() -> void:
 	multiplayer.multiplayer_peer = null
-	multiplayer.connected_to_server.connect(_launch_multiplayer_menu)
-	#multiplayer.connection_failed.connect(_on_connection_failed)
-	#multiplayer.server_disconnected.connect(_on_server_disconnected)
+	if not multiplayer.connected_to_server.is_connected(_launch_multiplayer_menu):
+		multiplayer.connected_to_server.connect(_launch_multiplayer_menu)
 	var peer := WebSocketMultiplayerPeer.new()
 	if "--local" in OS.get_cmdline_user_args():
 		peer.create_client("ws://localhost:1157")
