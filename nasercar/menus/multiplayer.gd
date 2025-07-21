@@ -15,6 +15,7 @@ func _on_back_button_pressed() -> void:
 # Player wants to start their own multiplayer session.
 func _on_new_button_pressed() -> void:
 	_create_new_race.rpc_id(1,_handle.text)
+	MenuHandler.deactivate_menu()
 	join_race.emit(multiplayer.get_unique_id(),_handle.text)
 @rpc("any_peer","reliable")
 func _create_new_race (handle: String) -> void:
@@ -27,6 +28,9 @@ func _create_new_race (handle: String) -> void:
 # Where is race id going to be stored?
 func _spawn_race_entry (id: int):
 	var entry = load("res://menus/multiplayer_join_line.tscn").instantiate()
-	entry.get_node("JoinButton").pressed.connect(func (): join_race.emit(id,_handle.text))
+	entry.get_node("JoinButton").pressed.connect(func ():
+		MenuHandler.deactivate_menu()
+		join_race.emit(id,_handle.text)
+	)
 	entry.name = str(id)
 	return entry

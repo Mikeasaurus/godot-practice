@@ -2,6 +2,10 @@ extends Control
 
 @onready var _naomi := $CarSelection/MarginContainer/CenterContainer/VBoxContainer/GridContainer/Naomi
 
+# List of all race instances running / being created.
+# (for server side).
+var _races: Dictionary = {}
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var notracks: Array[TileMapLayer] = []
@@ -18,6 +22,7 @@ func _ready() -> void:
 
 # Multiplayer server setup.
 func _make_server () -> void:
+	# Set up server, listening for incoming peers.
 	multiplayer.multiplayer_peer = null
 	#multiplayer.peer_disconnected.connect(_on_client_disconnected)
 	var peer := WebSocketMultiplayerPeer.new()
@@ -29,6 +34,8 @@ func _make_server () -> void:
 		var tls_options := TLSOptions.server(key,cert)
 		peer.create_server(1157,"*",tls_options)
 	multiplayer.multiplayer_peer = peer
+	# Propogate multiplayer race info to car selection menu.
+	$CarSelection._races = _races
 
 func _reset_car() -> void:
 	$NaserCar.set_deferred("global_position",Vector2(-53,-75))
@@ -105,4 +112,20 @@ func start_race (player_car: Car) -> void:
 # This is called once the player selects a multiplayer race to join.
 # This is called from peer instance.  Need to coordinate with the server.
 func _on_multiplayer_join_race(race_id: int, handle: String) -> void:
-	print ("Request to join race ", race_id, " from ", handle)
+	_peer_joining_race.rpc_id(1, race_id, handle)
+	# Open car selection menu with multiplayer context.
+	_reset_car()
+	MenuHandler.activate_menu($CarSelection)
+# Server side - bookkeeping for current races.
+@rpc("any_peer","reliable")
+func _peer_joining_race(race_id: int, handle: String) -> void:
+	# Get id of the peer that's joining.
+	var id: int = multiplayer.get_remote_sender_id()
+	# If this race doesn't exist yet, then create it.
+	if race_id not in _races:
+		_races[race_id] = {}
+	# No kart selected, so just a handle for now.
+	_races[race_id][id] = [handle,""]
+	# Update count for the race.
+	var race_list: VBoxContainer = $Multiplayer/MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer
+	race_list.get_node(str(race_id)).get_node("VBoxContainer/NumPlayers").text = "%d player(s) joined so far"%len(_races[race_id])

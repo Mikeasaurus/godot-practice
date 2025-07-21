@@ -182,5 +182,6 @@ text = "     RACE!     "
 
 [node name="FullScreenToggle" parent="." instance=ExtResource("11_1wam5")]
 
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton" to="." method="_on_race_button_pressed"]
