@@ -8,6 +8,12 @@ var _races: Dictionary = {}
 # Signal that gets sent when the player is ready to start the race.
 signal race (car: Car)
 
+# Signal that gets sent when the race stats should be re-read by the parent scene.
+signal refresh_race (race_id: int)
+
+# Signal for displaying an error message on the main screen.
+signal error_message (msg: String)
+
 # Helper methods: convert between panel index and car name.
 var car_names: Array[String]
 func index2name (panel_index: int) -> String:
@@ -24,6 +30,9 @@ func _ready() -> void:
 	for panel in $MarginContainer/CenterContainer/VBoxContainer/GridContainer.get_children() as Array[CarSelectionPanel]:
 		panel.selected.connect(func(): _panel_selected(panel))
 		car_names.append(panel.car.display_name)
+	# Server side setup.
+	if multiplayer.get_unique_id() == 1:
+		multiplayer.peer_disconnected.connect(_player_bailed)
 
 func _panel_selected (panel: CarSelectionPanel) -> void:
 	# If this is a multiplayer game, then need to delegate car selection through the server.
@@ -38,7 +47,11 @@ func _panel_selected (panel: CarSelectionPanel) -> void:
 	if $MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled:
 		$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = false
 
+# Called when the user backs out of car selection.
 func _on_back_button_pressed() -> void:
+	# For multiplayer games, need to let the server know that we're backing out.
+	if multiplayer.get_unique_id() != 1:
+		_bail.rpc_id(1)
 	MenuHandler.deactivate_menu()
 
 func _on_race_button_pressed() -> void:
@@ -118,6 +131,47 @@ func _update_panel (panel_index: int, is_taken: bool, player_id: int, handle: St
 func _on_visibility_changed() -> void:
 	if visible:
 		if multiplayer.get_unique_id() != 1:
+			# Clear any previously selected car (it's not actually selected anymore).
+			if selection != null:
+				selection.unselect()
+				selection = null
 			_sync_panels.rpc_id(1)
+
+# Handle cancellations (if a host or other player bails).
+# Calls from peer to server side.
+@rpc("any_peer","reliable")
+func _bail () -> void:
+	var player_id: int = multiplayer.get_remote_sender_id()
+	_player_bailed(player_id)
+# This is also from server side.
+func _player_bailed (player_id: int) -> void:
+	# If this player was hosting a race, then bail on the whole race.
+	if player_id in _races:
+		_race_bailed(player_id)
+		return
+	# Otherwise, just clear out the player and free any selected kart.
+	for r in _races.values():
+		if player_id in r:
+			var car_name: String = r[player_id][1]
+			if car_name != "":
+				for p in r.keys():
+					_update_panel.rpc_id(p,name2index(car_name),false,-1,"")
+			r.erase(player_id)
+# This is also from server side.
+func _race_bailed (race_id: int) -> void:
+	# Kick out all players.
+	for player_id in _races[race_id].keys():
+		# Assuming the host would have already left this screen by the time this even happens,
+		# so don't need to "cancel" their screen.
+		if player_id != race_id:
+			_cancel.rpc_id(player_id,"The race was cancelled by the host.")
+	# Clear out the race.
+	_races.erase(race_id)
+	refresh_race.emit(race_id)
+# This is called from server to client, to tell them that the race is cancelled.
+@rpc("authority","reliable")
+func _cancel (msg: String) -> void:
+	error_message.emit(msg)
+	MenuHandler.deactivate_menu()
 
 #TODO: timer for multiplayer kart selection (if not the host)

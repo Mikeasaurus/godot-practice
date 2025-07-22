@@ -20,6 +20,8 @@ func _ready() -> void:
 	# If this is configured as a headless server, then set up the connection.
 	if DisplayServer.get_name() == "headless":
 		_make_server()
+	# Error messages from other screens, when returning.
+	$MultiplayerCarSelection.error_message.connect(_error_message)
 
 # Multiplayer server setup.
 func _make_server () -> void:
@@ -37,6 +39,7 @@ func _make_server () -> void:
 	multiplayer.multiplayer_peer = peer
 	# Propogate multiplayer race info to car selection menu.
 	$MultiplayerCarSelection._races = _races
+	$MultiplayerCarSelection.refresh_race.connect(_refresh_race)
 
 func _reset_car() -> void:
 	$NaserCar.set_deferred("global_position",Vector2(-53,-75))
@@ -127,6 +130,23 @@ func _peer_joining_race(race_id: int, handle: String) -> void:
 		_races[race_id] = {}
 	# No kart selected, so just a handle for now.
 	_races[race_id][id] = [handle,""]
+	_refresh_race (race_id)
+# Called when the race stats should be updated.
+# Called from server to itself.
+func _refresh_race (race_id) -> void:
 	# Update count for the race.
 	var race_list: VBoxContainer = $Multiplayer/MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer
-	race_list.get_node(str(race_id)).get_node("VBoxContainer/NumPlayers").text = "%d player(s) joined so far"%len(_races[race_id])
+	# Update info on the race.
+	if race_id in _races:
+		race_list.get_node(str(race_id)).get_node("VBoxContainer/NumPlayers").text = "%d player(s) joined so far"%len(_races[race_id])
+	# Or clear it out if it no longer exists.
+	else:
+		race_list.get_node(str(race_id)).queue_free()
+# Briefly displays an error message at the top of the screen.
+func _error_message (msg: String) -> void:
+	var e: Label = $MarginContainer/CenterContainer/VBoxContainer/ErrorMessage
+	e.modulate = Color.WHITE
+	e.text = msg
+	var tween: Tween = create_tween()
+	tween.tween_interval(3.0)
+	tween.tween_property(e,"modulate",Color.hex(0xffffff00),3.0)
