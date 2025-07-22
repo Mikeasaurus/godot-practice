@@ -194,9 +194,6 @@ func _itemblock (car: Car) -> void:
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("use_item"):
 		_use_item(player_car)
-	if event.is_action_pressed("debug"):
-		_lap_announce(1)
-		quit.emit(1)
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
