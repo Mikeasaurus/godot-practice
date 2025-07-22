@@ -154,6 +154,10 @@ layout_mode = 1
 visible = false
 layout_mode = 1
 
+[node name="MultiplayerCarSelection" parent="." instance=ExtResource("8_82lv5")]
+visible = false
+layout_mode = 1
+
 [node name="Naomi" parent="." instance=ExtResource("9_lriup")]
 process_mode = 4
 visible = false

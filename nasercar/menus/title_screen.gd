@@ -17,6 +17,7 @@ func _ready() -> void:
 	$CarSelection.race.connect(start_race)
 	# Need to unlock Naomi kart.
 	_naomi.hide()
+	# If this is configured as a headless server, then set up the connection.
 	if DisplayServer.get_name() == "headless":
 		_make_server()
 
@@ -35,7 +36,7 @@ func _make_server () -> void:
 		peer.create_server(1157,"*",tls_options)
 	multiplayer.multiplayer_peer = peer
 	# Propogate multiplayer race info to car selection menu.
-	$CarSelection._races = _races
+	$MultiplayerCarSelection._races = _races
 
 func _reset_car() -> void:
 	$NaserCar.set_deferred("global_position",Vector2(-53,-75))
@@ -115,7 +116,7 @@ func _on_multiplayer_join_race(race_id: int, handle: String) -> void:
 	_peer_joining_race.rpc_id(1, race_id, handle)
 	# Open car selection menu with multiplayer context.
 	_reset_car()
-	MenuHandler.activate_menu($CarSelection)
+	MenuHandler.activate_menu($MultiplayerCarSelection)
 # Server side - bookkeeping for current races.
 @rpc("any_peer","reliable")
 func _peer_joining_race(race_id: int, handle: String) -> void:
