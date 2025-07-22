@@ -5,6 +5,7 @@ class_name CarSelectionPanel
 signal selected
 
 var car: Car
+var selectable: bool = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -22,8 +23,15 @@ func unselect() -> void:
 	var stylebox: StyleBoxFlat = get_theme_stylebox("panel")
 	stylebox.border_color = Color.hex(0xffffff00)
 
+func disable() -> void:
+	selectable = false
+	car.get_node("Body").modulate = Color.hex(0x555555ff)
+func enable() -> void:
+	selectable = true
+	car.get_node("Body").modulate = Color.WHITE
 
 func _on_mouse_entered() -> void:
+	if not selectable: return
 	var stylebox: StyleBoxFlat = get_theme_stylebox("panel")
 	stylebox.bg_color = 0x777777ff
 
@@ -32,7 +40,7 @@ func _on_mouse_exited() -> void:
 	stylebox.bg_color = 0x77777700
 
 func _on_gui_input(event: InputEvent) -> void:
+	if not selectable: return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			select()
 			selected.emit()
