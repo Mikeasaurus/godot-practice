@@ -254,33 +254,59 @@ func _process(delta: float) -> void:
 	#######################################################
 	# Wheel-turning for player or override of regular CPU steering
 	#######################################################
+	var turn_left: bool = false
+	var turn_right: bool = false
+	var recenter: bool = false
+	# Determine if wheels need to be turned, and in which direction.
 	if type == CarType.PLAYER or (type == CarType.CPU and cpu_steer_direction != CPU_Steer_Direction.PATH):
 		# Turn left
 		if (type == CarType.PLAYER and Input.is_action_pressed("turn_left")) or cpu_steer_direction == CPU_Steer_Direction.LEFT:
-			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
-				if wheel.rotation > -max_r:
-					wheel.rotation -= dr
+			turn_left = true
 		# Turn right
 		elif (type == CarType.PLAYER and Input.is_action_pressed("turn_right")) or cpu_steer_direction == CPU_Steer_Direction.RIGHT:
-			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
-				if wheel.rotation < max_r:
-					wheel.rotation += dr
+			turn_right = true
 		# Re-center
 		else:
-			for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
-				if wheel.rotation < 0:
-					wheel.rotation += 2*dr
-				elif wheel.rotation > 0:
-					wheel.rotation -= 2*dr
-				if abs(wheel.rotation) <= 2*dr:
-					wheel.rotation = 0
+			recenter = true
+	# Touch controls
+	# Also, declare movement variable up here so touch controls can modify them.
+	var go_pressed: bool = Input.is_action_pressed("go")
+	var stop_pressed: bool = Input.is_action_pressed("stop")
+	var reverse_pressed: bool = Input.is_action_pressed("reverse")
+	if type == CarType.PLAYER and DisplayServer.is_touchscreen_available():
+		if Input.is_mouse_button_pressed(1):
+			var t: Vector2 = get_global_mouse_position() - global_position
+			var w: Vector2 = Vector2.from_angle($Wheels/FrontLeft.global_rotation).rotated(PI/2)
+			var angle: float = w.angle_to(t)/PI*180
+			if angle < 0: turn_left = true
+			elif angle > 0: turn_right = true
+			#var c: Vector2 = Vector2.from_angle(global_rotation).rotated(PI/2)
+			if w.dot(t) >= 0: go_pressed = true
+			else: reverse_pressed = true
+		else:
+			recenter = true
+
+	if turn_left:
+		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
+			if wheel.rotation > -max_r:
+				wheel.rotation -= dr
+	elif turn_right:
+		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
+			if wheel.rotation < max_r:
+				wheel.rotation += dr
+	elif recenter:
+		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
+			if wheel.rotation < 0:
+				wheel.rotation += 2*dr
+			elif wheel.rotation > 0:
+				wheel.rotation -= 2*dr
+			if abs(wheel.rotation) <= 2*dr:
+				wheel.rotation = 0
+
 
 	#######################################################
 	# Movement
 	#######################################################
-	var go_pressed: bool = Input.is_action_pressed("go")
-	var stop_pressed: bool = Input.is_action_pressed("stop")
-	var reverse_pressed: bool = Input.is_action_pressed("reverse")
 	# Check for speed modifiers.
 	var acceleration_modifier: float = 1.0
 	var max_speed_modifier: float = 1.0

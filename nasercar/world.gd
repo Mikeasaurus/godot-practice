@@ -276,6 +276,10 @@ func _get_item(car: Car) -> void:
 	if car.type == car.CarType.CPU:
 		await get_tree().create_timer(randf()*5).timeout
 		_use_item(car)
+	# Players with touchscreen automatically use items after a short amount of time.
+	if car.type == car.CarType.PLAYER and DisplayServer.is_touchscreen_available():
+		await get_tree().create_timer(1.0).timeout
+		_use_item(car)
 
 func _use_item(car: Car) -> void:
 	if car not in _current_items: return
