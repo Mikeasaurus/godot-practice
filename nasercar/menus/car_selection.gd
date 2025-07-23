@@ -17,13 +17,19 @@ func _panel_selected (panel: CarSelectionPanel) -> void:
 	if $MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled:
 		$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = false
 
+var _tweening: bool = false
+
 func _on_back_button_pressed() -> void:
+	if _tweening: return
 	MenuHandler.deactivate_menu()
 
 func _on_race_button_pressed() -> void:
+	if _tweening: return
 	var tween: Tween = create_tween()
 	tween.tween_property(self,"modulate",Color.BLACK,1.0)
+	_tweening = true
 	await tween.finished
+	_tweening = false
 	modulate = Color.WHITE
 	hide()
 	race.emit(selection.car)
