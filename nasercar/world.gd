@@ -95,6 +95,11 @@ func _ready() -> void:
 		stylebox.thickness = 3
 		hsep.add_theme_stylebox_override("separator", stylebox)
 		places_vbox.add_child(hsep)
+	# Set up a pause screen for single player games.
+	if multiplayer.get_unique_id() == 1:
+		MenuHandler.pause.connect(_pause_screen)
+		MenuHandler.done_submenus.connect(_unpause_screen)
+		$ScreenEffects/PauseMenu/MarginContainer/CenterContainer/VBoxContainer/QuitButton.pressed.connect(_leave_race)
 
 	# Move the playable car to the front
 	var c: Car = _cars()[0]
@@ -194,6 +199,13 @@ func _itemblock (car: Car) -> void:
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("use_item"):
 		_use_item(player_car)
+
+func _pause_screen() -> void:
+	if _leaving_race: return  # Don't pause if race is being terminated.
+	get_tree().paused = true
+	MenuHandler.activate_menu($ScreenEffects/PauseMenu)
+func _unpause_screen() -> void:
+	get_tree().paused = false
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
@@ -458,10 +470,22 @@ func _finished (car: Car) -> void:
 
 func _on_done_button_pressed() -> void:
 	$CanvasLayer/DoneButton.disabled = true
+	_leave_race(true)
+var _leaving_race: bool = false
+func _leave_race(completed: bool = false) -> void:
+	# Check if already leaving race.
+	if _leaving_race: return
+	_leaving_race = true
+	# Make sure we're unpaused.
+	MenuHandler.deactivate_menu()
 	var tween: Tween = create_tween()
 	tween.tween_property(self,"modulate",Color.BLACK,1.0)
 	# Why do I need to modulate stats if I'm already modulating the whole scene???
 	tween.parallel().tween_property($CanvasLayer/Stats,"modulate",Color.BLACK,1.0)
 	tween.parallel().tween_property($CanvasLayer/LapFinished,"modulate",Color.BLACK,1.0)
 	await tween.finished
-	quit.emit(_place)
+	_leaving_race = false
+	if completed:
+		quit.emit(_place)
+	else:
+		quit.emit(-1)

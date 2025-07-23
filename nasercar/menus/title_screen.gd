@@ -48,14 +48,13 @@ func start_race (player_car: Car) -> void:
 			race.player_car = car
 	add_child(race)
 	# Turn off Naser car visual.
-	# Do this after a bit of a delay, because there's a call to _reset_and_start_timer around the same
-	# time as this (from MenuHandler) that would cause the Naser car to start on its own.
-	#
 	$NaserCar.call_deferred("hide")
 	await get_tree().create_timer(0.1).timeout
+	MenuHandler.done_submenus.disconnect(_reset_and_start_timer)
 	$NaserCar.call_deferred("hide")
 	_reset_car()
 	#
+	# Let the race finish, and get the player's final place in the race.
 	var place: int
 	place = await race.quit
 	if place == 1 and not _naomi.visible:
@@ -69,3 +68,6 @@ func start_race (player_car: Car) -> void:
 	else:
 		call_deferred("_reset_and_start_timer")
 	race.queue_free()
+	# Restore Naser car.
+	MenuHandler.done_submenus.connect(_reset_and_start_timer)
+	_reset_and_start_timer()
