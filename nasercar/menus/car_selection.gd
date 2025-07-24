@@ -150,13 +150,15 @@ func _player_bailed (player_id: int) -> void:
 		_race_bailed(player_id)
 		return
 	# Otherwise, just clear out the player and free any selected kart.
-	for r in _races.values():
+	for race_id in _races.keys():
+		var r: Dictionary = _races[race_id]
 		if player_id in r:
 			var car_name: String = r[player_id][1]
 			if car_name != "":
 				for p in r.keys():
 					_update_panel.rpc_id(p,name2index(car_name),false,-1,"")
 			r.erase(player_id)
+			refresh_race.emit(race_id)
 # This is also from server side.
 func _race_bailed (race_id: int) -> void:
 	# Kick out all players.
