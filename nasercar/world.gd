@@ -8,7 +8,7 @@ var player_car: Car = null
 signal quit (place: int)
 
 ## Number of laps for the track.
-var laps: int = 3
+var laps: int = 1
 
 # Current game state (for applied effects, etc.)
 
