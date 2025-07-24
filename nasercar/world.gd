@@ -23,6 +23,11 @@ var _meteor: bool = false
 
 # Keep track of player's place in the race.
 var _place: int = 0
+# This is set right at the end of the race (in case a kart passes another kart while
+# the results are displayed).
+# Otherwise, for instance, the Naomi kart unlock won't trigger if player gets subsequently passed
+# by a CPU before the "Done" button is pressed.
+var _final_place: int = -1
 # This flag is set when the displayed place is being updated.
 var _updating_place: bool = false
 # Shortcut for updating results for the stats page.
@@ -446,6 +451,7 @@ func _finished (car: Car) -> void:
 			var place: int = i+1
 			if car == player_car:
 				_places[i].set_results(place, car, "Player", time, Color.GREEN)
+				_final_place = place
 			else:
 				_places[i].set_results(place, car, car.display_name+" (CPU)", time, Color.WHITE)
 				return
@@ -490,6 +496,6 @@ func _leave_race(completed: bool = false) -> void:
 	await tween.finished
 	_leaving_race = false
 	if completed:
-		quit.emit(_place)
+		quit.emit(_final_place)
 	else:
 		quit.emit(-1)
