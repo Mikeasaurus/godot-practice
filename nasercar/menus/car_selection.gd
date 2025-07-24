@@ -117,15 +117,18 @@ func _update_panel (panel_index: int, is_taken: bool, player_id: int, handle: St
 	var panel: CarSelectionPanel = $MarginContainer/CenterContainer/VBoxContainer/GridContainer.get_children()[panel_index]
 	if is_taken and player_id != my_id:
 		panel.disable()
+		panel.overlay(handle)
 	elif is_taken and player_id == my_id:
 		panel.enable()
 		if selection != null and selection != panel:
 			selection.unselect()
 		selection = panel
 		selection.select()
+		panel.overlay(handle)
 	else:
 		panel.unselect()
 		panel.enable()
+		panel.no_overlay()
 
 # If joining into a multiplayer game, update the status of all karts.
 func _on_visibility_changed() -> void:

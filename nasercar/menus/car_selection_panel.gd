@@ -23,12 +23,23 @@ func unselect() -> void:
 	var stylebox: StyleBoxFlat = get_theme_stylebox("panel")
 	stylebox.border_color = Color.hex(0xffffff00)
 
+# Car taken by somebody else; not available for selection.
 func disable() -> void:
 	selectable = false
-	car.get_node("Body").modulate = Color.hex(0x555555ff)
+	for node in ["Body","Wheels/FrontLeft", "Wheels/FrontRight", "Wheels/RearLeft", "Wheels/RearRight"]:
+		car.get_node(node).modulate = Color.hex(0x555555ff)
 func enable() -> void:
 	selectable = true
-	car.get_node("Body").modulate = Color.WHITE
+	for node in ["Body","Wheels/FrontLeft", "Wheels/FrontRight", "Wheels/RearLeft", "Wheels/RearRight"]:
+		car.get_node(node).modulate = Color.WHITE
+	$SubViewportContainer/SubViewport/Name.hide()
+
+# Put text overlay on a panel.
+func overlay(text: String) -> void:
+	$SubViewportContainer/SubViewport/Name.text = text
+	$SubViewportContainer/SubViewport/Name.show()
+func no_overlay() -> void:
+	$SubViewportContainer/SubViewport/Name.hide()
 
 func _on_mouse_entered() -> void:
 	if not selectable: return
