@@ -2,11 +2,14 @@ extends Control
 
 var selection: CarSelectionPanel = null
 
-# This is copied from the title screen.
+# This is copied from the title screen, on server instance.
 var _races: Dictionary = {}
 
-# Signal that gets sent when the player is ready to start the race.
-signal race (car: Car)
+# Signal that gets sent when the player is ready to start a single player race.
+signal singleplayer_race (car: Car)
+
+# Signal for when the player is ready to start a multiplayer race.
+signal multiplayer_race (race_id: int)
 
 # Signal that gets sent when the race stats should be re-read by the parent scene.
 signal refresh_race (race_id: int)
@@ -54,14 +57,48 @@ func _on_back_button_pressed() -> void:
 		_bail.rpc_id(1)
 	MenuHandler.deactivate_menu()
 
-func _on_race_button_pressed() -> void:
+# Helper function - face out the screen.
+# Can also be triggered from a server process for multiplayer games.
+var _fadeout_time: float = 1.0
+@rpc("authority","reliable")
+func _fadeout() -> void:
 	var tween: Tween = create_tween()
-	tween.tween_property(self,"modulate",Color.BLACK,1.0)
+	tween.tween_property(self,"modulate",Color.BLACK,_fadeout_time)
 	await tween.finished
 	modulate = Color.WHITE
 	hide()
-	race.emit(selection.car)
-	MenuHandler.deactivate_menu()
+
+# Called when the user clicks the "Race" button.
+func _on_race_button_pressed() -> void:
+	# If this is a single player game, send signal back to parent scene that we're ready.
+	if multiplayer.get_unique_id() == 1:
+		await _fadeout()
+		singleplayer_race.emit(selection.car)
+		MenuHandler.deactivate_menu()
+	# If this is a multiplayer game, delegate to the server for sending the signal to
+	# its parent scene.
+	else:
+		_try_starting_race.rpc_id(1)
+# Called from client to server, to request the race to start.
+@rpc("any_peer","reliable")
+func _try_starting_race() -> void:
+	var player_id: int = multiplayer.get_remote_sender_id()
+	# This is probably not necessary, but make sure this player is a host for a race.
+	if player_id not in _races: return
+	var race_id: int = player_id
+	# Send some signals to all participating players.
+	var r: Dictionary = _races[race_id]
+	for p in r.keys():
+		var value: Array = r[p]
+		# value is [handle,car_name]
+		var car_name: String = value[1]
+		# If there are any peers left who have not selected a kart, then politely cancel them out.
+		if car_name == "":
+			_cancel.rpc_id(p,"Sorry, the race has already started.")
+		# Otherwise, fade out their screen as a heads-up that the race is beginning.
+		_fadeout.rpc_id(p)
+	await get_tree().create_timer(_fadeout_time).timeout
+	multiplayer_race.emit(race_id)
 
 # Handle remote updates of kart selections
 # This is called on the server when the user clicks on a kart in multiplayer context.
@@ -93,6 +130,9 @@ func _try_selecting_car (panel_index: int) -> void:
 				# Also, free up previously taken car.
 				if old_car_name != "":
 					_update_panel.rpc_id(p,name2index(old_car_name),false,-1,"")
+			# If this player is also the host, then they can join the race whenever they're ready.
+			if player_id == race_id:
+				_enable_race_button.rpc_id(player_id)
 
 # This is called by a new peer to request updated status of the selection panels.
 @rpc("any_peer","reliable")
@@ -115,9 +155,11 @@ func _sync_panels () -> void:
 func _update_panel (panel_index: int, is_taken: bool, player_id: int, handle: String) -> void:
 	var my_id: int = multiplayer.get_unique_id()
 	var panel: CarSelectionPanel = $MarginContainer/CenterContainer/VBoxContainer/GridContainer.get_children()[panel_index]
+	# Car is taken by somebody else
 	if is_taken and player_id != my_id:
 		panel.disable()
 		panel.overlay(handle)
+	# Car is taken by this player
 	elif is_taken and player_id == my_id:
 		panel.enable()
 		if selection != null and selection != panel:
@@ -129,6 +171,10 @@ func _update_panel (panel_index: int, is_taken: bool, player_id: int, handle: St
 		panel.unselect()
 		panel.enable()
 		panel.no_overlay()
+# This is called from the server to the client, when they're allowed to click the "Race" button.
+@rpc("authority","reliable")
+func _enable_race_button () -> void:
+	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = false
 
 # If joining into a multiplayer game, update the status of all karts.
 func _on_visibility_changed() -> void:
@@ -139,6 +185,8 @@ func _on_visibility_changed() -> void:
 				selection.unselect()
 				selection = null
 			_sync_panels.rpc_id(1)
+			# No joining until a car is selected.
+			$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = true
 
 # Handle cancellations (if a host or other player bails).
 # Calls from peer to server side.

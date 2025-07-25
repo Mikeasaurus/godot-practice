@@ -14,7 +14,7 @@ func _ready() -> void:
 	_reset_car()
 	$CarTimer.start()
 	MenuHandler.done_submenus.connect(_reset_and_start_timer)
-	$CarSelection.race.connect(start_race)
+	$CarSelection.singleplayer_race.connect(start_race)
 	# Need to unlock Naomi kart.
 	_naomi.hide()
 	# If this is configured as a headless server, then set up the connection.
