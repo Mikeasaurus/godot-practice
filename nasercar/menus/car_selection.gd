@@ -70,6 +70,9 @@ func _fadeout() -> void:
 
 # Called when the user clicks the "Race" button.
 func _on_race_button_pressed() -> void:
+	# Disable any further button presses.
+	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton.disabled = true
+	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = true
 	# If this is a single player game, send signal back to parent scene that we're ready.
 	if multiplayer.get_unique_id() == 1:
 		await _fadeout()
@@ -179,13 +182,16 @@ func _enable_race_button () -> void:
 # If joining into a multiplayer game, update the status of all karts.
 func _on_visibility_changed() -> void:
 	if visible:
+		# Clear any previously selected car (it's not actually selected anymore).
+		if selection != null:
+			selection.unselect()
+			selection = null
+		# Enable "Back" button (may have been disabled in previous interaction with this scene).
+		$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton.disabled = false
 		if multiplayer.get_unique_id() != 1:
-			# Clear any previously selected car (it's not actually selected anymore).
-			if selection != null:
-				selection.unselect()
-				selection = null
+			# Ask server about which cars are already taken and which ones are available.
 			_sync_panels.rpc_id(1)
-			# No joining until a car is selected.
+			# No joining race until a car is selected.
 			$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = true
 
 # Handle cancellations (if a host or other player bails).
