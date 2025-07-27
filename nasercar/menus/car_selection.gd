@@ -145,6 +145,9 @@ func _sync_panels () -> void:
 	for race_id in _races.keys():
 		if id in _races[race_id]:
 			var r: Dictionary = _races[race_id]
+			# Start by clearing the status of all cars.
+			for car_name in car_names:
+				_update_panel.rpc_id(id, name2index(car_name), false, -1, "")
 			# For all cars that are already taken, update the panel visual.
 			for player_id in r.keys():
 				var value = r[player_id]
