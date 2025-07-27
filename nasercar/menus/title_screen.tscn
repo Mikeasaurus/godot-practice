@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://nvfby80br4pn"]
+[gd_scene load_steps=12 format=3 uid="uid://nvfby80br4pn"]
 
 [ext_resource type="Script" path="res://menus/title_screen.gd" id="1_26oih"]
 [ext_resource type="FontFile" uid="uid://ble5tl2cuo0pm" path="res://fonts/Hauser Italic.otf" id="1_ygr87"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="5_w0neb"]
 [ext_resource type="PackedScene" uid="uid://culfs1hcaohhm" path="res://menus/help.tscn" id="7_31u7g"]
 [ext_resource type="PackedScene" uid="uid://0dummt6q0fyv" path="res://menus/car_selection.tscn" id="8_82lv5"]
+[ext_resource type="PackedScene" uid="uid://dnd8afldnrcld" path="res://menus/multiplayer.tscn" id="9_6v5ik"]
 [ext_resource type="PackedScene" uid="uid://bkswkyttwn7xp" path="res://menus/naomi.tscn" id="9_lriup"]
 
 [sub_resource type="Curve2D" id="Curve2D_uem21"]
@@ -42,6 +43,14 @@ layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/CenterContainer"]
 layout_mode = 2
+
+[node name="ErrorMessage" type="Label" parent="MarginContainer/CenterContainer/VBoxContainer"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+text = "This is a sample message."
+horizontal_alignment = 1
 
 [node name="Title" type="HBoxContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -150,11 +159,21 @@ layout_mode = 1
 visible = false
 layout_mode = 1
 
+[node name="Multiplayer" parent="." instance=ExtResource("9_6v5ik")]
+visible = false
+layout_mode = 1
+
+[node name="MultiplayerCarSelection" parent="." instance=ExtResource("8_82lv5")]
+visible = false
+layout_mode = 1
+
 [node name="Naomi" parent="." instance=ExtResource("9_lriup")]
 process_mode = 4
 visible = false
 layout_mode = 1
 
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/SinglePlayer" to="." method="_on_single_player_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Multiplayer" to="." method="_on_multiplayer_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Help" to="." method="_on_help_pressed"]
 [connection signal="timeout" from="CarTimer" to="." method="_on_car_timer_timeout"]
+[connection signal="join_race" from="Multiplayer" to="." method="_on_multiplayer_join_race"]
