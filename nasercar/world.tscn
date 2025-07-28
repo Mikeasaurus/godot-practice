@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=4 uid="uid://b4tklj1nsft7a"]
+[gd_scene load_steps=46 format=4 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_5oo6t"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://tiles/ground.png" id="1_cexhq"]
@@ -30,6 +30,7 @@
 [ext_resource type="AudioStream" uid="uid://yggwxfin8it2" path="res://audio/352402__noahpardo__npx-throat-gathering-spit-2.wav" id="28_iaess"]
 [ext_resource type="AudioStream" uid="uid://ck8qxnm7h80pv" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="29_xj85u"]
 [ext_resource type="PackedScene" uid="uid://dscelbyqu4ok3" path="res://menus/pause_menu.tscn" id="30_kkwd5"]
+[ext_resource type="Script" path="res://internal/race_synchronizer.gd" id="31_2r05m"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fosln"]
 texture = ExtResource("1_cexhq")
@@ -737,7 +738,8 @@ stream = ExtResource("29_xj85u")
 [node name="PauseMenu" parent="ScreenEffects" instance=ExtResource("30_kkwd5")]
 visible = false
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="RaceSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_pcovh")
+script = ExtResource("31_2r05m")
 
 [connection signal="pressed" from="CanvasLayer/DoneButton" to="." method="_on_done_button_pressed"]

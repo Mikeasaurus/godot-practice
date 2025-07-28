@@ -65,8 +65,6 @@ func _fadeout() -> void:
 	var tween: Tween = create_tween()
 	tween.tween_property(self,"modulate",Color.BLACK,_fadeout_time)
 	await tween.finished
-	modulate = Color.WHITE
-	hide()
 
 # Called when the user clicks the "Race" button.
 func _on_race_button_pressed() -> void:
@@ -185,6 +183,8 @@ func _enable_race_button () -> void:
 # If joining into a multiplayer game, update the status of all karts.
 func _on_visibility_changed() -> void:
 	if visible:
+		# If this was faded out, then bring it back.
+		modulate = Color.WHITE
 		# Clear any previously selected car (it's not actually selected anymore).
 		if selection != null:
 			selection.unselect()

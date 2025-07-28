@@ -10,6 +10,10 @@ signal quit (place: int)
 ## Number of laps for the track.
 var laps: int = 1
 
+# List of particpants for the race.
+# Filled in by the parent scene.
+var participants: Dictionary
+
 # Current game state (for applied effects, etc.)
 
 # Time of start of race.

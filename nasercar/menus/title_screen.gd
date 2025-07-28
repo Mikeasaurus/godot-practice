@@ -22,6 +22,8 @@ func _ready() -> void:
 		_make_server()
 	# Error messages from other screens, when returning.
 	$MultiplayerCarSelection.error_message.connect(_error_message)
+	# Spawn a race in multiplayer context.
+	$MultiplayerSpawner.spawn_function = _spawn_multiplayer_race
 
 # Multiplayer server setup.
 func _make_server () -> void:
@@ -40,6 +42,8 @@ func _make_server () -> void:
 	# Propogate multiplayer race info to car selection menu.
 	$MultiplayerCarSelection._races = _races
 	$MultiplayerCarSelection.refresh_race.connect(_refresh_race)
+	# Signals for starting the race.
+	$MultiplayerCarSelection.multiplayer_race.connect(_start_multiplayer_race)
 
 func _reset_car() -> void:
 	$NaserCar.set_deferred("global_position",Vector2(-53,-75))
@@ -79,6 +83,25 @@ func _launch_multiplayer_menu() -> void:
 func _on_car_timer_timeout() -> void:
 	$NaserCar.freeze = false
 	$NaserCar.go()
+
+# Called within server (from kart selection screen back to main screen) to indicate
+# a race is ready to start.
+func _start_multiplayer_race(race_id: int) -> void:
+	var race: World = $MultiplayerSpawner.spawn([race_id,_races[race_id]])
+	print ("Starting race! ", race)
+
+# This is called to create a multiplayer race among all peers.
+# "data" is the race_id, and dictionary containing all players / karts for the race.
+func _spawn_multiplayer_race (data) -> Node:
+	var race: World = load("res://world.tscn").instantiate()
+	var race_id: int = data[0]
+	var participants: Dictionary = data[1]
+	# Set a consistent name for this race across all participating peers.
+	race.name = str(race_id)
+	# Only synchronize state across participating peers.
+	if multiplayer.get_unique_id() == 1:
+		race.participants = participants
+	return race
 
 func start_race (player_car: Car) -> void:
 	# Load up the race track.

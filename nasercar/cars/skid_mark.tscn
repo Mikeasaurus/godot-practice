@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://carfgs1mg40pn"]
+[gd_scene load_steps=4 format=3 uid="uid://carfgs1mg40pn"]
 
 [ext_resource type="Script" path="res://cars/skid_mark.gd" id="1_auf4s"]
+[ext_resource type="Script" path="res://internal/race_synchronizer.gd" id="2_1uiic"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_y1tgt"]
 properties/0/path = NodePath(".:points")
@@ -20,7 +21,8 @@ script = ExtResource("1_auf4s")
 wait_time = 10.0
 one_shot = true
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="RaceSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_y1tgt")
+script = ExtResource("2_1uiic")
 
 [connection signal="timeout" from="CleanupTimer" to="." method="_on_cleanup_timer_timeout"]

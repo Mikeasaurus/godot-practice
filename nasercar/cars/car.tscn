@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://xkg3ucnitsra"]
+[gd_scene load_steps=38 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
 [ext_resource type="Script" path="res://cars/car.gd" id="1_88aey"]
@@ -13,6 +13,7 @@
 [ext_resource type="AudioStream" uid="uid://ck8qxnm7h80pv" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="9_x1whg"]
 [ext_resource type="AudioStream" uid="uid://88hgpp0mmg15" path="res://audio/348645__redafs__slurping-sipping-and-gulp-4.mp3" id="11_myl1q"]
 [ext_resource type="AudioStream" uid="uid://cgnsq3fqkf7fo" path="res://audio/167563__benboncan__jet_whoosh.wav" id="12_petsi"]
+[ext_resource type="Script" path="res://internal/race_synchronizer.gd" id="14_diguy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4ldm1"]
 radius = 35.0
@@ -568,7 +569,8 @@ libraries = {
 "": SubResource("AnimationLibrary_18i12")
 }
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="RaceSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_kxogy")
+script = ExtResource("14_diguy")
 
 [connection signal="timeout" from="CrashSoundTimer" to="." method="_on_crash_sound_timer_timeout"]
