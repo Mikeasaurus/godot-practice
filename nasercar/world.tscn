@@ -399,14 +399,14 @@ curve = SubResource("Curve2D_2l6ov")
 [node name="GoLabel" type="Label" parent="CanvasLayer"]
 visible = false
 texture_filter = 1
+custom_minimum_size = Vector2(562, 0)
 offset_left = 625.0
 offset_top = 1.0
 offset_right = 681.0
 offset_bottom = 35.0
-scale = Vector2(10, 10)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 5
-theme_override_font_sizes/font_size = 24
+theme_override_constants/outline_size = 50
+theme_override_font_sizes/font_size = 240
 text = "GO!!!"
 horizontal_alignment = 1
 vertical_alignment = 1

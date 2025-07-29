@@ -159,8 +159,8 @@ func _ready() -> void:
 	_start_time = Time.get_ticks_msec() / 1000.
 	var go: Tween = create_tween()
 	go.tween_property($CanvasLayer/GoLabel,"modulate",Color.TRANSPARENT,1.0)
-	go.parallel().tween_property($CanvasLayer/GoLabel,"scale",Vector2(20,20),1.0)
-	go.parallel().tween_property($CanvasLayer/GoLabel,"position", Vector2(400,1),1.0)
+	go.parallel().tween_property($CanvasLayer/GoLabel,"scale",Vector2(2,2),1.0)
+	go.parallel().tween_property($CanvasLayer/GoLabel,"position", Vector2($CanvasLayer/GoLabel.position.x*0.5,1),1.0)
 	# Show place after the cars have starting racing a bit.
 	await get_tree().create_timer(3.0).timeout
 	var place_tween: Tween = create_tween()
