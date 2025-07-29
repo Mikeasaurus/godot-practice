@@ -195,7 +195,7 @@ func _process(delta: float) -> void:
 	#######################################################
 	# Get CPUs unstuck.
 	#######################################################
-	if type == CarType.CPU and moveable and not _getting_unstuck:
+	if type == CarType.CPU and moveable and not _getting_unstuck and EffectType.SMOULDERING not in effects:
 		if linear_velocity.length() < 10:
 			# Just starting to be stuck (or just speeding up from a stop)
 			if not _is_stuck:
@@ -639,6 +639,9 @@ func _kersplash (liquid_type: int) -> void:
 	ripple_light.modulate = Color.WHITE
 	# Make car mobile again.
 	freeze = false
+	# Reset stuck detection timer to avoid triggereing "un-stuck" maneuver.
+	# We haven't been stuck this whole time, just occupied.
+	_stuck_since = Time.get_ticks_msec()
 	moveable = true
 	# Done
 	_splashing = false
