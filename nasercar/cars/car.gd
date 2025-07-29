@@ -214,8 +214,10 @@ func _process(delta: float) -> void:
 		var target_direction: Vector2 = _pathfollow.global_position - global_position
 		var dx: float = target_direction.length()
 		if dx < 10:
+			_old_path_pos = _pathfollow.global_position
 			_pathfollow.progress += 300
 		else:
+			_old_path_pos = _pathfollow.global_position
 			_pathfollow.progress += (300/dx) * linear_velocity.length() * delta
 		var angle: float = target_direction.angle() - global_rotation
 		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
