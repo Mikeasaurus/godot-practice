@@ -1,9 +1,6 @@
 extends Node2D
 class_name World
 
-# Player car
-var player_car: Car = null
-
 # Signal that gets emitted when the game is finished and the player wishes to exit.
 signal quit (place: int)
 
@@ -13,6 +10,9 @@ var laps: int = 1
 # List of particpants for the race.
 # Filled in by the parent scene.
 var participants: Dictionary
+
+#TODO: remove this (temporary workaround while refactoring)
+var player_car: Car
 
 # Current game state (for applied effects, etc.)
 
@@ -109,17 +109,39 @@ func _ready() -> void:
 		MenuHandler.pause.connect(_pause_screen)
 		MenuHandler.done_submenus.connect(_unpause_screen)
 		$ScreenEffects/PauseMenu/MarginContainer/CenterContainer/VBoxContainer/QuitButton.pressed.connect(_leave_race)
+	# Default cars to being passive (remotely controlled).
+	for car in _cars():
+		car.type = car.CarType.REMOTE
 
-	# Move the playable car to the front
-	var c: Car = _cars()[0]
-	if c != player_car and player_car != null:
-		var gp: Vector2 = c.global_position
-		c.global_position = player_car.global_position
-		player_car.global_position = gp
+# Called to do final setup of race, and start it.
+func setup_race (participants: Dictionary) -> void:
+	if multiplayer.get_unique_id() != 1:
+		print ("Attempted to call setup_race on a passive peer.")
+		return
+
+	# Match each player to their car scene in the race.
+	# participants variable gets updated from car names to instances of car objects.
+	var cars: Array[Car] = _cars()
+	self.participants = {}
+	for player_id in participants.keys():
+		for car in cars:
+			if car.display_name == participants[player_id]:
+				self.participants[player_id] = car
+
+	# Move the playable car(s) to the front.
+	var player_ids: Array = self.participants.keys()
+	for i in range(len(player_ids)):
+		var player_id: int = player_ids[i]
+		var player_car: Car = self.participants[player_id]
+		var c: Car = cars[i]
+		if c != player_car:
+			var gp: Vector2 = c.global_position
+			c.global_position = player_car.global_position
+			player_car.global_position = gp
 
 	# Add the cars to the track.
 	# (Let the cars know what path to follow, and whether they are CPU or player controlled).
-	for car in _cars():
+	for car in cars:
 		car.add_to_track($TrackPath, [$Ground, $Road])
 		car.itemblock.connect(func():
 			_itemblock(car)
@@ -131,14 +153,18 @@ func _ready() -> void:
 			_lap_completed(car,lap)
 		)
 
-	# Set up a car under player's control.
-	if player_car == null:
-		player_car = $Cars/NaserCar
-	player_car.make_playable()
+	# For single-player game, set up a car under the player's control.
+	if 1 in self.participants:
+		self.participants[1].make_playable()
 
-	for car in _cars():
-		if car != player_car:
+	#TODO: setup remotely controlled player cars for multiplayer games.
+
+	# Set up CPU control for remaining cars.
+	for car in cars:
+		if car not in self.participants.values():
 			car.make_cpu()
+
+	player_car = self.participants[1]
 
 	# Start of race.
 	$CanvasLayer/FadeIn.show()
@@ -173,7 +199,7 @@ func _ready() -> void:
 	await place_tween.finished
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	# Check place of the car, and update as necessary.
+	# Check place of the player car(s), and update as necessary.
 	_check_place (player_car)
 
 func _check_place (car: Car) -> void:

@@ -98,21 +98,20 @@ func _spawn_multiplayer_race (data) -> Node:
 	var participants: Dictionary = data[1]
 	# Set a consistent name for this race across all participating peers.
 	race.name = str(race_id)
-	# Only synchronize state across participating peers.
+	# Configure the race with the given participants.
 	if multiplayer.get_unique_id() == 1:
-		race.participants = participants
+		race.setup_race(participants)
 	return race
 
 func start_race (player_car: Car) -> void:
 	# Load up the race track.
 	var race: World = load("res://world.tscn").instantiate()
+	add_child(race)
 	# Set up the player car based on the car type chosen.
 	# Can't just set player_car as the one we're given - it has to be one of the instantiated
 	# scenes in the race.
-	for car in race.get_node("Cars").get_children() as Array[Car]:
-		if car.display_name == player_car.display_name:
-			race.player_car = car
-	add_child(race)
+	# For single-player games, player id is just 1.
+	race.setup_race({1:player_car.display_name})
 	# Turn off Naser car visual.
 	# Do this after a bit of a delay, because there's a call to _reset_and_start_timer around the same
 	# time as this (from MenuHandler) that would cause the Naser car to start on its own.
