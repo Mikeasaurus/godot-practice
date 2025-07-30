@@ -108,8 +108,6 @@ func start_race (player_car: Car) -> void:
 	var race: World = load("res://world.tscn").instantiate()
 	add_child(race)
 	# Set up the player car based on the car type chosen.
-	# Can't just set player_car as the one we're given - it has to be one of the instantiated
-	# scenes in the race.
 	# For single-player games, player id is just 1.
 	race.setup_race({1:player_car.display_name})
 	# Turn off Naser car visual.

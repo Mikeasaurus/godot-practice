@@ -26,14 +26,12 @@ var _sliming: bool = false
 var _meteor: bool = false
 
 # Keep track of player's place in the race.
-var _place: int = 0
+var _place: Dictionary
 # This is set right at the end of the race (in case a kart passes another kart while
 # the results are displayed).
 # Otherwise, for instance, the Naomi kart unlock won't trigger if player gets subsequently passed
 # by a CPU before the "Done" button is pressed.
-var _final_place: int = -1
-# This flag is set when the displayed place is being updated.
-var _updating_place: bool = false
+var _final_place: Dictionary
 # Shortcut for updating results for the stats page.
 var _places: Array[ResultLine] = []
 var _finished_cars: Array[Car] = []
@@ -128,6 +126,8 @@ func setup_race (participants: Dictionary) -> void:
 			if car.display_name == participants[player_id]:
 				self.participants[player_id] = car
 
+	self.player_car = self.participants[1]
+
 	# Move the playable car(s) to the front.
 	var player_ids: Array = self.participants.keys()
 	for i in range(len(player_ids)):
@@ -164,7 +164,11 @@ func setup_race (participants: Dictionary) -> void:
 		if car not in self.participants.values():
 			car.make_cpu()
 
-	player_car = self.participants[1]
+
+	# Set default values of car places, to be computed in _process.
+	for player_id in self.participants:
+		_place[player_id] = 0
+		_final_place[player_id] = -1
 
 	# Start of race.
 	$CanvasLayer/FadeIn.show()
@@ -199,21 +203,23 @@ func setup_race (participants: Dictionary) -> void:
 	await place_tween.finished
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	# Check place of the player car(s), and update as necessary.
-	_check_place (player_car)
-
-func _check_place (car: Car) -> void:
-	if _updating_place: return
-	var current_place: int = _car_place(car)
-	if current_place == _place: return
-	_updating_place = true
-	var dt: float = abs(current_place - _place) * 0.5
+	# Update the places of all the cars.
+	# Determined on the server side.
+	if multiplayer.get_unique_id() == 1:
+		#TODO: more efficient code - this requires a loop inside _car_place.
+		for player_id in _place.keys():
+			var old_place: int = _place[player_id]
+			var new_place: int = _car_place(participants[player_id])
+			if old_place != new_place:
+				_place[player_id] = new_place
+				_update_displayed_place.rpc_id(player_id, new_place)
+@rpc("authority","reliable","call_local")
+func _update_displayed_place (place: int) -> void:
+	var dt: float = 0.5
 	var tween: Tween = create_tween()
 	tween.set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property($CanvasLayer/Place, "scroll_vertical", (current_place-1)*176.0/4, dt)
+	tween.tween_property($CanvasLayer/Place, "scroll_vertical", (place-1)*176.0/4, dt)
 	await tween.finished
-	_place = current_place
-	_updating_place = false
 
 # All available item types.
 enum ItemType {NONE,NAILPOLISH,COFFEE,METEOR,SLIME,BEETLE}
@@ -481,7 +487,7 @@ func _finished (car: Car) -> void:
 			var place: int = i+1
 			if car == player_car:
 				_places[i].set_results(place, car, "Player", time, Color.GREEN)
-				_final_place = place
+				_final_place[multiplayer.get_unique_id()] = place
 			else:
 				_places[i].set_results(place, car, car.display_name+" (CPU)", time, Color.WHITE)
 				return
@@ -526,6 +532,6 @@ func _leave_race(completed: bool = false) -> void:
 	await tween.finished
 	_leaving_race = false
 	if completed:
-		quit.emit(_final_place)
+		quit.emit(_final_place[multiplayer.get_unique_id()])
 	else:
 		quit.emit(-1)
