@@ -648,12 +648,16 @@ func _kersplash (liquid_type: int) -> void:
 
 func _move_to_road () -> void:
 	freeze = true # Rigid bodies don't like being relocated when they're undergoing physics.
+	# Temporarily hide other effects like slimed hood.
+	$Slimed.hide()
 	var tween: Tween = create_tween()
 	tween.set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "global_position", _pathfollow.global_position, 1.0)
 	await tween.finished
 	global_rotation = (_pathfollow.global_position - _old_path_pos).angle() - PI/2
 	freeze = false
+	# Restore other effects.
+	$Slimed.show()
 
 func get_slimed (delay: float, full_slime_duration: float, end: float) -> void:
 	# Wait a bit for Mango to spit the slime (same timing as screen slime).
