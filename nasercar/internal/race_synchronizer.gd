@@ -17,6 +17,6 @@ func _ready() -> void:
 		node = node.get_parent()
 	# Only need to synchronize with participating peers.
 	if node == null: return
-	print (self, " from ", self.get_parent(), " participants: ", node.participants.keys())
+	#print (self, " from ", self.get_parent(), " participants: ", node.participants.keys())
 	for peer in node.participants.keys():
 		set_visibility_for(peer,true)

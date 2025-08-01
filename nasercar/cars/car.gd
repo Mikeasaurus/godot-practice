@@ -274,7 +274,7 @@ func _process(delta: float) -> void:
 	var stop_pressed: bool = Input.is_action_pressed("stop")
 	var reverse_pressed: bool = Input.is_action_pressed("reverse")
 	if type == CarType.PLAYER and DisplayServer.is_touchscreen_available():
-		if Input.is_mouse_button_pressed(1):
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			var t: Vector2 = get_global_mouse_position() - global_position
 			var w: Vector2 = Vector2.from_angle($Wheels/FrontLeft.global_rotation).rotated(PI/2)
 			var angle: float = w.angle_to(t)/PI*180
