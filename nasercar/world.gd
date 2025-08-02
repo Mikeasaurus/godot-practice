@@ -155,18 +155,33 @@ func setup_race (participants: Dictionary) -> void:
 			_lap_completed(car,lap)
 		)
 
-	# For single-player game, set up a car under the player's control.
+	# For single-player game, set up a car under the player's control, and local CPUs.
 	if 1 in self.participants:
-		self.participants[1].make_playable()
+		self.participants[1].make_local_playable()
+		for car in cars:
+			if car not in self.participants.values():
+				car.make_local_cpu()
+				car.display_name = car.display_name + " (CPU)"
 
-	#TODO: setup remotely controlled player cars for multiplayer games.
-
-	# Set up CPU control for remaining cars.
-	for car in cars:
-		if car not in self.participants.values():
-			car.make_cpu()
-			car.display_name = car.display_name + " (CPU)"
-
+	# For multiplayer game, set local controls but remote management for players, and
+	# remotely managed CPUs
+	else:
+		for player_id in self.participants.keys():
+			var car: Car = self.participants[player_id]
+			for id in self.participants.keys():
+				if id == player_id:
+					car.make_remote_playable.rpc_id(id)
+				else:
+					car.make_remote.rpc_id(id)
+			#TODO: better category for cars on server?
+			car.make_local_playable()
+		for car in _cars():
+			# All non-player cars are treated as CPU-controlled on server, and
+			# remotely managed on clients.
+			if car not in self.participants.values():
+				car.make_local_cpu()
+				car.display_name = car.display_name + " (CPU)"
+				car.make_remote.rpc()
 
 	# Set default values of car places, to be computed in _process.
 	for player_id in self.participants:

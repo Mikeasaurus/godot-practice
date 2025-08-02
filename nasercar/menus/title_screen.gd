@@ -10,7 +10,7 @@ var _races: Dictionary = {}
 func _ready() -> void:
 	var notracks: Array[TileMapLayer] = []
 	$NaserCar.add_to_track($Path2D,notracks)
-	$NaserCar.make_cpu()
+	$NaserCar.make_local_cpu()
 	_reset_car()
 	$CarTimer.start()
 	MenuHandler.done_submenus.connect(_reset_and_start_timer)
@@ -39,6 +39,9 @@ func _make_server () -> void:
 		var tls_options := TLSOptions.server(key,cert)
 		peer.create_server(1157,"*",tls_options)
 	multiplayer.multiplayer_peer = peer
+	# Turn off the Naser car for server instance, otherwise it gets synchronized to all the players and
+	# they see an extra car floating around the screen!
+	_reset_car()
 	# Propogate multiplayer race info to car selection menu.
 	$MultiplayerCarSelection._races = _races
 	$MultiplayerCarSelection.refresh_race.connect(_refresh_race)
@@ -97,6 +100,8 @@ func _start_multiplayer_race(race_id: int, participants: Dictionary) -> void:
 	# Configure the race with the given participants.
 	if multiplayer.get_unique_id() == 1:
 		race.setup_race(participants)
+		#TODO: wait for players to finish.
+		#TODO: free the race object once all players have left the game.
 
 # This is called to create a multiplayer race among all peers.
 # "data" is the race_id, and dictionary containing all players / karts for the race.
@@ -106,6 +111,12 @@ func _spawn_multiplayer_race (player_ids: Array[int]) -> Node:
 	var player_id: int = multiplayer.get_unique_id()
 	if player_id == 1 or player_id in player_ids:
 		race = load("res://world.tscn").instantiate()
+		# Turn off Naser car visual.
+		$NaserCar.call_deferred("hide")
+		MenuHandler.done_submenus.disconnect(_reset_and_start_timer)
+		$NaserCar.call_deferred("hide")
+		_reset_car()
+		#
 	# For other peers, just put a simple dummy object here.
 	else:
 		race = Node.new()

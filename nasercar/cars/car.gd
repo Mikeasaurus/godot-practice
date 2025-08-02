@@ -54,6 +54,13 @@ var collision_friction_modifier: float = 1.0
 ## Whether this car is allowed to move.
 var moveable: bool = false
 
+## Car controls.
+var controllable: bool = false
+var _turning_left: bool = false
+var _turning_right: bool = false
+var _accelerating: bool = false
+var _braking: bool = false
+
 enum CarType {PLAYER, CPU, REMOTE}
 
 ## Type of car
@@ -105,8 +112,23 @@ func add_to_track (track_path: Path2D, tilesets: Array[TileMapLayer]) -> void:
 	_last_progress = 0
 
 # Let this car be playable by the local user.
-func make_playable () -> void:
+func make_local_playable () -> void:
 	type = CarType.PLAYER
+	controllable = true
+	$Camera2D.enabled = true
+	$Arrow.show()
+	# Make own engine sound louder.
+	$EngineSound.volume_db = 1.0
+
+# Let this car be playable in a multiplayer game.
+# (input controls captured locally, but car managed by server).
+@rpc("authority","reliable")
+func make_remote_playable () -> void:
+	# Turn off local collision detection for remotely managed cars.
+	collision_mask = 0
+	collision_layer = 0
+	type = CarType.REMOTE
+	controllable = true
 	$Camera2D.enabled = true
 	$Arrow.show()
 	# Make own engine sound louder.
@@ -120,8 +142,17 @@ func autopilot () -> void:
 
 # Make this car follow a predetermined path
 # (as local CPU).
-func make_cpu () -> void:
+func make_local_cpu () -> void:
 	type = CarType.CPU
+
+# Make this car an entirely remotely controlled car,
+# with no input captured from the user.
+@rpc("authority","reliable")
+func make_remote () -> void:
+	# Turn off local collision detection for remotely managed cars.
+	collision_mask = 0
+	collision_layer = 0
+	type = CarType.REMOTE
 
 # Allow this car to start moving.
 func go () -> void:
