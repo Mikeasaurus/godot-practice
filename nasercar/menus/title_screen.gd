@@ -86,20 +86,34 @@ func _on_car_timer_timeout() -> void:
 
 # Called within server (from kart selection screen back to main screen) to indicate
 # a race is ready to start.
-func _start_multiplayer_race(race_id: int) -> void:
-	#TODO: better id for this race.
-	var race: World = $MultiplayerSpawner.spawn(race_id)
+func _start_multiplayer_race(race_id: int, participants: Dictionary) -> void:
+	# Construct a list of all race participants, starting with the host.
+	var player_ids: Array[int] = [race_id]
+	for player_id in participants.keys():
+		if player_id not in player_ids:
+			player_ids.append(player_id)
+	var race: World = $MultiplayerSpawner.spawn(player_ids)
 	print ("Starting race! ", race)
 	# Configure the race with the given participants.
 	if multiplayer.get_unique_id() == 1:
-		race.setup_race(_races[race_id])
+		race.setup_race(participants)
 
 # This is called to create a multiplayer race among all peers.
 # "data" is the race_id, and dictionary containing all players / karts for the race.
-func _spawn_multiplayer_race (race_id: int) -> Node:
-	var race: World = load("res://world.tscn").instantiate()
-	# Set a consistent name for this race across all participating peers.
-	race.name = str(race_id)
+func _spawn_multiplayer_race (player_ids: Array[int]) -> Node:
+	var race: Node
+	# For the server and participating peers, this will be the fully constructed race.
+	var player_id: int = multiplayer.get_unique_id()
+	if player_id == 1 or player_id in player_ids:
+		race = load("res://world.tscn").instantiate()
+	# For other peers, just put a simple dummy object here.
+	else:
+		race = Node.new()
+		#race = load("res://world.tscn").instantiate()
+		#race.process_mode = Node.PROCESS_MODE_DISABLED
+	# Set a consistent name for this race across all peers.
+	# Use the id of the host player (first entry).
+	race.name = str(player_ids[0])
 	return race
 
 func start_race (player_car: Car) -> void:

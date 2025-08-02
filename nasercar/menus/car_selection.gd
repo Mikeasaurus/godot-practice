@@ -9,7 +9,7 @@ var _races: Dictionary = {}
 signal singleplayer_race (car: Car)
 
 # Signal for when the player is ready to start a multiplayer race.
-signal multiplayer_race (race_id: int)
+signal multiplayer_race (race_id: int, participants: Dictionary)
 
 # Signal that gets sent when the race stats should be re-read by the parent scene.
 signal refresh_race (race_id: int)
@@ -88,9 +88,9 @@ func _try_starting_race() -> void:
 	if player_id not in _races: return
 	var race_id: int = player_id
 	# Send some signals to all participating players.
-	var r: Dictionary = _races[race_id]
-	for p in r.keys():
-		var value: Array = r[p]
+	var participants: Dictionary = _races[race_id]
+	for p in participants.keys():
+		var value: Array = participants[p]
 		# value is [handle,car_name]
 		var car_name: String = value[1]
 		# If there are any peers left who have not selected a kart, then politely cancel them out.
@@ -98,8 +98,11 @@ func _try_starting_race() -> void:
 			_cancel.rpc_id(p,"Sorry, the race has already started.")
 		# Otherwise, fade out their screen as a heads-up that the race is beginning.
 		_fadeout.rpc_id(p)
+	# Remove the entry from the list of races (can't join anymore).
+	_races.erase(race_id)
+	refresh_race.emit(race_id)
 	await get_tree().create_timer(_fadeout_time).timeout
-	multiplayer_race.emit(race_id)
+	multiplayer_race.emit(race_id, participants)
 
 # Handle remote updates of kart selections
 # This is called on the server when the user clicks on a kart in multiplayer context.
