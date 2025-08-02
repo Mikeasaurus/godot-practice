@@ -149,6 +149,10 @@ func _process(delta: float) -> void:
 	# Same with smouldering effects.
 	$Meteor.global_rotation = 0
 
+	#TODO: handle remotely managed cars in multiplayer mode.
+	# (Which bits of code in here still need to run?)
+	if type == CarType.REMOTE: return
+
 	#######################################################
 	# Check if a lap was just completed.
 	#######################################################

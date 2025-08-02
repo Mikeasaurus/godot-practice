@@ -91,7 +91,8 @@ func _ready() -> void:
 	var places_vbox: VBoxContainer = $CanvasLayer/Stats/CenterContainer/Places
 	for car in _cars():
 		var result_line: ResultLine = result_scene.instantiate()
-		result_line.set_results(-1, null, "", -1, Color.hex(0x555555ff))
+		result_line.name = car.display_name  # Consistent name to help with RPC calls into this object.
+		result_line.set_results(-1, "", "", -1, Color.hex(0x555555ff))
 		places_vbox.add_child(result_line)
 		_final_stats.append(result_line)
 		var hsep: HSeparator = HSeparator.new()
@@ -117,13 +118,17 @@ func setup_race (participants: Dictionary) -> void:
 		return
 
 	# Match each player to their car scene in the race.
-	# participants variable gets updated from car names to instances of car objects.
+	# participants variable gets updated from [player_name,car_name] to instances of car objects.
 	var cars: Array[Car] = _cars()
 	self.participants = {}
 	for player_id in participants.keys():
 		for car in cars:
-			if car.display_name == participants[player_id]:
+			var player_name: String = participants[player_id][0]
+			var car_name: String = participants[player_id][1]
+			if car.display_name == car_name:
 				self.participants[player_id] = car
+				# Update the names of player car(s)
+				car.display_name = player_name
 
 	# Move the playable car(s) to the front.
 	var player_ids: Array = self.participants.keys()
@@ -160,6 +165,7 @@ func setup_race (participants: Dictionary) -> void:
 	for car in cars:
 		if car not in self.participants.values():
 			car.make_cpu()
+			car.display_name = car.display_name + " (CPU)"
 
 
 	# Set default values of car places, to be computed in _process.
@@ -500,18 +506,18 @@ func _finished (car: Car) -> void:
 	for i in range(len(_finished_cars)):
 		if _finished_cars[i] == car:
 			var place: int = i+1
-			# Single player mode - use "Player" as name.
-			if 1 in participants and car == participants[1]:
-				_final_stats[i].set_results(place, car, "Player", time, Color.GREEN)
-			#TODO: Peer  handles
-			else:
-				_final_stats[i].set_results(place, car, car.display_name+" (CPU)", time, Color.WHITE)
-				return
-	# CPU takes control of car after race, so cars are still moving in the background
-	# while the player reads the final results.
-	car.autopilot()
-	# Rest of this is for the player's screen.
-	_finished_announce.rpc_id(_get_player_id(car))
+			for player_id in participants.keys():
+				var text_colour: Color = Color.WHITE
+				# Highlight the player's name in green on their own screen.
+				if participants[player_id] == car:
+					text_colour = Color.GREEN
+				_final_stats[i].set_results.rpc_id(player_id, place, car.scene_file_path, car.display_name, time, text_colour)
+	if car.type == car.CarType.PLAYER:
+		# CPU takes control of car after race, so cars are still moving in the background
+		# while the player reads the final results.
+		car.autopilot()
+		# Rest of this is for the player's screen.
+		_finished_announce.rpc_id(_get_player_id(car))
 @rpc("authority","reliable","call_local")
 func _finished_announce() -> void:
 	$CanvasLayer/Place.hide()

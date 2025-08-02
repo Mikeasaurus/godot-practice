@@ -7,12 +7,13 @@ func _ready() -> void:
 	pass # Replace with function body.
 	#set_results(2, load("res://cars/naser_car.tscn").instantiate(), "Naser (CPU)", 64.0, Color.GREEN)
 
-func set_results (place: int, car: Car, name: String, time: float, colour: Color = Color.WHITE) -> void:
+@rpc("authority","reliable","call_local")
+func set_results (place: int, car_path: String, name: String, time: float, colour: Color = Color.WHITE) -> void:
 	if place > 0:
 		$Place.text = str(place)
 	$Place.modulate = colour
-	if car != null:
-		car = load(car.scene_file_path).instantiate()
+	if car_path != '':
+		var car: Car = load(car_path).instantiate()
 		$Car/SubViewport.add_child(car)
 		car.scale = Vector2(0.5,0.5)
 		car.position = Vector2(40,40)

@@ -87,20 +87,19 @@ func _on_car_timer_timeout() -> void:
 # Called within server (from kart selection screen back to main screen) to indicate
 # a race is ready to start.
 func _start_multiplayer_race(race_id: int) -> void:
-	var race: World = $MultiplayerSpawner.spawn([race_id,_races[race_id]])
+	#TODO: better id for this race.
+	var race: World = $MultiplayerSpawner.spawn(race_id)
 	print ("Starting race! ", race)
+	# Configure the race with the given participants.
+	if multiplayer.get_unique_id() == 1:
+		race.setup_race(_races[race_id])
 
 # This is called to create a multiplayer race among all peers.
 # "data" is the race_id, and dictionary containing all players / karts for the race.
-func _spawn_multiplayer_race (data) -> Node:
+func _spawn_multiplayer_race (race_id: int) -> Node:
 	var race: World = load("res://world.tscn").instantiate()
-	var race_id: int = data[0]
-	var participants: Dictionary = data[1]
 	# Set a consistent name for this race across all participating peers.
 	race.name = str(race_id)
-	# Configure the race with the given participants.
-	if multiplayer.get_unique_id() == 1:
-		race.setup_race(participants)
 	return race
 
 func start_race (player_car: Car) -> void:
@@ -109,7 +108,7 @@ func start_race (player_car: Car) -> void:
 	add_child(race)
 	# Set up the player car based on the car type chosen.
 	# For single-player games, player id is just 1.
-	race.setup_race({1:player_car.display_name})
+	race.setup_race({1:["Player",player_car.display_name]})
 	# Turn off Naser car visual.
 	# Do this after a bit of a delay, because there's a call to _reset_and_start_timer around the same
 	# time as this (from MenuHandler) that would cause the Naser car to start on its own.
