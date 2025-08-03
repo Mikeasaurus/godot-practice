@@ -183,7 +183,7 @@ func make_local_playable () -> void:
 # Let this car be playable in a multiplayer game.
 # (input controls captured locally, but car managed by server).
 @rpc("authority","reliable")
-func make_remote_playable () -> void:
+func make_remote_playable_clientside () -> void:
 	# Turn off local collision detection for remotely managed cars.
 	collision_mask = 0
 	collision_layer = 0
@@ -193,6 +193,8 @@ func make_remote_playable () -> void:
 	$Arrow.show()
 	# Make own engine sound louder.
 	$EngineSound.volume_db = 1.0
+func make_remote_playable_serverside () -> void:
+	type = CarType.PLAYER
 
 # Override player controls with autopilot.
 # (for after end of race).
@@ -240,8 +242,35 @@ func _process(delta: float) -> void:
 	# Same with smouldering effects.
 	$Meteor.global_rotation = 0
 
-	#TODO: handle remotely managed cars in multiplayer mode.
-	# (Which bits of code in here still need to run?)
+	#######################################################
+	# Handle touch controls.
+	#######################################################
+	# Done early in _process, since it has to be handled on client side and the
+	# rest of this routine is for server side stuff.
+	if controllable and DisplayServer.is_touchscreen_available():
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			var t: Vector2 = get_global_mouse_position() - global_position
+			var w: Vector2 = Vector2.from_angle($Wheels/FrontLeft.global_rotation).rotated(PI/2)
+			var angle: float = w.angle_to(t)/PI*180
+			if angle < 0:
+				_press_left.rpc_id(1)
+				_unpress_right.rpc_id(1)
+			elif angle > 0:
+				_press_right.rpc_id(1)
+				_unpress_left.rpc_id(1)
+			if w.dot(t) >= 0:
+				_press_up.rpc_id(1)
+				_unpress_down.rpc_id(1)
+			else:
+				_press_down.rpc_id(1)
+				_unpress_up.rpc_id(1)
+		else:
+			_unpress_left.rpc_id(1)
+			_unpress_right.rpc_id(1)
+			_unpress_up.rpc_id(1)
+			_unpress_down.rpc_id(1)
+
+	# The rest of this code is for server-side processing.
 	if type == CarType.REMOTE: return
 
 	#######################################################
@@ -363,23 +392,6 @@ func _process(delta: float) -> void:
 		# Re-center
 		else:
 			recenter = true
-	# Touch controls
-	# Also, declare movement variable up here so touch controls can modify them.
-	var go_pressed: bool = _accelerating
-	var stop_pressed: bool = _braking
-	var reverse_pressed: bool = _reversing
-	if type == CarType.PLAYER and DisplayServer.is_touchscreen_available():
-		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-			var t: Vector2 = get_global_mouse_position() - global_position
-			var w: Vector2 = Vector2.from_angle($Wheels/FrontLeft.global_rotation).rotated(PI/2)
-			var angle: float = w.angle_to(t)/PI*180
-			if angle < 0: turn_left = true
-			elif angle > 0: turn_right = true
-			#var c: Vector2 = Vector2.from_angle(global_rotation).rotated(PI/2)
-			if w.dot(t) >= 0: go_pressed = true
-			else: reverse_pressed = true
-		else:
-			recenter = true
 
 	if turn_left:
 		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
@@ -402,6 +414,9 @@ func _process(delta: float) -> void:
 	#######################################################
 	# Movement
 	#######################################################
+	var go_pressed: bool = _accelerating
+	var stop_pressed: bool = _braking
+	var reverse_pressed: bool = _reversing
 	# Check for speed modifiers.
 	var acceleration_modifier: float = 1.0
 	var max_speed_modifier: float = 1.0

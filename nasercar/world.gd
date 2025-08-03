@@ -170,11 +170,10 @@ func setup_race (participants: Dictionary) -> void:
 			var car: Car = self.participants[player_id]
 			for id in self.participants.keys():
 				if id == player_id:
-					car.make_remote_playable.rpc_id(id)
+					car.make_remote_playable_clientside.rpc_id(id)
 				else:
 					car.make_remote.rpc_id(id)
-			#TODO: better category for cars on server?
-			car.make_local_playable()
+			car.make_remote_playable_serverside()
 		for car in _cars():
 			# All non-player cars are treated as CPU-controlled on server, and
 			# remotely managed on clients.

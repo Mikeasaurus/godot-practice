@@ -305,6 +305,18 @@ properties/18/replication_mode = 1
 properties/19/path = NodePath(".:angular_velocity")
 properties/19/spawn = true
 properties/19/replication_mode = 1
+properties/20/path = NodePath("Wheels/FrontLeft:rotation")
+properties/20/spawn = true
+properties/20/replication_mode = 1
+properties/21/path = NodePath("Wheels/FrontRight:rotation")
+properties/21/spawn = true
+properties/21/replication_mode = 1
+properties/22/path = NodePath("Wheels/RearLeft:rotation")
+properties/22/spawn = true
+properties/22/replication_mode = 1
+properties/23/path = NodePath("Wheels/RearRight:rotation")
+properties/23/spawn = true
+properties/23/replication_mode = 1
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0
