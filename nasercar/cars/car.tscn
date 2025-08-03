@@ -296,6 +296,15 @@ properties/15/replication_mode = 2
 properties/16/path = NodePath(".:position")
 properties/16/spawn = true
 properties/16/replication_mode = 1
+properties/17/path = NodePath(".:linear_velocity")
+properties/17/spawn = true
+properties/17/replication_mode = 1
+properties/18/path = NodePath(".:rotation")
+properties/18/spawn = true
+properties/18/replication_mode = 1
+properties/19/path = NodePath(".:angular_velocity")
+properties/19/spawn = true
+properties/19/replication_mode = 1
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0

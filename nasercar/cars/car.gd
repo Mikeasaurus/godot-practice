@@ -55,11 +55,71 @@ var collision_friction_modifier: float = 1.0
 var moveable: bool = false
 
 ## Car controls.
+## Inputs captured from client side, and sent to server side via RPC calls.
 var controllable: bool = false
+#
 var _turning_left: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_left () -> void:
+	_turning_left = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_left () -> void:
+	_turning_left = false
+#
 var _turning_right: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_right () -> void:
+	_turning_right = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_right () -> void:
+	_turning_right = false
+#
 var _accelerating: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_up () -> void:
+	_accelerating = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_up () -> void:
+	_accelerating = false
+#
 var _braking: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_space () -> void:
+	_braking = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_space () -> void:
+	_braking = false
+#
+var _reversing: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_down () -> void:
+	_reversing = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_down () -> void:
+	_reversing = false
+#
+func _input(event: InputEvent) -> void:
+	if not controllable: return
+	if event.is_action_pressed("turn_left"):
+		_press_left.rpc_id(1)
+	if event.is_action_released("turn_left"):
+		_unpress_left.rpc_id(1)
+	if event.is_action_pressed("turn_right"):
+		_press_right.rpc_id(1)
+	if event.is_action_released("turn_right"):
+		_unpress_right.rpc_id(1)
+	if event.is_action_pressed("go"):
+		_press_up.rpc_id(1)
+	if event.is_action_released("go"):
+		_unpress_up.rpc_id(1)
+	if event.is_action_pressed("stop"):
+		_press_space.rpc_id(1)
+	if event.is_action_released("stop"):
+		_unpress_space.rpc_id(1)
+	if event.is_action_pressed("reverse"):
+		_press_down.rpc_id(1)
+	if event.is_action_released("reverse"):
+		_unpress_down.rpc_id(1)
 
 enum CarType {PLAYER, CPU, REMOTE}
 
@@ -295,19 +355,19 @@ func _process(delta: float) -> void:
 	# Determine if wheels need to be turned, and in which direction.
 	if type == CarType.PLAYER or (type == CarType.CPU and cpu_steer_direction != CPU_Steer_Direction.PATH):
 		# Turn left
-		if (type == CarType.PLAYER and Input.is_action_pressed("turn_left")) or cpu_steer_direction == CPU_Steer_Direction.LEFT:
+		if (type == CarType.PLAYER and _turning_left) or cpu_steer_direction == CPU_Steer_Direction.LEFT:
 			turn_left = true
 		# Turn right
-		elif (type == CarType.PLAYER and Input.is_action_pressed("turn_right")) or cpu_steer_direction == CPU_Steer_Direction.RIGHT:
+		elif (type == CarType.PLAYER and _turning_right) or cpu_steer_direction == CPU_Steer_Direction.RIGHT:
 			turn_right = true
 		# Re-center
 		else:
 			recenter = true
 	# Touch controls
 	# Also, declare movement variable up here so touch controls can modify them.
-	var go_pressed: bool = Input.is_action_pressed("go")
-	var stop_pressed: bool = Input.is_action_pressed("stop")
-	var reverse_pressed: bool = Input.is_action_pressed("reverse")
+	var go_pressed: bool = _accelerating
+	var stop_pressed: bool = _braking
+	var reverse_pressed: bool = _reversing
 	if type == CarType.PLAYER and DisplayServer.is_touchscreen_available():
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			var t: Vector2 = get_global_mouse_position() - global_position
