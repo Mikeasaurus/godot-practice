@@ -353,6 +353,9 @@ properties/34/replication_mode = 2
 properties/35/path = NodePath("LavaSplash/SplashSound:playing")
 properties/35/spawn = true
 properties/35/replication_mode = 2
+properties/36/path = NodePath("Meteor/CPUParticles2D:emitting")
+properties/36/spawn = true
+properties/36/replication_mode = 2
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0

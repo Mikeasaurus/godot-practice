@@ -672,26 +672,17 @@ func _on_crash_sound_timer_timeout() -> void:
 # Make car splash into water
 func _kersplash (liquid_type: int) -> void:
 	var splash: Node2D
-	var ripple: Node2D
-	var ripple_light: TextureRect
-	var ripple_dark: TextureRect
 	var sound: AudioStreamPlayer2D
 	var particles: CPUParticles2D
 	var dt: float
 	match liquid_type:
 		0:
 			splash = $WaterSplash
-			ripple = $WaterSplash/Ripple
-			ripple_light = $WaterSplash/Ripple/Light
-			ripple_dark = $WaterSplash/Ripple/Dark
 			sound = $WaterSplash/SplashSound
 			particles = $WaterSplash/Particles
 			dt = 0.3
 		1:
 			splash = $LavaSplash
-			ripple = $LavaSplash/Ripple
-			ripple_light = $LavaSplash/Ripple/Light
-			ripple_dark = $LavaSplash/Ripple/Dark
 			sound = $LavaSplash/SplashSound
 			particles = $LavaSplash/Particles
 			dt = 0.6
@@ -705,16 +696,9 @@ func _kersplash (liquid_type: int) -> void:
 	# Start showing ripple of water when car is sinking.
 	# Also fade the car into the water.
 	splash.global_rotation = 0
-	ripple.show()
-	var dr: float = 0.20
+	_ripples.rpc(liquid_type)
 	var tween: Tween = create_tween()
-	var start: PackedFloat32Array = PackedFloat32Array([0,1-2*dr,1-dr,1,1])
-	var almost: PackedFloat32Array = PackedFloat32Array([0,0,dr,2*dr,1])
-	var finish: PackedFloat32Array = PackedFloat32Array([0,0,0,dr,1])
-	ripple_dark.texture.gradient.offsets = start
-	ripple_light.texture.gradient.offsets = start
-	tween.tween_property(ripple_dark.texture.gradient, "offsets", almost, dt)
-	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", almost, dt)
+	var dr: float = 0.20
 	var modulated_stuff: Array = [$Body, $Wheels/FrontLeft/Sprite2D, $Wheels/FrontRight/Sprite2D, $Wheels/RearLeft/Sprite2D, $Wheels/RearRight/Sprite2D]
 	for m in modulated_stuff:
 		tween.parallel().tween_property(m, "modulate", Color.hex(0x00000000), dt)
@@ -723,13 +707,7 @@ func _kersplash (liquid_type: int) -> void:
 	await tween.finished
 	# Near end of inward convergence of water, show spray of water particles.
 	particles.emitting = true
-	tween = create_tween()
-	tween.tween_property(ripple_dark.texture.gradient, "offsets", finish, dt*dr*2)
-	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", finish, dt*dr*2)
-	tween.parallel().tween_property(ripple_dark, "modulate", Color.TRANSPARENT, dt*dr*2)
-	tween.parallel().tween_property(ripple_light, "modulate", Color.TRANSPARENT, dt*dr*2)
-	await tween.finished
-	ripple.hide()
+	await get_tree().create_timer(dt*dr*2).timeout
 	particles.emitting = false
 	# Cut off sound before second splash in the .wav file.
 	await get_tree().create_timer(1.0).timeout
@@ -743,13 +721,51 @@ func _kersplash (liquid_type: int) -> void:
 	else:
 		for m in modulated_stuff:
 			m.modulate = Color.WHITE
-	ripple_dark.modulate = Color.WHITE
-	ripple_light.modulate = Color.WHITE
 	# Make car mobile again.
 	freeze = false
 	moveable = true
 	# Done
 	_splashing = false
+# Need to manage ripple effect via RPC, since gradient properties can't be
+# managed in a MultiplayerSynchronizer.
+@rpc("authority","reliable","call_local")
+func _ripples (liquid_type: int) -> void:
+	var ripple: Node2D
+	var ripple_light: TextureRect
+	var ripple_dark: TextureRect
+	var dt: float
+	match liquid_type:
+		0:
+			ripple = $WaterSplash/Ripple
+			ripple_light = $WaterSplash/Ripple/Light
+			ripple_dark = $WaterSplash/Ripple/Dark
+			dt = 0.3
+		1:
+			ripple = $LavaSplash/Ripple
+			ripple_light = $LavaSplash/Ripple/Light
+			ripple_dark = $LavaSplash/Ripple/Dark
+			dt = 0.6
+	ripple.show()
+	var dr: float = 0.20
+	var tween: Tween = create_tween()
+	var start: PackedFloat32Array = PackedFloat32Array([0,1-2*dr,1-dr,1,1])
+	var almost: PackedFloat32Array = PackedFloat32Array([0,0,dr,2*dr,1])
+	var finish: PackedFloat32Array = PackedFloat32Array([0,0,0,dr,1])
+	ripple_dark.texture.gradient.offsets = start
+	ripple_light.texture.gradient.offsets = start
+	tween.tween_property(ripple_dark.texture.gradient, "offsets", almost, dt)
+	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", almost, dt)
+	#TODO
+	await tween.finished
+	tween = create_tween()
+	tween.tween_property(ripple_dark.texture.gradient, "offsets", finish, dt*dr*2)
+	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", finish, dt*dr*2)
+	tween.parallel().tween_property(ripple_dark, "modulate", Color.TRANSPARENT, dt*dr*2)
+	tween.parallel().tween_property(ripple_light, "modulate", Color.TRANSPARENT, dt*dr*2)
+	await tween.finished
+	ripple.hide()
+	ripple_dark.modulate = Color.WHITE
+	ripple_light.modulate = Color.WHITE
 
 func _move_to_road () -> void:
 	freeze = true # Rigid bodies don't like being relocated when they're undergoing physics.
