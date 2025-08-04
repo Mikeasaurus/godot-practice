@@ -753,4 +753,8 @@ spawn_path = NodePath("..")
 _spawnable_scenes = PackedStringArray("res://items/nail_polish.tscn")
 spawn_path = NodePath("..")
 
+[node name="ImpactSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://effects/impact.tscn", "res://effects/crater.tscn")
+spawn_path = NodePath("..")
+
 [connection signal="pressed" from="CanvasLayer/DoneButton" to="." method="_on_done_button_pressed"]

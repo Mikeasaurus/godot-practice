@@ -480,7 +480,7 @@ func _release_nailpolish (from: Car) -> void:
 func _big_badaboom (car: Car) -> void:
 	# Flash of light
 	var boom: Node2D = load("res://effects/impact.tscn").instantiate()
-	add_child(boom)
+	add_child(boom,true)
 	boom.global_position = car.global_position
 	boom.z_index = 3
 	var tween: Tween = create_tween()
@@ -495,7 +495,7 @@ func _big_badaboom (car: Car) -> void:
 			c.smoulder()
 	# Smoking crater.
 	var crater: Node2D = load("res://effects/crater.tscn").instantiate()
-	add_child(crater)
+	add_child(crater,true)
 	crater.global_position = car.global_position
 	crater.z_index = 2
 	crater.get_node("CPUParticles2D").emitting = true
