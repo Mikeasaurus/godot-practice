@@ -110,6 +110,9 @@ func _ready() -> void:
 	# Default cars to being passive (remotely controlled).
 	for car in _cars():
 		car.type = car.CarType.REMOTE
+	# Force the TileMapLayer to instantiate its scenes, because normally this is deferred and we can't
+	# see the sprites from this _ready() function.
+	$Items.update_internals()
 
 # Called to do final setup of race, and start it.
 func setup_race (participants: Dictionary) -> void:
@@ -185,6 +188,11 @@ func setup_race (participants: Dictionary) -> void:
 	# Set default values of car places, to be computed in _process.
 	for player_id in self.participants:
 		_place[player_id] = 0
+
+	# Update set of peers for item blocks.
+	# They don't use normal synchronizers, so need to explicitly set this up.
+	for c in $Items.get_children():
+		c.peers = participants.keys()
 
 	# Start of race.
 	$CanvasLayer/FadeIn.show()
@@ -363,17 +371,7 @@ func _use_item(car: Car = null) -> void:
 	if item == ItemType.NONE: return  # Item not available yet.
 	_current_items.erase(car)
 	if car.type == car.CarType.PLAYER:
-		# Play item activation sound.
-		# Skipped for certain items which have their own distinct sound.
-		if item not in [ItemType.NAILPOLISH, ItemType.COFFEE]:
-			$ItemSelect/WhooshSound.play()
-		var tween: Tween = create_tween()
-		tween.tween_property($ItemSelect/CenterContainer,"scale",Vector2(1.0,1.0),0.2)
-		tween.parallel().tween_property($ItemSelect/CenterContainer,"modulate",Color.hex(0xffffff00),0.2)
-		await tween.finished
-		$ItemSelect.hide()
-		$ItemSelect/CenterContainer.scale = Vector2(0.5,0.5)
-		$ItemSelect/CenterContainer.modulate = Color.WHITE
+		_item_usage_visual.rpc_id(_get_player_id(car),item)
 	if item == ItemType.SLIME:
 		for c in _cars_in_front_of(car):
 			c.get_slimed(0.7+0.4, 4.0, 2.0)
@@ -392,6 +390,21 @@ func _use_item(car: Car = null) -> void:
 		car.sip_coffee()
 	if item == ItemType.METEOR:
 		_launch_meteor(car)
+# Called from server to client, to trigger visual feedback of using the item.
+@rpc("authority","reliable","call_local")
+func _item_usage_visual (item: ItemType) -> void:
+	# Play item activation sound.
+	# Skipped for certain items which have their own distinct sound.
+	if item not in [ItemType.NAILPOLISH, ItemType.COFFEE]:
+		$ItemSelect/WhooshSound.play()
+	var tween: Tween = create_tween()
+	tween.tween_property($ItemSelect/CenterContainer,"scale",Vector2(1.0,1.0),0.2)
+	tween.parallel().tween_property($ItemSelect/CenterContainer,"modulate",Color.hex(0xffffff00),0.2)
+	await tween.finished
+	$ItemSelect.hide()
+	$ItemSelect/CenterContainer.scale = Vector2(0.5,0.5)
+	$ItemSelect/CenterContainer.modulate = Color.WHITE
+
 @rpc("authority","reliable","call_local")
 func _slime_screen() -> void:
 	$ScreenEffects/MangoSlime.show()

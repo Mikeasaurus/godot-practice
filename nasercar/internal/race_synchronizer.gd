@@ -4,9 +4,6 @@ class_name RaceSynchronizer
 
 # Extension of MultiplayerSynchronizer to handle subgroups of peers within a race.
 
-## List of peers who are participating in this race
-var peers: Array
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Get peers to synchronize with (server-side setup only).
@@ -17,6 +14,5 @@ func _ready() -> void:
 		node = node.get_parent()
 	# Only need to synchronize with participating peers.
 	if node == null: return
-	#print (self, " from ", self.get_parent(), " participants: ", node.participants.keys())
 	for peer in node.participants.keys():
 		set_visibility_for(peer,true)
