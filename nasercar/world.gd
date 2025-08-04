@@ -113,6 +113,11 @@ func _ready() -> void:
 	# Force the TileMapLayer to instantiate its scenes, because normally this is deferred and we can't
 	# see the sprites from this _ready() function.
 	$Items.update_internals()
+	# Use consistent names for the items.
+	# The auto-generated names can quickly get out of sync between client/server.
+	# Copied this solution from SlimeTime, where I was having the same problem.
+	for c in $Items.get_children():
+		c.name = c.scene_file_path.split('/')[-1].split('.')[0]+"_"+str(c.position.x)+"_"+str(c.position.y)
 
 # Called to do final setup of race, and start it.
 func setup_race (participants: Dictionary) -> void:
