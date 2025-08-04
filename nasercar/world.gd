@@ -450,11 +450,11 @@ func _slime_screen() -> void:
 
 func _launch_beetle (from: Car, to: Car) -> void:
 	var beetle = load("res://items/beetle.tscn").instantiate()
-	add_child(beetle)
+	add_child(beetle,true)
 	beetle.z_index = 10
 	beetle.global_position = from.global_position
 	beetle.velocity = from.linear_velocity
-	if to != null:	
+	if to != null:
 		beetle.set_target(to)
 	else:
 		beetle.buzz_off()
@@ -468,7 +468,7 @@ func _launch_meteor (from: Car) -> void:
 
 func _release_nailpolish (from: Car) -> void:
 	var nailpolish = load("res://items/nail_polish.tscn").instantiate()
-	add_child(nailpolish)
+	add_child(nailpolish,true)
 	nailpolish.global_position = from.global_position
 	nailpolish.z_index = 0  # Under item blocks and things.
 

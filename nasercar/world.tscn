@@ -745,4 +745,12 @@ visible = false
 replication_config = SubResource("SceneReplicationConfig_pcovh")
 script = ExtResource("31_2r05m")
 
+[node name="BeetleSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://items/beetle.tscn")
+spawn_path = NodePath("..")
+
+[node name="NailPolishSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://items/nail_polish.tscn")
+spawn_path = NodePath("..")
+
 [connection signal="pressed" from="CanvasLayer/DoneButton" to="." method="_on_done_button_pressed"]
