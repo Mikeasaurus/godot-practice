@@ -527,9 +527,10 @@ func _process(delta: float) -> void:
 		var dusty: bool = false
 		var wheel_sinking: bool
 		var skid_sound: int
+		var wheel_local_position: Vector2 = wheel.global_position - global_position + position
 		for tilesource in _tilesets:
 			if tilesource == null: continue
-			var tilepos: Vector2i = tilesource.local_to_map((position+wheel.position)/tilesource.scale.x)
+			var tilepos: Vector2i = tilesource.local_to_map(wheel_local_position/tilesource.scale.x)
 			var tiledata: TileData = tilesource.get_cell_tile_data(tilepos)
 			if tiledata == null: continue
 			if tiledata.get_custom_data("has_skidmarks"):
@@ -547,7 +548,7 @@ func _process(delta: float) -> void:
 						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(dx/2,-dx/2)
 					if partial_type == 4:
 						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(-dx/2,-dx/2)
-					if (position + wheel.position - origin).length() > dx:
+					if (wheel_local_position - origin).length() > dx:
 						continue
 				skidmark_colour = tiledata.get_custom_data("skidmark_colour")
 			if tiledata.get_custom_data("has_particles"):
@@ -586,7 +587,7 @@ func _process(delta: float) -> void:
 					wheel_skidmarks[w].default_color = skidmark_colour
 					add_sibling(wheel_skidmarks[w],true)
 					wheel_skidmarks[w].z_index = 1
-				wheel_skidmarks[w].add_point(position + wheel.position)
+				wheel_skidmarks[w].add_point(wheel_local_position)
 			else:
 				wheel_skidmarks[w] = null
 			if particle_colour_1 != Color.TRANSPARENT:
