@@ -574,7 +574,7 @@ func _process(delta: float) -> void:
 				if wheel_skidmarks[w] == null or wheel_skidmarks[w].default_color != skidmark_colour:
 					wheel_skidmarks[w] = load("res://cars/skid_mark.tscn").instantiate()
 					wheel_skidmarks[w].default_color = skidmark_colour
-					add_sibling(wheel_skidmarks[w])
+					add_sibling(wheel_skidmarks[w],true)
 					wheel_skidmarks[w].z_index = 1
 				wheel_skidmarks[w].add_point(wheel.global_position)
 			else:
