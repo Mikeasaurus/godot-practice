@@ -421,6 +421,15 @@ z_index = 10
 rotation = 3.14159
 texture = ExtResource("5_sxyoi")
 
+[node name="Nameplate" type="Label" parent="."]
+visible = false
+z_index = 1
+offset_right = 96.0
+offset_bottom = 23.0
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
 [node name="Slimed" type="Node2D" parent="."]
 
 [node name="Slime" type="Sprite2D" parent="Slimed"]

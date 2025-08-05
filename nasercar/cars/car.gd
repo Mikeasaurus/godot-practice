@@ -156,6 +156,12 @@ func _ready() -> void:
 	# Raise the z_index so effects like skid marks appear beneath it.
 	z_index = 2
 
+# Called to show a nameplace on the car.
+@rpc("authority","reliable")
+func _show_nameplate (text: String) -> void:
+	$Nameplate.show()
+	$Nameplate.text = text
+
 # Add track information (world tiles, path from start to finish of race).
 func add_to_track (track_path: Path2D, tilesets: Array[TileMapLayer]) -> void:
 	_tilesets = tilesets
@@ -241,6 +247,10 @@ func _process(delta: float) -> void:
 	$Arrow.offset.y = -60*$Camera2D.zoom.y
 	# Same with smouldering effects.
 	$Meteor.global_rotation = 0
+	# Same with nameplate.
+	if $Nameplate.visible:
+		$Nameplate.rotation = $Arrow.rotation
+		$Nameplate.global_position = global_position + Vector2(-$Nameplate.size.x/2,-110)
 
 	#######################################################
 	# Handle touch controls.

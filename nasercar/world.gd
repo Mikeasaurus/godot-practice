@@ -137,6 +137,7 @@ func setup_race (participants: Dictionary) -> void:
 				self.participants[player_id] = car
 				# Update the names of player car(s)
 				car.display_name = player_name
+				car._show_nameplate.rpc(player_name)
 
 	# Move the playable car(s) to the front.
 	var player_ids: Array = self.participants.keys()
