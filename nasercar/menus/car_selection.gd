@@ -17,6 +17,9 @@ signal refresh_race (race_id: int)
 # Signal for displaying an error message on the main screen.
 signal error_message (msg: String)
 
+# Signal for disconnecting from the server.
+signal leave_server
+
 # Helper methods: convert between panel index and car name.
 var car_names: Array[String]
 func index2name (panel_index: int) -> String:
@@ -55,6 +58,7 @@ func _on_back_button_pressed() -> void:
 	# For multiplayer games, need to let the server know that we're backing out.
 	if multiplayer.get_unique_id() != 1:
 		_bail.rpc_id(1)
+	leave_server.emit()
 	MenuHandler.deactivate_menu()
 
 # Helper function - face out the screen.
@@ -237,6 +241,7 @@ func _race_bailed (race_id: int) -> void:
 @rpc("authority","reliable")
 func _cancel (msg: String) -> void:
 	error_message.emit(msg)
+	leave_server.emit()
 	MenuHandler.deactivate_menu()
 
 #TODO: timer for multiplayer kart selection (if not the host)

@@ -22,6 +22,10 @@ func _ready() -> void:
 		_make_server()
 	# Error messages from other screens, when returning.
 	$MultiplayerCarSelection.error_message.connect(_error_message)
+	# Handles cases where the player needs to disconnect from the server.
+	# (going back to single-player mode).
+	$Multiplayer.leave_server.connect(_leave_server)
+	$MultiplayerCarSelection.leave_server.connect(_leave_server)
 	# Spawn a race in multiplayer context.
 	$MultiplayerSpawner.spawn_function = _spawn_multiplayer_race
 
@@ -199,3 +203,8 @@ func _error_message (msg: String) -> void:
 	var tween: Tween = create_tween()
 	tween.tween_interval(3.0)
 	tween.tween_property(e,"modulate",Color.hex(0xffffff00),3.0)
+
+# Disconnect from any multiplayer instance.
+func _leave_server () -> void:
+	if multiplayer.get_unique_id() != 1:
+		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
