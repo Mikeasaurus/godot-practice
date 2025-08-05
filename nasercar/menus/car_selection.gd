@@ -141,11 +141,15 @@ func _try_selecting_car (panel_index: int) -> void:
 			# If this player is also the host, then they can join the race whenever they're ready.
 			if player_id == race_id:
 				_enable_race_button.rpc_id(player_id)
+				_info.rpc_id(player_id,"You can wait for others to join, or press \"RACE!\" when you're ready to start.")
+			else:
+				_info.rpc_id(player_id,"Waiting for the host to start the race.")
 
 # This is called by a new peer to request updated status of the selection panels.
 @rpc("any_peer","reliable")
 func _sync_panels () -> void:
 	var id: int = multiplayer.get_remote_sender_id()
+	_info.rpc_id(id,"Please select a kart for the race.")
 	# Figure out which race this player is interested in.
 	for race_id in _races.keys():
 		if id in _races[race_id]:
@@ -186,6 +190,12 @@ func _update_panel (panel_index: int, is_taken: bool, player_id: int, handle: St
 @rpc("authority","reliable")
 func _enable_race_button () -> void:
 	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = false
+# This is called to put an informative message on the client's screen.
+@rpc("authority","reliable")
+func _info (msg: String) -> void:
+	$MarginContainer/CenterContainer/VBoxContainer/Info.text = msg
+	$MarginContainer/CenterContainer/VBoxContainer/Info.show()
+
 
 # If joining into a multiplayer game, update the status of all karts.
 func _on_visibility_changed() -> void:
