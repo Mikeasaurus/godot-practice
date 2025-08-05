@@ -140,15 +140,19 @@ func setup_race (participants: Dictionary) -> void:
 				car._show_nameplate.rpc(player_name)
 
 	# Move the playable car(s) to the front.
-	var player_ids: Array = self.participants.keys()
-	for i in range(len(player_ids)):
-		var player_id: int = player_ids[i]
-		var player_car: Car = self.participants[player_id]
-		var c: Car = cars[i]
-		if c != player_car:
-			var gp: Vector2 = c.global_position
-			c.global_position = player_car.global_position
-			player_car.global_position = gp
+	var positions: Array[Vector2] = []
+	for c in _cars():
+		positions.append(c.global_position)
+	var car_order: Array[Car] = []
+	for c in self.participants.values():
+		car_order.append(c)
+	for c in _cars():
+		if c not in car_order:
+			car_order.append(c)
+	for i in range(len(car_order)):
+		var c: Car = car_order[i]
+		var p: Vector2 = positions[i]
+		c.global_position = p
 
 	# Add the cars to the track.
 	# (Let the cars know what path to follow, and whether they are CPU or player controlled).
