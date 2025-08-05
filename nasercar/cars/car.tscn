@@ -359,6 +359,9 @@ properties/36/replication_mode = 2
 properties/37/path = NodePath("EngineSound:pitch_scale")
 properties/37/spawn = true
 properties/37/replication_mode = 2
+properties/38/path = NodePath("Camera2D:zoom")
+properties/38/spawn = true
+properties/38/replication_mode = 2
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0
