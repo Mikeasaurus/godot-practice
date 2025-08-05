@@ -4,7 +4,12 @@ extends Control
 
 # List of all race instances running / being created.
 # (for server side).
+# Key is host player id, values are dictionaries of participants.
 var _races: Dictionary = {}
+# Table of currently running races.
+# (also for server side).
+# Key is race number, values are the nodes containing the races.
+var _running_races: Dictionary = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -99,7 +104,13 @@ func _start_multiplayer_race(race_id: int, participants: Dictionary) -> void:
 	for player_id in participants.keys():
 		if player_id not in player_ids:
 			player_ids.append(player_id)
-	var race: World = $MultiplayerSpawner.spawn(player_ids)
+	# Find a free index for the race.
+	# Starting at index 1 instead of 0, to always start in an offset.
+	# (avoids visual glitches where things spawn starting at the origin).
+	var index: int = 1
+	while index in _running_races:
+		index += 1
+	var race: World = $MultiplayerSpawner.spawn([index,player_ids])
 	print ("Starting race! ", race)
 	# Configure the race with the given participants.
 	if multiplayer.get_unique_id() == 1:
@@ -109,12 +120,17 @@ func _start_multiplayer_race(race_id: int, participants: Dictionary) -> void:
 
 # This is called to create a multiplayer race among all peers.
 # "data" is the race_id, and dictionary containing all players / karts for the race.
-func _spawn_multiplayer_race (player_ids: Array[int]) -> Node:
+func _spawn_multiplayer_race (data: Array) -> Node:
 	var race: Node
+	var index: int = data[0]
+	var player_ids: Array[int] = data[1]
 	# For the server and participating peers, this will be the fully constructed race.
 	var player_id: int = multiplayer.get_unique_id()
 	if player_id == 1 or player_id in player_ids:
 		race = load("res://world.tscn").instantiate()
+		# Each race is offset so that they don't overlap in the coordinate space.
+		# So that rigid bodies from different races don't collide with each other... haha.
+		race.global_position.x = 100000*index
 		# Turn off Naser car visual.
 		$NaserCar.call_deferred("hide")
 		MenuHandler.done_submenus.disconnect(_reset_and_start_timer)
