@@ -10,7 +10,7 @@ var peers: Array = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
 
 func _on_body_entered(body: Node2D) -> void:
 	collision_mask = 0
@@ -47,3 +47,8 @@ func _item_reappear() -> void:
 func _on_reactivate_timer_timeout() -> void:
 	collision_layer = 1
 	collision_mask = 1
+
+# Update peer list when a peer disconnects, or get spurrious errors in the console about unknown peer ids.
+func _player_disconnected (player_id: int) -> void:
+	if player_id in peers:
+		peers.erase(player_id)

@@ -112,11 +112,14 @@ func _start_multiplayer_race(race_id: int, participants: Dictionary) -> void:
 		index += 1
 	var race: World = $MultiplayerSpawner.spawn([index,player_ids])
 	print ("Starting race! ", race)
+	_running_races[index] = race
 	# Configure the race with the given participants.
 	if multiplayer.get_unique_id() == 1:
 		race.setup_race(participants)
-		#TODO: wait for players to finish.
-		#TODO: free the race object once all players have left the game.
+		# Free the race object once all players have left the game.
+		await race.quit
+		_running_races.erase(index)
+		race.queue_free()
 
 # This is called to create a multiplayer race among all peers.
 # "data" is the race_id, and dictionary containing all players / karts for the race.
@@ -131,12 +134,6 @@ func _spawn_multiplayer_race (data: Array) -> Node:
 		# Each race is offset so that they don't overlap in the coordinate space.
 		# So that rigid bodies from different races don't collide with each other... haha.
 		race.global_position.x = 100000*index
-		# Turn off Naser car visual.
-		$NaserCar.call_deferred("hide")
-		MenuHandler.done_submenus.disconnect(_reset_and_start_timer)
-		$NaserCar.call_deferred("hide")
-		_reset_car()
-		#
 	# For other peers, just put a simple dummy object here.
 	else:
 		race = Node.new()

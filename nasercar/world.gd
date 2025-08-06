@@ -107,6 +107,9 @@ func _ready() -> void:
 		MenuHandler.pause.connect(_pause_screen)
 		MenuHandler.done_submenus.connect(_unpause_screen)
 		$ScreenEffects/PauseMenu/MarginContainer/CenterContainer/VBoxContainer/QuitButton.pressed.connect(_leave_race)
+	# Hook up server signals.
+	if multiplayer.get_unique_id() == 1:
+		multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
 	# Default cars to being passive (remotely controlled).
 	for car in _cars():
 		car.type = car.CarType.REMOTE
@@ -242,6 +245,7 @@ func _process(_delta: float) -> void:
 	if multiplayer.get_unique_id() == 1:
 		#TODO: more efficient code - this requires a loop inside _car_place.
 		for player_id in _place.keys():
+			if player_id not in participants: continue  # In case player already left the race.
 			var car: Car = participants[player_id]
 			# Don't update the place of cars that already crossed the finish line.
 			if car in _finished_cars: continue
@@ -597,6 +601,16 @@ func _leave_race(completed: bool = false) -> void:
 	var my_id: int = multiplayer.get_unique_id()
 	if completed and my_id == 1:
 		quit.emit(_place[my_id])
-	# Otherwise, just return.
-	else:
+	# For incomplete single-player games, don't have a place to return.
+	elif not completed and my_id == 1:
 		quit.emit(-1)
+	# For multiplayer games, leave the server and clean up the screen.
+	elif my_id != 1:
+		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+		queue_free()
+
+# Handle peer disconnections.
+func _player_disconnected (player_id: int) -> void:
+	self.participants.erase(player_id)
+	if len(self.participants) == 0:
+		quit.emit(-1)  # Tell the parent scene that this race is completely finished.
