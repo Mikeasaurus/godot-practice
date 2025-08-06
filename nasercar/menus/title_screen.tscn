@@ -126,7 +126,6 @@ text = "  Single Player  "
 layout_mode = 2
 tooltip_text = "Race against other players online"
 theme_override_font_sizes/font_size = 72
-disabled = true
 text = "  Multiplayer  "
 
 [node name="Help" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
@@ -171,6 +170,9 @@ layout_mode = 1
 process_mode = 4
 visible = false
 layout_mode = 1
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+spawn_path = NodePath("..")
 
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/SinglePlayer" to="." method="_on_single_player_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Multiplayer" to="." method="_on_multiplayer_pressed"]

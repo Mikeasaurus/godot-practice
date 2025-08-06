@@ -1,14 +1,15 @@
 extends Node2D
 class_name World
 
-# Player car
-var player_car: Car = null
-
 # Signal that gets emitted when the game is finished and the player wishes to exit.
 signal quit (place: int)
 
 ## Number of laps for the track.
 var laps: int = 1
+
+# List of particpants for the race.
+# Filled in by the parent scene.
+var participants: Dictionary
 
 # Current game state (for applied effects, etc.)
 
@@ -22,16 +23,9 @@ var _sliming: bool = false
 var _meteor: bool = false
 
 # Keep track of player's place in the race.
-var _place: int = 0
-# This is set right at the end of the race (in case a kart passes another kart while
-# the results are displayed).
-# Otherwise, for instance, the Naomi kart unlock won't trigger if player gets subsequently passed
-# by a CPU before the "Done" button is pressed.
-var _final_place: int = -1
-# This flag is set when the displayed place is being updated.
-var _updating_place: bool = false
+var _place: Dictionary
 # Shortcut for updating results for the stats page.
-var _places: Array[ResultLine] = []
+var _final_stats: Array[ResultLine] = []
 var _finished_cars: Array[Car] = []
 
 # Keep track of which cars are carrying which items.
@@ -82,6 +76,13 @@ func _num_cars_behind (car: Car) -> int:
 			num += 1
 	return num
 
+# Helper method (for server-side): find the player associated with the given car.
+# Returns 0 if no player associated with it.
+func _get_player_id (car: Car) -> int:
+	for player_id in participants.keys():
+		if participants[player_id] == car:
+			return player_id
+	return 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -90,9 +91,10 @@ func _ready() -> void:
 	var places_vbox: VBoxContainer = $CanvasLayer/Stats/CenterContainer/Places
 	for car in _cars():
 		var result_line: ResultLine = result_scene.instantiate()
-		result_line.set_results(-1, null, "", -1, Color.hex(0x555555ff))
+		result_line.name = car.display_name  # Consistent name to help with RPC calls into this object.
+		result_line.set_results(-1, "", "", -1, Color.hex(0x555555ff))
 		places_vbox.add_child(result_line)
-		_places.append(result_line)
+		_final_stats.append(result_line)
 		var hsep: HSeparator = HSeparator.new()
 		hsep.add_theme_constant_override("separation",5)
 		var stylebox: StyleBoxLine = StyleBoxLine.new()
@@ -105,17 +107,59 @@ func _ready() -> void:
 		MenuHandler.pause.connect(_pause_screen)
 		MenuHandler.done_submenus.connect(_unpause_screen)
 		$ScreenEffects/PauseMenu/MarginContainer/CenterContainer/VBoxContainer/QuitButton.pressed.connect(_leave_race)
+	# Hook up server signals.
+	if multiplayer.get_unique_id() == 1:
+		multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
+	# Default cars to being passive (remotely controlled).
+	for car in _cars():
+		car.type = car.CarType.REMOTE
+	# Force the TileMapLayer to instantiate its scenes, because normally this is deferred and we can't
+	# see the sprites from this _ready() function.
+	$Items.update_internals()
+	# Use consistent names for the items.
+	# The auto-generated names can quickly get out of sync between client/server.
+	# Copied this solution from SlimeTime, where I was having the same problem.
+	for c in $Items.get_children():
+		c.name = c.scene_file_path.split('/')[-1].split('.')[0]+"_"+str(c.position.x)+"_"+str(c.position.y)
 
-	# Move the playable car to the front
-	var c: Car = _cars()[0]
-	if c != player_car and player_car != null:
-		var gp: Vector2 = c.global_position
-		c.global_position = player_car.global_position
-		player_car.global_position = gp
+# Called to do final setup of race, and start it.
+func setup_race (participants: Dictionary) -> void:
+	if multiplayer.get_unique_id() != 1:
+		print ("Attempted to call setup_race on a passive peer.")
+		return
+
+	# Match each player to their car scene in the race.
+	# participants variable gets updated from [player_name,car_name] to instances of car objects.
+	var cars: Array[Car] = _cars()
+	self.participants = {}
+	for player_id in participants.keys():
+		for car in cars:
+			var player_name: String = participants[player_id][0]
+			var car_name: String = participants[player_id][1]
+			if car.display_name == car_name:
+				self.participants[player_id] = car
+				# Update the names of player car(s)
+				car.display_name = player_name
+				car._show_nameplate.rpc(player_name)
+
+	# Move the playable car(s) to the front.
+	var positions: Array[Vector2] = []
+	for c in _cars():
+		positions.append(c.global_position)
+	var car_order: Array[Car] = []
+	for c in self.participants.values():
+		car_order.append(c)
+	for c in _cars():
+		if c not in car_order:
+			car_order.append(c)
+	for i in range(len(car_order)):
+		var c: Car = car_order[i]
+		var p: Vector2 = positions[i]
+		c.global_position = p
 
 	# Add the cars to the track.
 	# (Let the cars know what path to follow, and whether they are CPU or player controlled).
-	for car in _cars():
+	for car in cars:
 		car.add_to_track($TrackPath, [$Ground, $Road])
 		car.itemblock.connect(func():
 			_itemblock(car)
@@ -127,14 +171,41 @@ func _ready() -> void:
 			_lap_completed(car,lap)
 		)
 
-	# Set up a car under player's control.
-	if player_car == null:
-		player_car = $Cars/NaserCar
-	player_car.make_playable()
+	# For single-player game, set up a car under the player's control, and local CPUs.
+	if 1 in self.participants:
+		self.participants[1].make_local_playable()
+		for car in cars:
+			if car not in self.participants.values():
+				car.make_local_cpu()
+				car.display_name = car.display_name + " (CPU)"
 
-	for car in _cars():
-		if car != player_car:
-			car.make_cpu()
+	# For multiplayer game, set local controls but remote management for players, and
+	# remotely managed CPUs
+	else:
+		for player_id in self.participants.keys():
+			var car: Car = self.participants[player_id]
+			for id in self.participants.keys():
+				if id == player_id:
+					car.make_remote_playable_clientside.rpc_id(id)
+				else:
+					car.make_remote.rpc_id(id)
+			car.make_remote_playable_serverside()
+		for car in _cars():
+			# All non-player cars are treated as CPU-controlled on server, and
+			# remotely managed on clients.
+			if car not in self.participants.values():
+				car.make_local_cpu()
+				car.display_name = car.display_name + " (CPU)"
+				car.make_remote.rpc()
+
+	# Set default values of car places, to be computed in _process.
+	for player_id in self.participants:
+		_place[player_id] = 0
+
+	# Update set of peers for item blocks.
+	# They don't use normal synchronizers, so need to explicitly set this up.
+	for c in $Items.get_children():
+		c.peers = participants.keys()
 
 	# Start of race.
 	$CanvasLayer/FadeIn.show()
@@ -169,21 +240,27 @@ func _ready() -> void:
 	await place_tween.finished
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	# Check place of the car, and update as necessary.
-	_check_place (player_car)
-
-func _check_place (car: Car) -> void:
-	if _updating_place: return
-	var current_place: int = _car_place(car)
-	if current_place == _place: return
-	_updating_place = true
-	var dt: float = abs(current_place - _place) * 0.5
+	# Update the places of all the cars.
+	# Determined on the server side.
+	if multiplayer.get_unique_id() == 1:
+		#TODO: more efficient code - this requires a loop inside _car_place.
+		for player_id in _place.keys():
+			if player_id not in participants: continue  # In case player already left the race.
+			var car: Car = participants[player_id]
+			# Don't update the place of cars that already crossed the finish line.
+			if car in _finished_cars: continue
+			var old_place: int = _place[player_id]
+			var new_place: int = _car_place(participants[player_id])
+			if old_place != new_place:
+				_place[player_id] = new_place
+				_update_displayed_place.rpc_id(player_id, new_place)
+@rpc("authority","reliable","call_local")
+func _update_displayed_place (place: int) -> void:
+	var dt: float = 0.5
 	var tween: Tween = create_tween()
 	tween.set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property($CanvasLayer/Place, "scroll_vertical", (current_place-1)*175, dt)
+	tween.tween_property($CanvasLayer/Place, "scroll_vertical", (place-1)*175, dt)
 	await tween.finished
-	_place = current_place
-	_updating_place = false
 
 # All available item types.
 enum ItemType {NONE,NAILPOLISH,COFFEE,METEOR,SLIME,BEETLE}
@@ -196,14 +273,16 @@ enum ItemType {NONE,NAILPOLISH,COFFEE,METEOR,SLIME,BEETLE}
 	ItemType.BEETLE: $ItemSelect/CenterContainer/ScrollContainer/VBoxContainer/Beetle,
 }
 
+# Item block touched by car.
+# Called from within server / single-player side.
 func _itemblock (car: Car) -> void:
 	if car not in _current_items:
 		_get_item(car)
-	
 
+# Client side input capture for using an item.
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("use_item"):
-		_use_item(player_car)
+		_use_item.rpc_id(1)
 
 func _pause_screen() -> void:
 	if _leaving_race: return  # Don't pause if race is being terminated.
@@ -263,17 +342,9 @@ func _get_item(car: Car) -> void:
 		_sliming = true
 
 	# If this is player, then spin to this item.
+	# Send rpc to the client to update visual for item selection.
 	if car.type == car.CarType.PLAYER:
-		# Move item picture to the last entry.
-		$ItemSelect/CenterContainer/ScrollContainer/VBoxContainer.move_child(item_pics[item],-1)
-		$ItemSelect.show()
-		$ItemSelect/CenterContainer/ScrollContainer.scroll_vertical = 0
-		$ItemSelect/D20Sound.play()
-		var tween: Tween = create_tween()
-		tween.tween_interval(0.4)
-		tween.set_ease(Tween.EASE_IN)
-		tween.tween_property($ItemSelect/CenterContainer/ScrollContainer,"scroll_vertical",5*256+20,0.75)
-		await tween.finished
+		_item_selection_visual.rpc_id(_get_player_id(car), item)
 	else:
 		await get_tree().create_timer(2.0).timeout
 	_current_items[car] = item
@@ -281,34 +352,45 @@ func _get_item(car: Car) -> void:
 	if car.type == car.CarType.CPU:
 		await get_tree().create_timer(randf()*5).timeout
 		_use_item(car)
-	# Players with touchscreen automatically use items after a short amount of time.
-	if car.type == car.CarType.PLAYER and DisplayServer.is_touchscreen_available():
-		await get_tree().create_timer(1.0).timeout
-		_use_item(car)
 
-func _use_item(car: Car) -> void:
+# Called from server to client, to update visual for item selection.
+@rpc("authority","reliable","call_local")
+func _item_selection_visual (item: ItemType) -> void:
+	# Move item picture to the last entry.
+	$ItemSelect/CenterContainer/ScrollContainer/VBoxContainer.move_child(item_pics[item],-1)
+	$ItemSelect.show()
+	$ItemSelect/CenterContainer/ScrollContainer.scroll_vertical = 0
+	$ItemSelect/D20Sound.play()
+	var tween: Tween = create_tween()
+	tween.tween_interval(0.4)
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property($ItemSelect/CenterContainer/ScrollContainer,"scroll_vertical",5*256+20,0.75)
+	await tween.finished
+	# Players with touchscreen automatically use items after a short amount of time.
+	if DisplayServer.is_touchscreen_available():
+		await get_tree().create_timer(1.0).timeout
+		_use_item.rpc_id(1)
+
+# Called from client to server, to indicate the item should be used.
+@rpc("any_peer","reliable","call_local")
+func _use_item(car: Car = null) -> void:
+	# If no car specified, then find car based on which client made this rpc call.
+	if car == null:
+		var player_id: int = multiplayer.get_remote_sender_id()
+		car = participants[player_id]
+	# Check if there's actually any item for this car to use.
 	if car not in _current_items: return
 	#print (car, ' used ', item_pics[_current_items[car]])
 	var item: ItemType = _current_items.get(car)
 	if item == ItemType.NONE: return  # Item not available yet.
 	_current_items.erase(car)
 	if car.type == car.CarType.PLAYER:
-		# Play item activation sound.
-		# Skipped for certain items which have their own distinct sound.
-		if item not in [ItemType.NAILPOLISH, ItemType.COFFEE]:
-			$ItemSelect/WhooshSound.play()
-		var tween: Tween = create_tween()
-		tween.tween_property($ItemSelect/CenterContainer,"scale",Vector2(1.0,1.0),0.2)
-		tween.parallel().tween_property($ItemSelect/CenterContainer,"modulate",Color.hex(0xffffff00),0.2)
-		await tween.finished
-		$ItemSelect.hide()
-		$ItemSelect/CenterContainer.scale = Vector2(0.5,0.5)
-		$ItemSelect/CenterContainer.modulate = Color.WHITE
+		_item_usage_visual.rpc_id(_get_player_id(car),item)
 	if item == ItemType.SLIME:
 		for c in _cars_in_front_of(car):
 			c.get_slimed(0.7+0.4, 4.0, 2.0)
 			if c.type == c.CarType.PLAYER:
-				_slime_screen()
+				_slime_screen.rpc_id(_get_player_id(c))
 		# Allow slime item to be obtained again after slime has faded.
 		await get_tree().create_timer(7.1).timeout
 		_sliming = false
@@ -322,7 +404,22 @@ func _use_item(car: Car) -> void:
 		car.sip_coffee()
 	if item == ItemType.METEOR:
 		_launch_meteor(car)
+# Called from server to client, to trigger visual feedback of using the item.
+@rpc("authority","reliable","call_local")
+func _item_usage_visual (item: ItemType) -> void:
+	# Play item activation sound.
+	# Skipped for certain items which have their own distinct sound.
+	if item not in [ItemType.NAILPOLISH, ItemType.COFFEE]:
+		$ItemSelect/WhooshSound.play()
+	var tween: Tween = create_tween()
+	tween.tween_property($ItemSelect/CenterContainer,"scale",Vector2(1.0,1.0),0.2)
+	tween.parallel().tween_property($ItemSelect/CenterContainer,"modulate",Color.hex(0xffffff00),0.2)
+	await tween.finished
+	$ItemSelect.hide()
+	$ItemSelect/CenterContainer.scale = Vector2(0.5,0.5)
+	$ItemSelect/CenterContainer.modulate = Color.WHITE
 
+@rpc("authority","reliable","call_local")
 func _slime_screen() -> void:
 	$ScreenEffects/MangoSlime.show()
 	var mango: AnimatedSprite2D = $ScreenEffects/MangoSlime/Mango
@@ -367,11 +464,11 @@ func _slime_screen() -> void:
 
 func _launch_beetle (from: Car, to: Car) -> void:
 	var beetle = load("res://items/beetle.tscn").instantiate()
-	add_child(beetle)
+	add_child(beetle,true)
 	beetle.z_index = 10
 	beetle.global_position = from.global_position
 	beetle.velocity = from.linear_velocity
-	if to != null:	
+	if to != null:
 		beetle.set_target(to)
 	else:
 		beetle.buzz_off()
@@ -385,14 +482,14 @@ func _launch_meteor (from: Car) -> void:
 
 func _release_nailpolish (from: Car) -> void:
 	var nailpolish = load("res://items/nail_polish.tscn").instantiate()
-	add_child(nailpolish)
+	add_child(nailpolish,true)
 	nailpolish.global_position = from.global_position
 	nailpolish.z_index = 0  # Under item blocks and things.
 
 func _big_badaboom (car: Car) -> void:
 	# Flash of light
 	var boom: Node2D = load("res://effects/impact.tscn").instantiate()
-	add_child(boom)
+	add_child(boom,true)
 	boom.global_position = car.global_position
 	boom.z_index = 3
 	var tween: Tween = create_tween()
@@ -407,7 +504,7 @@ func _big_badaboom (car: Car) -> void:
 			c.smoulder()
 	# Smoking crater.
 	var crater: Node2D = load("res://effects/crater.tscn").instantiate()
-	add_child(crater)
+	add_child(crater,true)
 	crater.global_position = car.global_position
 	crater.z_index = 2
 	crater.get_node("CPUParticles2D").emitting = true
@@ -421,10 +518,11 @@ func _big_badaboom (car: Car) -> void:
 func _lap_completed (car: Car, lap: int) -> void:
 	if lap < laps:
 		if car.type == car.CarType.PLAYER:
-			_lap_announce(lap+1)
+			_lap_announce.rpc_id(_get_player_id(car), lap+1)
 	elif lap == laps:
 		_finished(car)
 # Announce the player's new lap on the screen.
+@rpc("authority","reliable","call_local")
 func _lap_announce (lap: int):
 	var t: Label = $CanvasLayer/LapFinished
 	t.text = "Lap %d"%lap
@@ -449,16 +547,20 @@ func _finished (car: Car) -> void:
 	for i in range(len(_finished_cars)):
 		if _finished_cars[i] == car:
 			var place: int = i+1
-			if car == player_car:
-				_places[i].set_results(place, car, "Player", time, Color.GREEN)
-				_final_place = place
-			else:
-				_places[i].set_results(place, car, car.display_name+" (CPU)", time, Color.WHITE)
-				return
-	# Rest of this is for the player's screen.
-	# CPU takes control of car after race, so cars are still moving in the background
-	# while the player reads the final results.
-	car.autopilot()
+			for player_id in participants.keys():
+				var text_colour: Color = Color.WHITE
+				# Highlight the player's name in green on their own screen.
+				if participants[player_id] == car:
+					text_colour = Color.GREEN
+				_final_stats[i].set_results.rpc_id(player_id, place, car.scene_file_path, car.display_name, time, text_colour)
+	if car.type == car.CarType.PLAYER:
+		# CPU takes control of car after race, so cars are still moving in the background
+		# while the player reads the final results.
+		car.autopilot()
+		# Rest of this is for the player's screen.
+		_finished_announce.rpc_id(_get_player_id(car))
+@rpc("authority","reliable","call_local")
+func _finished_announce() -> void:
 	$CanvasLayer/Place.hide()
 	var t: Label = $CanvasLayer/LapFinished
 	t.text = "FINISHED"
@@ -495,7 +597,20 @@ func _leave_race(completed: bool = false) -> void:
 	tween.parallel().tween_property($CanvasLayer/LapFinished,"modulate",Color.BLACK,1.0)
 	await tween.finished
 	_leaving_race = false
-	if completed:
-		quit.emit(_final_place)
-	else:
+	# For completed single-player games, return the player's place.
+	var my_id: int = multiplayer.get_unique_id()
+	if completed and my_id == 1:
+		quit.emit(_place[my_id])
+	# For incomplete single-player games, don't have a place to return.
+	elif not completed and my_id == 1:
 		quit.emit(-1)
+	# For multiplayer games, leave the server and clean up the screen.
+	elif my_id != 1:
+		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+		queue_free()
+
+# Handle peer disconnections.
+func _player_disconnected (player_id: int) -> void:
+	self.participants.erase(player_id)
+	if len(self.participants) == 0:
+		quit.emit(-1)  # Tell the parent scene that this race is completely finished.

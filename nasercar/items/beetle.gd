@@ -19,6 +19,11 @@ func set_target (car: Node2D) -> void:
 	# (so we don't hit the car that just launched us).
 	await get_tree().create_timer(0.5).timeout
 	active = true
+	# Need to start animation via RPC, because it's not clear what property
+	# to put into a MultiplayerSynchronizer to achieve the same effect.
+	_start_animation.rpc()
+@rpc("authority","reliable","call_local")
+func _start_animation() -> void:
 	$AnimatedSprite2D.play()
 
 # When no target available, just fly away.

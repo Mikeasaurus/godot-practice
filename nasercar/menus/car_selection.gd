@@ -9,13 +9,16 @@ var _races: Dictionary = {}
 signal singleplayer_race (car: Car)
 
 # Signal for when the player is ready to start a multiplayer race.
-signal multiplayer_race (race_id: int)
+signal multiplayer_race (race_id: int, participants: Dictionary)
 
 # Signal that gets sent when the race stats should be re-read by the parent scene.
 signal refresh_race (race_id: int)
 
 # Signal for displaying an error message on the main screen.
 signal error_message (msg: String)
+
+# Signal for disconnecting from the server.
+signal leave_server
 
 # Helper methods: convert between panel index and car name.
 var car_names: Array[String]
@@ -55,6 +58,7 @@ func _on_back_button_pressed() -> void:
 	# For multiplayer games, need to let the server know that we're backing out.
 	if multiplayer.get_unique_id() != 1:
 		_bail.rpc_id(1)
+	leave_server.emit()
 	MenuHandler.deactivate_menu()
 
 # Helper function - face out the screen.
@@ -65,8 +69,6 @@ func _fadeout() -> void:
 	var tween: Tween = create_tween()
 	tween.tween_property(self,"modulate",Color.BLACK,_fadeout_time)
 	await tween.finished
-	modulate = Color.WHITE
-	hide()
 
 # Called when the user clicks the "Race" button.
 func _on_race_button_pressed() -> void:
@@ -90,9 +92,9 @@ func _try_starting_race() -> void:
 	if player_id not in _races: return
 	var race_id: int = player_id
 	# Send some signals to all participating players.
-	var r: Dictionary = _races[race_id]
-	for p in r.keys():
-		var value: Array = r[p]
+	var participants: Dictionary = _races[race_id]
+	for p in participants.keys():
+		var value: Array = participants[p]
 		# value is [handle,car_name]
 		var car_name: String = value[1]
 		# If there are any peers left who have not selected a kart, then politely cancel them out.
@@ -100,8 +102,11 @@ func _try_starting_race() -> void:
 			_cancel.rpc_id(p,"Sorry, the race has already started.")
 		# Otherwise, fade out their screen as a heads-up that the race is beginning.
 		_fadeout.rpc_id(p)
+	# Remove the entry from the list of races (can't join anymore).
+	_races.erase(race_id)
+	refresh_race.emit(race_id)
 	await get_tree().create_timer(_fadeout_time).timeout
-	multiplayer_race.emit(race_id)
+	multiplayer_race.emit(race_id, participants)
 
 # Handle remote updates of kart selections
 # This is called on the server when the user clicks on a kart in multiplayer context.
@@ -136,15 +141,22 @@ func _try_selecting_car (panel_index: int) -> void:
 			# If this player is also the host, then they can join the race whenever they're ready.
 			if player_id == race_id:
 				_enable_race_button.rpc_id(player_id)
+				_info.rpc_id(player_id,"You can wait for others to join, or press \"RACE!\" when you're ready to start.")
+			else:
+				_info.rpc_id(player_id,"Waiting for the host to start the race.")
 
 # This is called by a new peer to request updated status of the selection panels.
 @rpc("any_peer","reliable")
 func _sync_panels () -> void:
 	var id: int = multiplayer.get_remote_sender_id()
+	_info.rpc_id(id,"Please select a kart for the race.")
 	# Figure out which race this player is interested in.
 	for race_id in _races.keys():
 		if id in _races[race_id]:
 			var r: Dictionary = _races[race_id]
+			# Start by clearing the status of all cars.
+			for car_name in car_names:
+				_update_panel.rpc_id(id, name2index(car_name), false, -1, "")
 			# For all cars that are already taken, update the panel visual.
 			for player_id in r.keys():
 				var value = r[player_id]
@@ -178,10 +190,18 @@ func _update_panel (panel_index: int, is_taken: bool, player_id: int, handle: St
 @rpc("authority","reliable")
 func _enable_race_button () -> void:
 	$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = false
+# This is called to put an informative message on the client's screen.
+@rpc("authority","reliable")
+func _info (msg: String) -> void:
+	$MarginContainer/CenterContainer/VBoxContainer/Info.text = msg
+	$MarginContainer/CenterContainer/VBoxContainer/Info.show()
+
 
 # If joining into a multiplayer game, update the status of all karts.
 func _on_visibility_changed() -> void:
 	if visible:
+		# If this was faded out, then bring it back.
+		modulate = Color.WHITE
 		# Clear any previously selected car (it's not actually selected anymore).
 		if selection != null:
 			selection.unselect()
@@ -231,6 +251,7 @@ func _race_bailed (race_id: int) -> void:
 @rpc("authority","reliable")
 func _cancel (msg: String) -> void:
 	error_message.emit(msg)
+	leave_server.emit()
 	MenuHandler.deactivate_menu()
 
 #TODO: timer for multiplayer kart selection (if not the host)

@@ -54,6 +54,73 @@ var collision_friction_modifier: float = 1.0
 ## Whether this car is allowed to move.
 var moveable: bool = false
 
+## Car controls.
+## Inputs captured from client side, and sent to server side via RPC calls.
+var controllable: bool = false
+#
+var _turning_left: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_left () -> void:
+	_turning_left = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_left () -> void:
+	_turning_left = false
+#
+var _turning_right: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_right () -> void:
+	_turning_right = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_right () -> void:
+	_turning_right = false
+#
+var _accelerating: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_up () -> void:
+	_accelerating = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_up () -> void:
+	_accelerating = false
+#
+var _braking: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_space () -> void:
+	_braking = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_space () -> void:
+	_braking = false
+#
+var _reversing: bool = false
+@rpc("any_peer","reliable","call_local")
+func _press_down () -> void:
+	_reversing = true
+@rpc("any_peer","reliable","call_local")
+func _unpress_down () -> void:
+	_reversing = false
+#
+func _input(event: InputEvent) -> void:
+	if not controllable: return
+	if event.is_action_pressed("turn_left"):
+		_press_left.rpc_id(1)
+	if event.is_action_released("turn_left"):
+		_unpress_left.rpc_id(1)
+	if event.is_action_pressed("turn_right"):
+		_press_right.rpc_id(1)
+	if event.is_action_released("turn_right"):
+		_unpress_right.rpc_id(1)
+	if event.is_action_pressed("go"):
+		_press_up.rpc_id(1)
+	if event.is_action_released("go"):
+		_unpress_up.rpc_id(1)
+	if event.is_action_pressed("stop"):
+		_press_space.rpc_id(1)
+	if event.is_action_released("stop"):
+		_unpress_space.rpc_id(1)
+	if event.is_action_pressed("reverse"):
+		_press_down.rpc_id(1)
+	if event.is_action_released("reverse"):
+		_unpress_down.rpc_id(1)
+
 enum CarType {PLAYER, CPU, REMOTE}
 
 ## Type of car
@@ -89,13 +156,19 @@ func _ready() -> void:
 	# Raise the z_index so effects like skid marks appear beneath it.
 	z_index = 2
 
+# Called to show a nameplace on the car.
+@rpc("authority","reliable")
+func _show_nameplate (text: String) -> void:
+	$Nameplate.show()
+	$Nameplate.text = text
+
 # Add track information (world tiles, path from start to finish of race).
 func add_to_track (track_path: Path2D, tilesets: Array[TileMapLayer]) -> void:
 	_tilesets = tilesets
 	type = CarType.REMOTE
 	_pathfollow = PathFollow2D.new()
 	track_path.add_child(_pathfollow)
-	var offset: Vector2 = global_position - track_path.curve.get_point_position(0)
+	var offset: Vector2 = position - track_path.curve.get_point_position(0)
 	#TODO: more robost with starting orientation.
 	_pathfollow.v_offset = offset.x
 	# Remember this offset in case we need to shift the path for wavering effect.
@@ -105,12 +178,29 @@ func add_to_track (track_path: Path2D, tilesets: Array[TileMapLayer]) -> void:
 	_last_progress = 0
 
 # Let this car be playable by the local user.
-func make_playable () -> void:
+func make_local_playable () -> void:
 	type = CarType.PLAYER
+	controllable = true
 	$Camera2D.enabled = true
 	$Arrow.show()
 	# Make own engine sound louder.
 	$EngineSound.volume_db = 1.0
+
+# Let this car be playable in a multiplayer game.
+# (input controls captured locally, but car managed by server).
+@rpc("authority","reliable")
+func make_remote_playable_clientside () -> void:
+	# Turn off local collision detection for remotely managed cars.
+	collision_mask = 0
+	collision_layer = 0
+	type = CarType.REMOTE
+	controllable = true
+	$Camera2D.enabled = true
+	$Arrow.show()
+	# Make own engine sound louder.
+	$EngineSound.volume_db = 1.0
+func make_remote_playable_serverside () -> void:
+	type = CarType.PLAYER
 
 # Override player controls with autopilot.
 # (for after end of race).
@@ -120,8 +210,17 @@ func autopilot () -> void:
 
 # Make this car follow a predetermined path
 # (as local CPU).
-func make_cpu () -> void:
+func make_local_cpu () -> void:
 	type = CarType.CPU
+
+# Make this car an entirely remotely controlled car,
+# with no input captured from the user.
+@rpc("authority","reliable")
+func make_remote () -> void:
+	# Turn off local collision detection for remotely managed cars.
+	collision_mask = 0
+	collision_layer = 0
+	type = CarType.REMOTE
 
 # Allow this car to start moving.
 func go () -> void:
@@ -148,6 +247,41 @@ func _process(delta: float) -> void:
 	$Arrow.offset.y = -60*$Camera2D.zoom.y
 	# Same with smouldering effects.
 	$Meteor.global_rotation = 0
+	# Same with nameplate.
+	if $Nameplate.visible:
+		$Nameplate.rotation = $Arrow.rotation
+		$Nameplate.global_position = global_position + Vector2(-$Nameplate.size.x/2,-110)
+
+	#######################################################
+	# Handle touch controls.
+	#######################################################
+	# Done early in _process, since it has to be handled on client side and the
+	# rest of this routine is for server side stuff.
+	if controllable and DisplayServer.is_touchscreen_available():
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			var t: Vector2 = get_global_mouse_position() - global_position
+			var w: Vector2 = Vector2.from_angle($Wheels/FrontLeft.global_rotation).rotated(PI/2)
+			var angle: float = w.angle_to(t)/PI*180
+			if angle < 0:
+				_press_left.rpc_id(1)
+				_unpress_right.rpc_id(1)
+			elif angle > 0:
+				_press_right.rpc_id(1)
+				_unpress_left.rpc_id(1)
+			if w.dot(t) >= 0:
+				_press_up.rpc_id(1)
+				_unpress_down.rpc_id(1)
+			else:
+				_press_down.rpc_id(1)
+				_unpress_up.rpc_id(1)
+		else:
+			_unpress_left.rpc_id(1)
+			_unpress_right.rpc_id(1)
+			_unpress_up.rpc_id(1)
+			_unpress_down.rpc_id(1)
+
+	# The rest of this code is for server-side processing.
+	if type == CarType.REMOTE: return
 
 	#######################################################
 	# Check if a lap was just completed.
@@ -262,29 +396,12 @@ func _process(delta: float) -> void:
 	# Determine if wheels need to be turned, and in which direction.
 	if type == CarType.PLAYER or (type == CarType.CPU and cpu_steer_direction != CPU_Steer_Direction.PATH):
 		# Turn left
-		if (type == CarType.PLAYER and Input.is_action_pressed("turn_left")) or cpu_steer_direction == CPU_Steer_Direction.LEFT:
+		if (type == CarType.PLAYER and _turning_left) or cpu_steer_direction == CPU_Steer_Direction.LEFT:
 			turn_left = true
 		# Turn right
-		elif (type == CarType.PLAYER and Input.is_action_pressed("turn_right")) or cpu_steer_direction == CPU_Steer_Direction.RIGHT:
+		elif (type == CarType.PLAYER and _turning_right) or cpu_steer_direction == CPU_Steer_Direction.RIGHT:
 			turn_right = true
 		# Re-center
-		else:
-			recenter = true
-	# Touch controls
-	# Also, declare movement variable up here so touch controls can modify them.
-	var go_pressed: bool = Input.is_action_pressed("go")
-	var stop_pressed: bool = Input.is_action_pressed("stop")
-	var reverse_pressed: bool = Input.is_action_pressed("reverse")
-	if type == CarType.PLAYER and DisplayServer.is_touchscreen_available():
-		if Input.is_mouse_button_pressed(1):
-			var t: Vector2 = get_global_mouse_position() - global_position
-			var w: Vector2 = Vector2.from_angle($Wheels/FrontLeft.global_rotation).rotated(PI/2)
-			var angle: float = w.angle_to(t)/PI*180
-			if angle < 0: turn_left = true
-			elif angle > 0: turn_right = true
-			#var c: Vector2 = Vector2.from_angle(global_rotation).rotated(PI/2)
-			if w.dot(t) >= 0: go_pressed = true
-			else: reverse_pressed = true
 		else:
 			recenter = true
 
@@ -309,6 +426,9 @@ func _process(delta: float) -> void:
 	#######################################################
 	# Movement
 	#######################################################
+	var go_pressed: bool = _accelerating
+	var stop_pressed: bool = _braking
+	var reverse_pressed: bool = _reversing
 	# Check for speed modifiers.
 	var acceleration_modifier: float = 1.0
 	var max_speed_modifier: float = 1.0
@@ -409,9 +529,10 @@ func _process(delta: float) -> void:
 		var dusty: bool = false
 		var wheel_sinking: bool
 		var skid_sound: int
+		var wheel_local_position: Vector2 = wheel.global_position - global_position + position
 		for tilesource in _tilesets:
 			if tilesource == null: continue
-			var tilepos: Vector2i = tilesource.local_to_map(wheel.global_position/tilesource.scale.x)
+			var tilepos: Vector2i = tilesource.local_to_map(wheel_local_position/tilesource.scale.x)
 			var tiledata: TileData = tilesource.get_cell_tile_data(tilepos)
 			if tiledata == null: continue
 			if tiledata.get_custom_data("has_skidmarks"):
@@ -429,7 +550,7 @@ func _process(delta: float) -> void:
 						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(dx/2,-dx/2)
 					if partial_type == 4:
 						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(-dx/2,-dx/2)
-					if (wheel.global_position - origin).length() > dx:
+					if (wheel_local_position - origin).length() > dx:
 						continue
 				skidmark_colour = tiledata.get_custom_data("skidmark_colour")
 			if tiledata.get_custom_data("has_particles"):
@@ -466,9 +587,9 @@ func _process(delta: float) -> void:
 				if wheel_skidmarks[w] == null or wheel_skidmarks[w].default_color != skidmark_colour:
 					wheel_skidmarks[w] = load("res://cars/skid_mark.tscn").instantiate()
 					wheel_skidmarks[w].default_color = skidmark_colour
-					add_sibling(wheel_skidmarks[w])
+					add_sibling(wheel_skidmarks[w],true)
 					wheel_skidmarks[w].z_index = 1
-				wheel_skidmarks[w].add_point(wheel.global_position)
+				wheel_skidmarks[w].add_point(wheel_local_position)
 			else:
 				wheel_skidmarks[w] = null
 			if particle_colour_1 != Color.TRANSPARENT:
@@ -564,26 +685,17 @@ func _on_crash_sound_timer_timeout() -> void:
 # Make car splash into water
 func _kersplash (liquid_type: int) -> void:
 	var splash: Node2D
-	var ripple: Node2D
-	var ripple_light: TextureRect
-	var ripple_dark: TextureRect
 	var sound: AudioStreamPlayer2D
 	var particles: CPUParticles2D
 	var dt: float
 	match liquid_type:
 		0:
 			splash = $WaterSplash
-			ripple = $WaterSplash/Ripple
-			ripple_light = $WaterSplash/Ripple/Light
-			ripple_dark = $WaterSplash/Ripple/Dark
 			sound = $WaterSplash/SplashSound
 			particles = $WaterSplash/Particles
 			dt = 0.3
 		1:
 			splash = $LavaSplash
-			ripple = $LavaSplash/Ripple
-			ripple_light = $LavaSplash/Ripple/Light
-			ripple_dark = $LavaSplash/Ripple/Dark
 			sound = $LavaSplash/SplashSound
 			particles = $LavaSplash/Particles
 			dt = 0.6
@@ -597,16 +709,9 @@ func _kersplash (liquid_type: int) -> void:
 	# Start showing ripple of water when car is sinking.
 	# Also fade the car into the water.
 	splash.global_rotation = 0
-	ripple.show()
-	var dr: float = 0.20
+	_ripples.rpc(liquid_type)
 	var tween: Tween = create_tween()
-	var start: PackedFloat32Array = PackedFloat32Array([0,1-2*dr,1-dr,1,1])
-	var almost: PackedFloat32Array = PackedFloat32Array([0,0,dr,2*dr,1])
-	var finish: PackedFloat32Array = PackedFloat32Array([0,0,0,dr,1])
-	ripple_dark.texture.gradient.offsets = start
-	ripple_light.texture.gradient.offsets = start
-	tween.tween_property(ripple_dark.texture.gradient, "offsets", almost, dt)
-	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", almost, dt)
+	var dr: float = 0.20
 	var modulated_stuff: Array = [$Body, $Wheels/FrontLeft/Sprite2D, $Wheels/FrontRight/Sprite2D, $Wheels/RearLeft/Sprite2D, $Wheels/RearRight/Sprite2D]
 	for m in modulated_stuff:
 		tween.parallel().tween_property(m, "modulate", Color.hex(0x00000000), dt)
@@ -615,13 +720,7 @@ func _kersplash (liquid_type: int) -> void:
 	await tween.finished
 	# Near end of inward convergence of water, show spray of water particles.
 	particles.emitting = true
-	tween = create_tween()
-	tween.tween_property(ripple_dark.texture.gradient, "offsets", finish, dt*dr*2)
-	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", finish, dt*dr*2)
-	tween.parallel().tween_property(ripple_dark, "modulate", Color.TRANSPARENT, dt*dr*2)
-	tween.parallel().tween_property(ripple_light, "modulate", Color.TRANSPARENT, dt*dr*2)
-	await tween.finished
-	ripple.hide()
+	await get_tree().create_timer(dt*dr*2).timeout
 	particles.emitting = false
 	# Cut off sound before second splash in the .wav file.
 	await get_tree().create_timer(1.0).timeout
@@ -635,8 +734,6 @@ func _kersplash (liquid_type: int) -> void:
 	else:
 		for m in modulated_stuff:
 			m.modulate = Color.WHITE
-	ripple_dark.modulate = Color.WHITE
-	ripple_light.modulate = Color.WHITE
 	# Make car mobile again.
 	freeze = false
 	# Reset stuck detection timer to avoid triggereing "un-stuck" maneuver.
@@ -645,6 +742,46 @@ func _kersplash (liquid_type: int) -> void:
 	moveable = true
 	# Done
 	_splashing = false
+# Need to manage ripple effect via RPC, since gradient properties can't be
+# managed in a MultiplayerSynchronizer.
+@rpc("authority","reliable","call_local")
+func _ripples (liquid_type: int) -> void:
+	var ripple: Node2D
+	var ripple_light: TextureRect
+	var ripple_dark: TextureRect
+	var dt: float
+	match liquid_type:
+		0:
+			ripple = $WaterSplash/Ripple
+			ripple_light = $WaterSplash/Ripple/Light
+			ripple_dark = $WaterSplash/Ripple/Dark
+			dt = 0.3
+		1:
+			ripple = $LavaSplash/Ripple
+			ripple_light = $LavaSplash/Ripple/Light
+			ripple_dark = $LavaSplash/Ripple/Dark
+			dt = 0.6
+	ripple.show()
+	var dr: float = 0.20
+	var tween: Tween = create_tween()
+	var start: PackedFloat32Array = PackedFloat32Array([0,1-2*dr,1-dr,1,1])
+	var almost: PackedFloat32Array = PackedFloat32Array([0,0,dr,2*dr,1])
+	var finish: PackedFloat32Array = PackedFloat32Array([0,0,0,dr,1])
+	ripple_dark.texture.gradient.offsets = start
+	ripple_light.texture.gradient.offsets = start
+	tween.tween_property(ripple_dark.texture.gradient, "offsets", almost, dt)
+	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", almost, dt)
+	#TODO
+	await tween.finished
+	tween = create_tween()
+	tween.tween_property(ripple_dark.texture.gradient, "offsets", finish, dt*dr*2)
+	tween.parallel().tween_property(ripple_light.texture.gradient, "offsets", finish, dt*dr*2)
+	tween.parallel().tween_property(ripple_dark, "modulate", Color.TRANSPARENT, dt*dr*2)
+	tween.parallel().tween_property(ripple_light, "modulate", Color.TRANSPARENT, dt*dr*2)
+	await tween.finished
+	ripple.hide()
+	ripple_dark.modulate = Color.WHITE
+	ripple_light.modulate = Color.WHITE
 
 func _move_to_road () -> void:
 	freeze = true # Rigid bodies don't like being relocated when they're undergoing physics.

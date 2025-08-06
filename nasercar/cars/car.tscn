@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://xkg3ucnitsra"]
+[gd_scene load_steps=38 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
 [ext_resource type="Script" path="res://cars/car.gd" id="1_88aey"]
@@ -13,6 +13,7 @@
 [ext_resource type="AudioStream" uid="uid://ck8qxnm7h80pv" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="9_x1whg"]
 [ext_resource type="AudioStream" uid="uid://88hgpp0mmg15" path="res://audio/348645__redafs__slurping-sipping-and-gulp-4.mp3" id="11_myl1q"]
 [ext_resource type="AudioStream" uid="uid://cgnsq3fqkf7fo" path="res://audio/167563__benboncan__jet_whoosh.wav" id="12_petsi"]
+[ext_resource type="Script" path="res://internal/race_synchronizer.gd" id="14_diguy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4ldm1"]
 radius = 35.0
@@ -292,6 +293,75 @@ properties/14/replication_mode = 2
 properties/15/path = NodePath(".:z_index")
 properties/15/spawn = true
 properties/15/replication_mode = 2
+properties/16/path = NodePath(".:position")
+properties/16/spawn = true
+properties/16/replication_mode = 2
+properties/17/path = NodePath(".:linear_velocity")
+properties/17/spawn = true
+properties/17/replication_mode = 1
+properties/18/path = NodePath(".:rotation")
+properties/18/spawn = true
+properties/18/replication_mode = 1
+properties/19/path = NodePath(".:angular_velocity")
+properties/19/spawn = true
+properties/19/replication_mode = 1
+properties/20/path = NodePath("Wheels/FrontLeft:rotation")
+properties/20/spawn = true
+properties/20/replication_mode = 1
+properties/21/path = NodePath("Wheels/FrontRight:rotation")
+properties/21/spawn = true
+properties/21/replication_mode = 1
+properties/22/path = NodePath("Wheels/RearLeft:rotation")
+properties/22/spawn = true
+properties/22/replication_mode = 1
+properties/23/path = NodePath("Wheels/RearRight:rotation")
+properties/23/spawn = true
+properties/23/replication_mode = 1
+properties/24/path = NodePath("Slimed/CPUParticles2D:emitting")
+properties/24/spawn = true
+properties/24/replication_mode = 2
+properties/25/path = NodePath("WaterSplash/Particles:emitting")
+properties/25/spawn = true
+properties/25/replication_mode = 2
+properties/26/path = NodePath("LavaSplash/Particles:emitting")
+properties/26/spawn = true
+properties/26/replication_mode = 2
+properties/27/path = NodePath("Coffee/CPUParticles2D:emitting")
+properties/27/spawn = true
+properties/27/replication_mode = 2
+properties/28/path = NodePath("LostArrow:rotation")
+properties/28/spawn = true
+properties/28/replication_mode = 2
+properties/29/path = NodePath("LostArrow:visible")
+properties/29/spawn = true
+properties/29/replication_mode = 2
+properties/30/path = NodePath("LostArrow:modulate")
+properties/30/spawn = true
+properties/30/replication_mode = 2
+properties/31/path = NodePath("LostArrow:scale")
+properties/31/spawn = true
+properties/31/replication_mode = 2
+properties/32/path = NodePath("WaterSplash:rotation")
+properties/32/spawn = true
+properties/32/replication_mode = 2
+properties/33/path = NodePath("LavaSplash:rotation")
+properties/33/spawn = true
+properties/33/replication_mode = 2
+properties/34/path = NodePath("WaterSplash/SplashSound:playing")
+properties/34/spawn = true
+properties/34/replication_mode = 2
+properties/35/path = NodePath("LavaSplash/SplashSound:playing")
+properties/35/spawn = true
+properties/35/replication_mode = 2
+properties/36/path = NodePath("Meteor/CPUParticles2D:emitting")
+properties/36/spawn = true
+properties/36/replication_mode = 2
+properties/37/path = NodePath("EngineSound:pitch_scale")
+properties/37/spawn = true
+properties/37/replication_mode = 2
+properties/38/path = NodePath("Camera2D:zoom")
+properties/38/spawn = true
+properties/38/replication_mode = 2
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0
@@ -350,6 +420,15 @@ visible = false
 z_index = 10
 rotation = 3.14159
 texture = ExtResource("5_sxyoi")
+
+[node name="Nameplate" type="Label" parent="."]
+visible = false
+z_index = 1
+offset_right = 96.0
+offset_bottom = 23.0
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
 
 [node name="Slimed" type="Node2D" parent="."]
 
@@ -568,7 +647,8 @@ libraries = {
 "": SubResource("AnimationLibrary_18i12")
 }
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+[node name="RaceSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_kxogy")
+script = ExtResource("14_diguy")
 
 [connection signal="timeout" from="CrashSoundTimer" to="." method="_on_crash_sound_timer_timeout"]
