@@ -111,13 +111,17 @@ func _start_multiplayer_race(race_id: int, participants: Dictionary) -> void:
 	while index in _running_races:
 		index += 1
 	var race: World = $MultiplayerSpawner.spawn([index,player_ids])
-	print ("Starting race! ", race)
+	var player_names: Array[String] = []
+	for player_id in participants.keys():
+		player_names.append(participants[player_id][0])
+	print ("Starting multiplayer race ", race_id, " at index ", index, " with players ", "," .join(player_names), ".")
 	_running_races[index] = race
 	# Configure the race with the given participants.
-	if multiplayer.get_unique_id() == 1:
+	if multiplayer.get_unique_id() == 1:  # Why do I need to check this???
 		race.setup_race(participants)
 		# Free the race object once all players have left the game.
 		await race.quit
+		print ("Finished multiplayer race ", race_id)
 		_running_races.erase(index)
 		race.queue_free()
 
