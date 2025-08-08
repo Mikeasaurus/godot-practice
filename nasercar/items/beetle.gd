@@ -17,7 +17,7 @@ func set_target (car: Node2D) -> void:
 	$BuzzSound.play(1.0)
 	# Wait a bit before becoming active
 	# (so we don't hit the car that just launched us).
-	await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(1.0).timeout
 	active = true
 	# Need to start animation via RPC, because it's not clear what property
 	# to put into a MultiplayerSynchronizer to achieve the same effect.
