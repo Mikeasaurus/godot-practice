@@ -95,5 +95,6 @@ spawn_path = NodePath("../MarginContainer/CenterContainer/VBoxContainer/ScrollCo
 replication_config = SubResource("SceneReplicationConfig_28faj")
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="child_exiting_tree" from="MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer" to="." method="_on_v_box_container_child_exiting_tree"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/NewButton" to="." method="_on_new_button_pressed"]
