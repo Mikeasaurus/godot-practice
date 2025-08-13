@@ -554,6 +554,8 @@ func _finished (car: Car) -> void:
 					text_colour = Color.GREEN
 				_final_stats[i].set_results.rpc_id(player_id, place, car.scene_file_path, car.display_name, time, text_colour)
 	if car.type == car.CarType.PLAYER:
+		# Immediately use any item that is still held by the player.
+		_use_item(car)
 		# CPU takes control of car after race, so cars are still moving in the background
 		# while the player reads the final results.
 		car.autopilot()
