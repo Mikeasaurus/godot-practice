@@ -33,12 +33,14 @@ var _current_items: Dictionary = {}
 
 # Helper method - get all cars in this track.
 # Omits other non-car entities that the cars may spawn as siblings.
+# Cache this value for future reference.
+var _cars_cache: Array[Car] = []
 func _cars () -> Array[Car]:
-	var cars: Array[Car] = []
-	for car in $Cars.get_children():
-		if "CarType" in car:
-			cars.append(car)
-	return cars
+	if len(_cars_cache) == 0:
+		for car in $Cars.get_children():
+			if "CarType" in car:
+				_cars_cache.append(car)
+	return _cars_cache
 # Helper method - get all cars in front of the specified car.
 func _cars_in_front_of (car: Car) -> Array[Car]:
 	var cars: Array[Car] = []
