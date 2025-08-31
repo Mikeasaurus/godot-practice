@@ -98,6 +98,31 @@ func _press_down () -> void:
 func _unpress_down () -> void:
 	_reversing = false
 #
+@rpc("any_peer","reliable","call_local")
+func _touchpad_press (touch_position: Vector2) -> void:
+	var t: Vector2 = touch_position - global_position
+	var w: Vector2 = Vector2.from_angle($Wheels/FrontLeft.global_rotation).rotated(PI/2)
+	var angle: float = w.angle_to(t)/PI*180
+	if angle < 0:
+		_turning_left = true
+		_turning_right = false
+	elif angle > 0:
+		_turning_right = true
+		_turning_left = false
+	if w.dot(t) >= 0:
+		_accelerating = true
+		_braking = false
+	else:
+		_braking = true
+		_accelerating = false
+#
+@rpc("any_peer","reliable","call_local")
+func _touchpad_unpress () -> void:
+	_unpress_left.rpc_id(1)
+	_unpress_right.rpc_id(1)
+	_unpress_up.rpc_id(1)
+	_unpress_down.rpc_id(1)
+#
 func _input(event: InputEvent) -> void:
 	if not controllable: return
 	if event.is_action_pressed("turn_left"):
@@ -259,22 +284,9 @@ func _process(delta: float) -> void:
 	# rest of this routine is for server side stuff.
 	if controllable and DisplayServer.is_touchscreen_available():
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-			var t: Vector2 = get_global_mouse_position() - global_position
-			var w: Vector2 = Vector2.from_angle($Wheels/FrontLeft.global_rotation).rotated(PI/2)
-			var angle: float = w.angle_to(t)/PI*180
-			if angle < 0:
-				_press_left.rpc_id(1)
-				_unpress_right.rpc_id(1)
-			elif angle > 0:
-				_press_right.rpc_id(1)
-				_unpress_left.rpc_id(1)
-			if w.dot(t) >= 0:
-				_press_up.rpc_id(1)
-				_unpress_down.rpc_id(1)
-			else:
-				_press_down.rpc_id(1)
-				_unpress_up.rpc_id(1)
+			_touchpad_press.rpc_id(1,get_global_mouse_position())
 		else:
+			_touchpad_unpress.rpc_id(1)
 			_unpress_left.rpc_id(1)
 			_unpress_right.rpc_id(1)
 			_unpress_up.rpc_id(1)
