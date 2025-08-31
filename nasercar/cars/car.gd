@@ -23,6 +23,8 @@ class_name Car
 @export var wheel_turn_speed: float = 120.0
 
 ## Emit signal when an item block is touched.
+# This signal gets connected and used from the parent context, so ignore the "unused" warning.
+@warning_ignore("unused_signal")
 signal itemblock
 
 ## Emit signal when meteor impacts.

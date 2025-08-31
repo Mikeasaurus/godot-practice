@@ -39,7 +39,7 @@ func _spawn_race_entry (id: int):
 	return entry
 
 # Print the information message when list of current races becomes empty.
-func _on_v_box_container_child_exiting_tree(node: Node) -> void:
+func _on_v_box_container_child_exiting_tree(_node: Node) -> void:
 	var vbox: VBoxContainer = $MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer
 	if len(vbox.get_children()) == 2:  # 2 = the (hidden) label, and the last race in the list being removed.
 		vbox.get_node("NoRacesLabel").show()
