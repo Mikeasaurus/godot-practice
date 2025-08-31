@@ -1,0 +1,13 @@
+Version 1.0.1 (Aug 31, 2025)
+	- Some minor bug fixes for the fanzine submission:
+	  - Fix some info text disappearing after multiplayer option is used.
+	  - Fix beetle sometimes colliding with own car in multiplayer, due
+	    to frame lag after launching it.
+	  - Use player's item when the crossing the finish line, to fix a bug
+	    where the post-game autopilot is unable to pick up and use items.
+	  - Small speedup after doing some profiling (not significant though).
+	  - Reduce jittering with touchscreen controls in multiplayer.
+	  - Enable on-screen keyboard for touch-based devices.
+
+Version 1.0.0 (Aug 6, 2025)
+	- This is the version that was submitted for the fanzine.
