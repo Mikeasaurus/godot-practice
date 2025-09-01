@@ -69,7 +69,7 @@ text = "Your handle:"
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
-text = "Player"
+placeholder_text = "Player Name"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -93,6 +93,21 @@ spawn_path = NodePath("../MarginContainer/CenterContainer/VBoxContainer/ScrollCo
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_28faj")
+
+[node name="NameWarning" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+text = "Please enter your handle for multiplayer."
+horizontal_alignment = 1
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="child_exiting_tree" from="MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer" to="." method="_on_v_box_container_child_exiting_tree"]

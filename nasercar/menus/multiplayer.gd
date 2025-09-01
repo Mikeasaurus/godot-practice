@@ -17,6 +17,10 @@ func _on_back_button_pressed() -> void:
 
 # Player wants to start their own multiplayer session.
 func _on_new_button_pressed() -> void:
+	if len(_handle.text) == 0:
+		$NameWarning.show()
+		return
+	$NameWarning.hide()
 	_create_new_race.rpc_id(1,_handle.text)
 	MenuHandler.deactivate_menu()
 	join_race.emit(multiplayer.get_unique_id(),_handle.text)
@@ -32,6 +36,10 @@ func _create_new_race (handle: String) -> void:
 func _spawn_race_entry (id: int):
 	var entry = load("res://menus/multiplayer_join_line.tscn").instantiate()
 	entry.get_node("JoinButton").pressed.connect(func ():
+		if len(_handle.text) == 0:
+			$NameWarning.show()
+			return
+		$NameWarning.hide()
 		MenuHandler.deactivate_menu()
 		join_race.emit(id,_handle.text)
 	)
