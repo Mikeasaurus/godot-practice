@@ -1,3 +1,10 @@
+Version 1.0.2 (Sep 6, 2025)
+	- More minor fixes, coinciding with fanzine v1.1 update:
+	  - Fix textbox input for multiplayer games on touchscreen.
+	  - Added a few buildings to the last part of the race, to break up
+	    the monotony.
+	  - Include character name in the final stats page, not just "Player".
+
 Version 1.0.1 (Aug 31, 2025)
 	- Some minor bug fixes for the fanzine submission:
 	  - Fix some info text disappearing after multiplayer option is used.
