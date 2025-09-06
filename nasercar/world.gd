@@ -141,7 +141,11 @@ func setup_race (participants: Dictionary) -> void:
 			if car.display_name == car_name:
 				self.participants[player_id] = car
 				# Update the names of player car(s)
-				car.display_name = player_name
+				# Use the handle for multiplayer, or (Player) for single player.
+				if 1 in participants:
+					car.display_name = car.display_name + " (Player)"
+				else:
+					car.display_name = player_name
 				car._show_nameplate.rpc(player_name)
 
 	# Move the playable car(s) to the front.
