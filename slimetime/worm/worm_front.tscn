@@ -1,6 +1,6 @@
 [gd_scene load_steps=46 format=3 uid="uid://dd7mpa5anwn06"]
 
-[ext_resource type="Script" path="res://worm/worm_front.gd" id="1_7ixcj"]
+[ext_resource type="Script" uid="uid://dwirta4jv65vb" path="res://worm/worm_front.gd" id="1_7ixcj"]
 [ext_resource type="PackedScene" uid="uid://c3celykknp05n" path="res://features/slime.tscn" id="2_4874p"]
 [ext_resource type="PackedScene" uid="uid://qs6dhqvybwnq" path="res://features/crumb.tscn" id="3_6ydm7"]
 [ext_resource type="Texture2D" uid="uid://yq7ask81bkqx" path="res://reactions/question1.png" id="4_i238b"]
@@ -119,8 +119,8 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ourl6"]
 _data = {
-"RESET": SubResource("Animation_4q7xl"),
-"walk": SubResource("Animation_no1wo")
+&"RESET": SubResource("Animation_4q7xl"),
+&"walk": SubResource("Animation_no1wo")
 }
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5lh23"]
@@ -290,7 +290,7 @@ metadata/_edit_lock_ = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_ourl6")
+&"": SubResource("AnimationLibrary_ourl6")
 }
 
 [node name="Sprites" type="Node2D" parent="."]

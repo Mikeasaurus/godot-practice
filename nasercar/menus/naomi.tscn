@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bkswkyttwn7xp"]
 
 [ext_resource type="Texture2D" uid="uid://bmq46o035mfux" path="res://menus/YouCanNowPlayAsNaomi.png" id="1_3eb1k"]
-[ext_resource type="Script" path="res://menus/naomi.gd" id="1_wvo5x"]
+[ext_resource type="Script" uid="uid://drj4scgfns4vi" path="res://menus/naomi.gd" id="1_wvo5x"]
 [ext_resource type="PackedScene" uid="uid://bvoj5fwm75u8v" path="res://cars/naomi_car.tscn" id="3_7vw4a"]
 
 [sub_resource type="Curve2D" id="Curve2D_fnutc"]

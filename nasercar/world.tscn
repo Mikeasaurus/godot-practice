@@ -1,6 +1,6 @@
 [gd_scene load_steps=46 format=4 uid="uid://b4tklj1nsft7a"]
 
-[ext_resource type="Script" path="res://world.gd" id="1_5oo6t"]
+[ext_resource type="Script" uid="uid://biv1bchek2mp7" path="res://world.gd" id="1_5oo6t"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://tiles/ground.png" id="1_cexhq"]
 [ext_resource type="Texture2D" uid="uid://chxeh0b48xusu" path="res://tiles/roads.png" id="2_dc0g2"]
 [ext_resource type="Texture2D" uid="uid://c0yw7rvucrjqq" path="res://tiles/obstacles.png" id="3_vv00q"]
@@ -30,7 +30,7 @@
 [ext_resource type="AudioStream" uid="uid://yggwxfin8it2" path="res://audio/352402__noahpardo__npx-throat-gathering-spit-2.wav" id="28_iaess"]
 [ext_resource type="AudioStream" uid="uid://ck8qxnm7h80pv" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="29_xj85u"]
 [ext_resource type="PackedScene" uid="uid://dscelbyqu4ok3" path="res://menus/pause_menu.tscn" id="30_kkwd5"]
-[ext_resource type="Script" path="res://internal/race_synchronizer.gd" id="31_2r05m"]
+[ext_resource type="Script" uid="uid://dx8rc3wylygum" path="res://internal/race_synchronizer.gd" id="31_2r05m"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fosln"]
 texture = ExtResource("1_cexhq")
@@ -761,19 +761,19 @@ replication_config = SubResource("SceneReplicationConfig_pcovh")
 script = ExtResource("31_2r05m")
 
 [node name="BeetleSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://items/beetle.tscn")
+_spawnable_scenes = PackedStringArray("uid://cxnaar8r01bmv")
 spawn_path = NodePath("..")
 
 [node name="NailPolishSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://items/nail_polish.tscn")
+_spawnable_scenes = PackedStringArray("uid://b7q1tvemcohtp")
 spawn_path = NodePath("..")
 
 [node name="ImpactSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://effects/impact.tscn", "res://effects/crater.tscn")
+_spawnable_scenes = PackedStringArray("uid://c1p70okfvp84r", "uid://bt70ftdpif78n")
 spawn_path = NodePath("..")
 
 [node name="SkidmarkSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://cars/skid_mark.tscn")
+_spawnable_scenes = PackedStringArray("uid://carfgs1mg40pn")
 spawn_path = NodePath("../Cars")
 
 [connection signal="pressed" from="CanvasLayer/DoneButton" to="." method="_on_done_button_pressed"]

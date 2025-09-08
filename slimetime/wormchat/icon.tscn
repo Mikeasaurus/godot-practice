@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://dui3wdxe57p5r"]
 
 [ext_resource type="Texture2D" uid="uid://bm4d25o6vbagc" path="res://wormchat/icon-background.png" id="1_lsokn"]
-[ext_resource type="Script" path="res://wormchat/icon.gd" id="1_m14jm"]
+[ext_resource type="Script" uid="uid://x8o40lpj77dd" path="res://wormchat/icon.gd" id="1_m14jm"]
 [ext_resource type="Texture2D" uid="uid://b7mgdesxpi5ii" path="res://wormchat/icon-outline.png" id="2_dkn2r"]
 [ext_resource type="Texture2D" uid="uid://bq8heuw2p3b5l" path="res://wormchat/icon-body.png" id="3_n8ykt"]
 [ext_resource type="Texture2D" uid="uid://8wjx60r0mdcf" path="res://wormchat/icon-top.png" id="4_8kqqu"]

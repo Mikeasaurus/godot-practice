@@ -1,11 +1,11 @@
 [gd_scene load_steps=7 format=3 uid="uid://dgp4315r85ut0"]
 
 [ext_resource type="Texture2D" uid="uid://cxvwaprwwansr" path="res://band.png" id="1_ltden"]
-[ext_resource type="Script" path="res://main.gd" id="1_p7o6g"]
+[ext_resource type="Script" uid="uid://bk8a84xycjrxo" path="res://main.gd" id="1_p7o6g"]
 [ext_resource type="PackedScene" uid="uid://ceqw036w7hyee" path="res://note.tscn" id="3_jgydo"]
 [ext_resource type="PackedScene" uid="uid://cf21ke6ukicec" path="res://meteor.tscn" id="4_fu6ey"]
 [ext_resource type="PackedScene" uid="uid://bm7qgjkk7dev2" path="res://ground.tscn" id="5_1l7i3"]
-[ext_resource type="Script" path="res://end_message.gd" id="5_u4d4m"]
+[ext_resource type="Script" uid="uid://b7og1gvkunu4v" path="res://end_message.gd" id="5_u4d4m"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_p7o6g")

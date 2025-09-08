@@ -1,6 +1,6 @@
 [gd_scene load_steps=18 format=3 uid="uid://c6aw5rjsklap6"]
 
-[ext_resource type="Script" path="res://worm/worm_tail.gd" id="1_onfeh"]
+[ext_resource type="Script" uid="uid://dwjapo55ppwyy" path="res://worm/worm_tail.gd" id="1_onfeh"]
 [ext_resource type="Texture2D" uid="uid://daoi0drmdmmdn" path="res://worm/tail-outline.png" id="4_o4jfh"]
 [ext_resource type="Texture2D" uid="uid://d1aiefgpj6kgq" path="res://worm/tail-body.png" id="5_uoy1x"]
 [ext_resource type="Texture2D" uid="uid://blls77duj641x" path="res://worm/tail-walk1.png" id="5_w4ufm"]
@@ -94,8 +94,8 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_edwdy"]
 _data = {
-"RESET": SubResource("Animation_q1xqk"),
-"walk": SubResource("Animation_hj0qd")
+&"RESET": SubResource("Animation_q1xqk"),
+&"walk": SubResource("Animation_hj0qd")
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rh2oh"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://b02glflgb3x4o"]
 
-[ext_resource type="Script" path="res://wormchat/own_message.gd" id="1_1co6p"]
+[ext_resource type="Script" uid="uid://k6yvwkvuxl6w" path="res://wormchat/own_message.gd" id="1_1co6p"]
 [ext_resource type="PackedScene" uid="uid://dg81msdx5nimm" path="res://wormchat/own_text.tscn" id="1_4s6ep"]
 
 [node name="OwnMessage" type="MarginContainer"]

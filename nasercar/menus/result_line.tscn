@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bmhhi1mw7s55r"]
 
-[ext_resource type="Script" path="res://menus/result_line.gd" id="1_hht88"]
+[ext_resource type="Script" uid="uid://lv1hwkhigmnj" path="res://menus/result_line.gd" id="1_hht88"]
 
 [node name="ResultLine" type="HBoxContainer"]
 theme_override_constants/separation = 50

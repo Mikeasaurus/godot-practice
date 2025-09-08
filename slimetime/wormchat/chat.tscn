@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://1fdldwucvxju"]
 
-[ext_resource type="Script" path="res://wormchat/chat.gd" id="1_e0o74"]
+[ext_resource type="Script" uid="uid://bgir8vbptrx40" path="res://wormchat/chat.gd" id="1_e0o74"]
 [ext_resource type="PackedScene" uid="uid://csjewo2nqeufg" path="res://wormchat/title.tscn" id="2_kniyt"]
 [ext_resource type="Texture2D" uid="uid://dnwslu4hiovni" path="res://wormchat/to-bottom-button-bg.png" id="2_yr72g"]
 [ext_resource type="Texture2D" uid="uid://b1oo5b0yq33pw" path="res://wormchat/to-bottom-button-arrow.png" id="3_jsmi6"]

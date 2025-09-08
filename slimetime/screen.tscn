@@ -1,6 +1,6 @@
 [gd_scene load_steps=27 format=4 uid="uid://decyn02rm6vq2"]
 
-[ext_resource type="Script" path="res://screen.gd" id="1_lwfk5"]
+[ext_resource type="Script" uid="uid://c56ammw36tk5a" path="res://screen.gd" id="1_lwfk5"]
 [ext_resource type="Texture2D" uid="uid://dgo457as2d7nc" path="res://tileset.png" id="1_vx3mq"]
 [ext_resource type="PackedScene" uid="uid://d2fqayuwohf12" path="res://bugs/beetle.tscn" id="5_6i2ap"]
 [ext_resource type="PackedScene" uid="uid://cg4qk38asbby4" path="res://bugs/lady_bug.tscn" id="5_gp822"]
@@ -236,7 +236,7 @@ spawn_path = NodePath("../Slimes")
 [node name="Splatters" type="Node2D" parent="."]
 
 [node name="SplatterSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://features/splatter.tscn")
+_spawnable_scenes = PackedStringArray("uid://b8p0fdmad0vcv")
 spawn_path = NodePath("../Splatters")
 
 [node name="Overlay" type="CanvasLayer" parent="."]
@@ -424,7 +424,7 @@ horizontal_alignment = 1
 [node name="Beachballs" type="Node2D" parent="."]
 
 [node name="BeachballSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://features/beachball.tscn")
+_spawnable_scenes = PackedStringArray("uid://bfljmksimqyd5")
 spawn_path = NodePath("../Beachballs")
 
 [node name="InfoSynchronizer" type="MultiplayerSynchronizer" parent="."]

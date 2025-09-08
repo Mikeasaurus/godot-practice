@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://culfs1hcaohhm"]
 
 [ext_resource type="Texture2D" uid="uid://dhkns5jdsokx5" path="res://items/beetle.png" id="1_fs3b4"]
-[ext_resource type="Script" path="res://menus/help.gd" id="1_hpd5p"]
+[ext_resource type="Script" uid="uid://cbgj37s6j3g2q" path="res://menus/help.gd" id="1_hpd5p"]
 [ext_resource type="Texture2D" uid="uid://co8nl3wxthqgo" path="res://items/lavajava.png" id="2_qey5n"]
 [ext_resource type="Texture2D" uid="uid://cqmnccveeaxu5" path="res://menus/arrow_up.png" id="2_yngvg"]
 [ext_resource type="Texture2D" uid="uid://c75py8357paxe" path="res://items/nailpolish.png" id="3_pif1m"]

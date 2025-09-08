@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://b88skvef3btfn"]
 
-[ext_resource type="Script" path="res://menus/controls_menu.gd" id="1_f1kbu"]
+[ext_resource type="Script" uid="uid://c02oi5sd47c3b" path="res://menus/controls_menu.gd" id="1_f1kbu"]
 [ext_resource type="PackedScene" uid="uid://blqqmlx16vwl6" path="res://menus/full_screen_toggle.tscn" id="2_hd1y8"]
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_5ajxi"]

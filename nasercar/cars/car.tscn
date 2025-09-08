@@ -1,7 +1,7 @@
 [gd_scene load_steps=38 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
-[ext_resource type="Script" path="res://cars/car.gd" id="1_88aey"]
+[ext_resource type="Script" uid="uid://coq2gttv7f4qw" path="res://cars/car.gd" id="1_88aey"]
 [ext_resource type="Texture2D" uid="uid://rtfavhcxxo25" path="res://cars/carslime.png" id="3_2eyeq"]
 [ext_resource type="AudioStream" uid="uid://dxqavad1nchgy" path="res://audio/158728__erdie__engine04-loop.wav" id="3_5h513"]
 [ext_resource type="AudioStream" uid="uid://c32p6fxjy0hxb" path="res://audio/659463__diogorusso__shoot-car-door-slam.wav" id="4_af8g7"]
@@ -13,7 +13,7 @@
 [ext_resource type="AudioStream" uid="uid://ck8qxnm7h80pv" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="9_x1whg"]
 [ext_resource type="AudioStream" uid="uid://88hgpp0mmg15" path="res://audio/348645__redafs__slurping-sipping-and-gulp-4.mp3" id="11_myl1q"]
 [ext_resource type="AudioStream" uid="uid://cgnsq3fqkf7fo" path="res://audio/167563__benboncan__jet_whoosh.wav" id="12_petsi"]
-[ext_resource type="Script" path="res://internal/race_synchronizer.gd" id="14_diguy"]
+[ext_resource type="Script" uid="uid://dx8rc3wylygum" path="res://internal/race_synchronizer.gd" id="14_diguy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4ldm1"]
 radius = 35.0
@@ -152,8 +152,8 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_w7snb"]
 _data = {
-"RESET": SubResource("Animation_yp50d"),
-"pulsing": SubResource("Animation_ne20p")
+&"RESET": SubResource("Animation_yp50d"),
+&"pulsing": SubResource("Animation_ne20p")
 }
 
 [sub_resource type="Animation" id="Animation_7rcyg"]
@@ -239,9 +239,9 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_18i12"]
 _data = {
-"RESET": SubResource("Animation_7rcyg"),
-"fade_in": SubResource("Animation_dhufv"),
-"fade_out": SubResource("Animation_b1cuh")
+&"RESET": SubResource("Animation_7rcyg"),
+&"fade_in": SubResource("Animation_dhufv"),
+&"fade_out": SubResource("Animation_b1cuh")
 }
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_kxogy"]
@@ -638,13 +638,13 @@ polygon = PackedVector2Array(-24, -129, -23, -193, -42, -194, 2, -248, 46, -198,
 
 [node name="Pulsing" type="AnimationPlayer" parent="LostArrow"]
 libraries = {
-"": SubResource("AnimationLibrary_w7snb")
+&"": SubResource("AnimationLibrary_w7snb")
 }
 autoplay = "pulsing"
 
 [node name="Fade" type="AnimationPlayer" parent="LostArrow"]
 libraries = {
-"": SubResource("AnimationLibrary_18i12")
+&"": SubResource("AnimationLibrary_18i12")
 }
 
 [node name="RaceSynchronizer" type="MultiplayerSynchronizer" parent="."]

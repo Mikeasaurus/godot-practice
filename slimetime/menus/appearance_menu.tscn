@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://b1jnthm2msap"]
 
-[ext_resource type="Script" path="res://menus/appearance_menu.gd" id="1_k7x11"]
+[ext_resource type="Script" uid="uid://dkr4i8ft36wxn" path="res://menus/appearance_menu.gd" id="1_k7x11"]
 [ext_resource type="PackedScene" uid="uid://bl2u1vwrkn7sx" path="res://worm/worm.tscn" id="2_dagsf"]
 [ext_resource type="PackedScene" uid="uid://dui3wdxe57p5r" path="res://wormchat/icon.tscn" id="2_siujr"]
 [ext_resource type="PackedScene" uid="uid://blqqmlx16vwl6" path="res://menus/full_screen_toggle.tscn" id="4_aycl7"]

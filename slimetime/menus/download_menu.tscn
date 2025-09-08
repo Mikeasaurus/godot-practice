@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://chwacgtkrchw5"]
 
-[ext_resource type="Script" path="res://menus/download_menu.gd" id="1_w7i20"]
+[ext_resource type="Script" uid="uid://b2dygjwdgrf8m" path="res://menus/download_menu.gd" id="1_w7i20"]
 [ext_resource type="PackedScene" uid="uid://blqqmlx16vwl6" path="res://menus/full_screen_toggle.tscn" id="2_nsiyo"]
 
 [node name="DownloadMenu" type="Control"]

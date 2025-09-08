@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://bfljmksimqyd5"]
 
-[ext_resource type="Script" path="res://features/beachball.gd" id="1_f8jlf"]
+[ext_resource type="Script" uid="uid://dngoqg1kvjvq7" path="res://features/beachball.gd" id="1_f8jlf"]
 [ext_resource type="Texture2D" uid="uid://bb00ilutjtyyo" path="res://features/beachball.png" id="1_mtokm"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_w3wrk"]

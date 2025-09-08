@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://cf21ke6ukicec"]
 
 [ext_resource type="Texture2D" uid="uid://cdxebjaj0kkyc" path="res://meteor/meteor1.png" id="1_f10hx"]
-[ext_resource type="Script" path="res://meteor.gd" id="1_msvut"]
+[ext_resource type="Script" uid="uid://bnobi1j511xxh" path="res://meteor.gd" id="1_msvut"]
 [ext_resource type="PackedScene" uid="uid://cx5x471j3o6n2" path="res://hit.tscn" id="2_63rp6"]
 [ext_resource type="Texture2D" uid="uid://bxwsbs6dgqbkw" path="res://meteor/meteor2.png" id="2_gbok5"]
 [ext_resource type="Texture2D" uid="uid://w3cyvu6umikl" path="res://meteor/meteor3.png" id="3_lycy1"]

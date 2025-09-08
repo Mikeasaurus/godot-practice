@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cx5x471j3o6n2"]
 
 [ext_resource type="Texture2D" uid="uid://1wfqwrj3id01" path="res://meteor/hit.png" id="1_k2hio"]
-[ext_resource type="Script" path="res://hit.gd" id="2_05ums"]
+[ext_resource type="Script" uid="uid://clpoib0cui5xo" path="res://hit.gd" id="2_05ums"]
 
 [node name="Hit" type="Sprite2D"]
 texture = ExtResource("1_k2hio")

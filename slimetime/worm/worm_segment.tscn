@@ -1,6 +1,6 @@
 [gd_scene load_steps=18 format=3 uid="uid://ss2xikvy6bt7"]
 
-[ext_resource type="Script" path="res://worm/worm_segment.gd" id="1_uf7xy"]
+[ext_resource type="Script" uid="uid://m8foyb40hsp2" path="res://worm/worm_segment.gd" id="1_uf7xy"]
 [ext_resource type="Texture2D" uid="uid://dca0wcvf7auln" path="res://worm/segment-walk1.png" id="2_a5yre"]
 [ext_resource type="Texture2D" uid="uid://fsoeijujxmy5" path="res://worm/segment-walk2.png" id="3_ejrf1"]
 [ext_resource type="Texture2D" uid="uid://bobv50cj7vfr6" path="res://worm/segment-walk3.png" id="4_5j156"]
@@ -95,8 +95,8 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_x8xul"]
 _data = {
-"RESET": SubResource("Animation_u8tnf"),
-"walk": SubResource("Animation_5cuub")
+&"RESET": SubResource("Animation_u8tnf"),
+&"walk": SubResource("Animation_5cuub")
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_alg25"]
@@ -154,7 +154,7 @@ metadata/_edit_group_ = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_x8xul")
+&"": SubResource("AnimationLibrary_x8xul")
 }
 
 [node name="Sprites" type="Node2D" parent="."]
