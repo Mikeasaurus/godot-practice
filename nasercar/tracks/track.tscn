@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://j4ohs2agmh6j"]
+
+[ext_resource type="Script" uid="uid://44j203c8tlla" path="res://tracks/track.gd" id="1_juy78"]
+
+[sub_resource type="Curve2D" id="Curve2D_2l6ov"]
+
+[node name="Track" type="Node2D"]
+editor_description = "This is the base scene for designing tracks.  To make a new track, create an instance of this scene and fill in the details of tiles, starting car positions, and track path."
+script = ExtResource("1_juy78")
+
+[node name="TilesBelowCars" type="Node2D" parent="."]
+editor_description = "TileMapLayers that should be displayed underneath the cars.  This can include the ground tiles and the road."
+
+[node name="TilesAboveCars" type="Node2D" parent="."]
+editor_description = "TileMapLayers that should be displayed on top of the cars.  This can include item boxes and above-ground obstacles."
+
+[node name="TrackPath" type="Path2D" parent="."]
+editor_description = "The path that cars should follow for the race."
+curve = SubResource("Curve2D_2l6ov")

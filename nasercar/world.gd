@@ -4,9 +4,6 @@ class_name World
 # Signal that gets emitted when the game is finished and the player wishes to exit.
 signal quit (place: int)
 
-## Number of laps for the track.
-var laps: int = 1
-
 # List of particpants for the race.
 # Filled in by the parent scene.
 var participants: Dictionary
@@ -30,6 +27,9 @@ var _finished_cars: Array[Car] = []
 
 # Keep track of which cars are carrying which items.
 var _current_items: Dictionary = {}
+
+# Shortcut to the track for this race.
+var track: Track
 
 # Helper method - get all cars in this track.
 # Omits other non-car entities that the cars may spawn as siblings.
@@ -91,9 +91,10 @@ func _ready() -> void:
 	# Prepare final stats screen with placeholder values.
 	var result_scene: PackedScene = load("res://menus/result_line.tscn")
 	var places_vbox: VBoxContainer = $CanvasLayer/Stats/CenterContainer/Places
-	for car in _cars():
+	# Set up blank entries for results (to be filled in)
+	for i in range(len(_cars())):
 		var result_line: ResultLine = result_scene.instantiate()
-		result_line.name = car.display_name  # Consistent name to help with RPC calls into this object.
+		result_line.name = "result"+str(i)  # Consistent name to help with RPC calls into this object.
 		result_line.set_results(-1, "", "", -1, Color.hex(0x555555ff))
 		places_vbox.add_child(result_line)
 		_final_stats.append(result_line)
@@ -113,19 +114,18 @@ func _ready() -> void:
 	if multiplayer.get_unique_id() == 1:
 		multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
 	# Default cars to being passive (remotely controlled).
-	for car in _cars():
+	for car in $Cars.get_children():
 		car.type = car.CarType.REMOTE
-	# Force the TileMapLayer to instantiate its scenes, because normally this is deferred and we can't
-	# see the sprites from this _ready() function.
-	$Items.update_internals()
-	# Use consistent names for the items.
-	# The auto-generated names can quickly get out of sync between client/server.
-	# Copied this solution from SlimeTime, where I was having the same problem.
-	for c in $Items.get_children():
-		c.name = c.scene_file_path.split('/')[-1].split('.')[0]+"_"+str(c.position.x)+"_"+str(c.position.y)
+
+# Call this during race creation.
+func set_track (track: Track) -> void:
+	# Store a reference to the track, and place it in the visible area.
+	self.track = track
+	$Track.add_child(track)
 
 # Called to do final setup of race, and start it.
 func setup_race (participants: Dictionary) -> void:
+
 	if multiplayer.get_unique_id() != 1:
 		print ("Attempted to call setup_race on a passive peer.")
 		return
@@ -165,8 +165,11 @@ func setup_race (participants: Dictionary) -> void:
 
 	# Add the cars to the track.
 	# (Let the cars know what path to follow, and whether they are CPU or player controlled).
+	var trackpath: Path2D = track.get_node("TrackPath")
+	var tiles: Array[TileMapLayer]
+	tiles.assign(track.get_node("TilesBelowCars").get_children())
 	for car in cars:
-		car.add_to_track($TrackPath, [$Ground, $Road])
+		car.add_to_track(trackpath, tiles)
 		car.itemblock.connect(func():
 			_itemblock(car)
 		)
@@ -207,11 +210,6 @@ func setup_race (participants: Dictionary) -> void:
 	# Set default values of car places, to be computed in _process.
 	for player_id in self.participants:
 		_place[player_id] = 0
-
-	# Update set of peers for item blocks.
-	# They don't use normal synchronizers, so need to explicitly set this up.
-	for c in $Items.get_children():
-		c.peers = participants.keys()
 
 	# Start of race.
 	$CanvasLayer/FadeIn.show()
@@ -505,7 +503,7 @@ func _big_badaboom (car: Car) -> void:
 	tween.tween_property(boom,"modulate",Color.hex(0xffffff00),5.0)
 	tween.parallel().tween_property(boom,"scale",Vector2(9,9),5.0)
 	# Smoulder effect (and impedence) on all cars within the blast radius.
-	for c in $Cars.get_children():
+	for c in _cars():
 		if "smoulder" in c and (c.global_position-boom.global_position).length() <= 500:
 			c.smoulder()
 	# Smoking crater.
@@ -522,10 +520,10 @@ func _big_badaboom (car: Car) -> void:
 
 # Called when a car has just completed a lap.
 func _lap_completed (car: Car, lap: int) -> void:
-	if lap < laps:
+	if lap < track.laps:
 		if car.type == car.CarType.PLAYER:
 			_lap_announce.rpc_id(_get_player_id(car), lap+1)
-	elif lap == laps:
+	elif lap == track.laps:
 		_finished(car)
 # Announce the player's new lap on the screen.
 @rpc("authority","reliable","call_local")

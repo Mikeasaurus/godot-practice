@@ -113,7 +113,7 @@ func _start_multiplayer_race(race_id: int, participants: Dictionary) -> void:
 	var index: int = 1
 	while index in _running_races:
 		index += 1
-	var race: World = $MultiplayerSpawner.spawn([index,player_ids])
+	var race: World = $MultiplayerSpawner.spawn([index,player_ids,"res://tracks/default.tscn"])
 	var player_names: Array[String] = []
 	for player_id in participants.keys():
 		player_names.append(participants[player_id][0])
@@ -134,6 +134,7 @@ func _spawn_multiplayer_race (data: Array) -> Node:
 	var race: Node
 	var index: int = data[0]
 	var player_ids: Array[int] = data[1]
+	var track_scene_path: String = data[2]
 	# For the server and participating peers, this will be the fully constructed race.
 	var player_id: int = multiplayer.get_unique_id()
 	if player_id == 1 or player_id in player_ids:
@@ -141,6 +142,15 @@ func _spawn_multiplayer_race (data: Array) -> Node:
 		# Each race is offset so that they don't overlap in the coordinate space.
 		# So that rigid bodies from different races don't collide with each other... haha.
 		race.global_position.x = 100000*index
+		var track: Track = load(track_scene_path).instantiate()
+		# Set up participants for track (for synchronization of peers).
+		# Don't need the specific cars, just the player ids.
+		var participants: Dictionary = {}
+		for id in player_ids:
+			participants[id] = null
+		# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
+		track.call_deferred('setup',participants)
+		race.set_track(track)
 	# For other peers, just put a simple dummy object here.
 	else:
 		race = Node.new()
@@ -152,12 +162,17 @@ func _spawn_multiplayer_race (data: Array) -> Node:
 	return race
 
 func start_race (player_car: Car) -> void:
+	# Set up the player car based on the car type chosen.
+	# For single-player games, player id is just 1.
+	var participants: Dictionary = {1:["Player",player_car.display_name]}
 	# Load up the race track.
 	var race: World = load("res://world.tscn").instantiate()
 	add_child(race)
-	# Set up the player car based on the car type chosen.
-	# For single-player games, player id is just 1.
-	race.setup_race({1:["Player",player_car.display_name]})
+	var track: Track = load("res://tracks/default.tscn").instantiate()
+	# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
+	track.call_deferred('setup',participants)
+	race.set_track(track)
+	race.setup_race(participants)
 	# Turn off Naser car visual.
 	# Do this after a bit of a delay, because there's a call to _reset_and_start_timer around the same
 	# time as this (from MenuHandler) that would cause the Naser car to start on its own.
