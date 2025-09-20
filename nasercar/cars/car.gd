@@ -151,7 +151,7 @@ func _input(event: InputEvent) -> void:
 enum CarType {PLAYER, CPU, REMOTE}
 
 ## Type of car
-var type: CarType
+var type: CarType = CarType.REMOTE
 
 ## Type of CPU movement.
 ## Normally, always moving forward unless needing to get unstuck.
@@ -195,7 +195,7 @@ func add_to_track (track_path: Path2D, tilesets: Array[TileMapLayer]) -> void:
 	type = CarType.REMOTE
 	_pathfollow = PathFollow2D.new()
 	track_path.add_child(_pathfollow)
-	var offset: Vector2 = position - track_path.curve.get_point_position(0)
+	var offset: Vector2 = global_position - track_path.curve.get_point_position(0)
 	#TODO: more robost with starting orientation.
 	_pathfollow.v_offset = offset.x
 	# Remember this offset in case we need to shift the path for wavering effect.
@@ -543,7 +543,7 @@ func _process(delta: float) -> void:
 		var dusty: bool = false
 		var wheel_sinking: bool
 		var skid_sound: int
-		var wheel_local_position: Vector2 = wheel.global_position - global_position + position
+		var wheel_local_position: Vector2 = wheel.global_position
 		for tilesource in _tilesets:
 			if tilesource == null: continue
 			var tilepos: Vector2i = tilesource.local_to_map(wheel_local_position/tilesource.scale.x)
@@ -603,7 +603,7 @@ func _process(delta: float) -> void:
 					wheel_skidmarks[w].default_color = skidmark_colour
 					add_sibling(wheel_skidmarks[w],true)
 					wheel_skidmarks[w].z_index = 1
-				wheel_skidmarks[w].add_point(wheel_local_position)
+				wheel_skidmarks[w].add_point(wheel_local_position - global_position + position)
 			else:
 				wheel_skidmarks[w] = null
 			if particle_colour_1 != Color.TRANSPARENT:

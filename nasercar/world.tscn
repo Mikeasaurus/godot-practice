@@ -1,14 +1,6 @@
-[gd_scene load_steps=33 format=3 uid="uid://b4tklj1nsft7a"]
+[gd_scene load_steps=25 format=3 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" uid="uid://biv1bchek2mp7" path="res://world.gd" id="1_5oo6t"]
-[ext_resource type="PackedScene" uid="uid://bx45dedd8jvb2" path="res://cars/naser_car.tscn" id="2_o3ebs"]
-[ext_resource type="PackedScene" uid="uid://bimruttii2nbg" path="res://cars/fang_car.tscn" id="3_k83mh"]
-[ext_resource type="PackedScene" uid="uid://bvoj5fwm75u8v" path="res://cars/naomi_car.tscn" id="4_qktwf"]
-[ext_resource type="PackedScene" uid="uid://d254t8huvudx6" path="res://cars/stella_car.tscn" id="5_bh8nc"]
-[ext_resource type="PackedScene" uid="uid://t281m7hks87i" path="res://cars/trish_car.tscn" id="6_jjr1n"]
-[ext_resource type="PackedScene" uid="uid://ceeynox2pxkxl" path="res://cars/reed_car.tscn" id="7_gggvi"]
-[ext_resource type="PackedScene" uid="uid://rem6honk7xys" path="res://cars/sage_car.tscn" id="8_w44yn"]
-[ext_resource type="PackedScene" uid="uid://dsew28lh05yyv" path="res://cars/rosa_car.tscn" id="9_6ah6f"]
 [ext_resource type="AudioStream" uid="uid://xnlgqle1fo4l" path="res://audio/20440__agfx__beep-pager.wav" id="10_leqvv"]
 [ext_resource type="AudioStream" uid="uid://dgii4vaux02bg" path="res://audio/196236__alienxxx__long-beep_011.wav" id="11_l7rta"]
 [ext_resource type="Texture2D" uid="uid://cfhya08sd73lc" path="res://items/mangoslime.png" id="16_4ogqs"]
@@ -103,43 +95,6 @@ properties/9/replication_mode = 2
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_5oo6t")
-
-[node name="Cars" type="Node2D" parent="."]
-editor_description = "Where to place the cars at the start of the race.  Note: the relative ordering of cars will change at race time, depending on the character chosen by the player."
-
-[node name="NaserCar" parent="Cars" instance=ExtResource("2_o3ebs")]
-position = Vector2(764, 255)
-rotation = 3.14159
-
-[node name="FangCar" parent="Cars" instance=ExtResource("3_k83mh")]
-position = Vector2(625, 258)
-rotation = -3.14159
-
-[node name="NaomiCar" parent="Cars" instance=ExtResource("4_qktwf")]
-position = Vector2(897, 258)
-rotation = 3.14159
-
-[node name="StellaCar" parent="Cars" instance=ExtResource("5_bh8nc")]
-position = Vector2(841, 587)
-rotation = 3.14159
-
-[node name="TrishCar" parent="Cars" instance=ExtResource("6_jjr1n")]
-position = Vector2(762, 418)
-rotation = 3.14159
-
-[node name="ReedCar" parent="Cars" instance=ExtResource("7_gggvi")]
-position = Vector2(899, 414)
-rotation = 3.14159
-
-[node name="SageCar" parent="Cars" instance=ExtResource("8_w44yn")]
-position = Vector2(695, 585)
-rotation = 3.14159
-
-[node name="RosaCar" parent="Cars" instance=ExtResource("9_6ah6f")]
-position = Vector2(630, 418)
-rotation = 3.14159
-
-[node name="Track" type="Node2D" parent="."]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -495,10 +450,8 @@ _spawnable_scenes = PackedStringArray("uid://c1p70okfvp84r", "uid://bt70ftdpif78
 spawn_path = NodePath("..")
 
 [node name="TrackSpawner" type="MultiplayerSpawner" parent="."]
-spawn_path = NodePath("../Track")
 
 [node name="SkidmarkSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://carfgs1mg40pn")
-spawn_path = NodePath("../Cars")
 
 [connection signal="pressed" from="CanvasLayer/DoneButton" to="." method="_on_done_button_pressed"]

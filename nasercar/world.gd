@@ -37,7 +37,7 @@ var track: Track
 var _cars_cache: Array[Car] = []
 func _cars () -> Array[Car]:
 	if len(_cars_cache) == 0:
-		for car in $Cars.get_children():
+		for car in track.get_node('StartingPositions').get_children():
 			if "CarType" in car:
 				_cars_cache.append(car)
 	return _cars_cache
@@ -92,7 +92,7 @@ func _ready() -> void:
 	var result_scene: PackedScene = load("res://menus/result_line.tscn")
 	var places_vbox: VBoxContainer = $CanvasLayer/Stats/CenterContainer/Places
 	# Set up blank entries for results (to be filled in)
-	for i in range(len(_cars())):
+	for i in range(8):
 		var result_line: ResultLine = result_scene.instantiate()
 		result_line.name = "result"+str(i)  # Consistent name to help with RPC calls into this object.
 		result_line.set_results(-1, "", "", -1, Color.hex(0x555555ff))
@@ -113,15 +113,12 @@ func _ready() -> void:
 	# Hook up server signals.
 	if multiplayer.get_unique_id() == 1:
 		multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
-	# Default cars to being passive (remotely controlled).
-	for car in $Cars.get_children():
-		car.type = car.CarType.REMOTE
 
 # Call this during race creation.
 func set_track (track: Track) -> void:
 	# Store a reference to the track, and place it in the visible area.
 	self.track = track
-	$Track.add_child(track)
+	add_child(track)
 
 # Called to do final setup of race, and start it.
 func setup_race (participants: Dictionary) -> void:
