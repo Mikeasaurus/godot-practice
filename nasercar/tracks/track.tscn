@@ -58,3 +58,7 @@ editor_description = "TileMapLayers that should be displayed on top of the cars.
 [node name="TrackPath" type="Path2D" parent="."]
 editor_description = "The path that cars should follow for the race."
 curve = SubResource("Curve2D_2l6ov")
+
+[node name="SkidmarkSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://carfgs1mg40pn")
+spawn_path = NodePath("../StartingPositions")

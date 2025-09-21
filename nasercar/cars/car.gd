@@ -195,7 +195,7 @@ func add_to_track (track_path: Path2D, tilesets: Array[TileMapLayer]) -> void:
 	type = CarType.REMOTE
 	_pathfollow = PathFollow2D.new()
 	track_path.add_child(_pathfollow)
-	var offset: Vector2 = global_position - track_path.curve.get_point_position(0)
+	var offset: Vector2 = global_position - (track_path.global_position+track_path.curve.get_point_position(0))
 	#TODO: more robost with starting orientation.
 	_pathfollow.v_offset = offset.x
 	# Remember this offset in case we need to shift the path for wavering effect.
@@ -543,10 +543,10 @@ func _process(delta: float) -> void:
 		var dusty: bool = false
 		var wheel_sinking: bool
 		var skid_sound: int
-		var wheel_local_position: Vector2 = wheel.global_position
+		var wheel_global_position: Vector2 = wheel.global_position
 		for tilesource in _tilesets:
 			if tilesource == null: continue
-			var tilepos: Vector2i = tilesource.local_to_map(wheel_local_position/tilesource.scale.x)
+			var tilepos: Vector2i = tilesource.local_to_map((wheel_global_position-tilesource.global_position)/tilesource.scale.x)
 			var tiledata: TileData = tilesource.get_cell_tile_data(tilepos)
 			if tiledata == null: continue
 			if tiledata.get_custom_data("has_skidmarks"):
@@ -557,14 +557,14 @@ func _process(delta: float) -> void:
 					var origin: Vector2
 					# 1,2,3,4 = quarter circles
 					if partial_type == 1:
-						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(dx/2,dx/2)
+						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(dx/2,dx/2) + tilesource.global_position
 					if partial_type == 2:
-						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(-dx/2,dx/2)
+						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(-dx/2,dx/2) + tilesource.global_position
 					if partial_type == 3:
-						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(dx/2,-dx/2)
+						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(dx/2,-dx/2) + tilesource.global_position
 					if partial_type == 4:
-						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(-dx/2,-dx/2)
-					if (wheel_local_position - origin).length() > dx:
+						origin = (tilesource.map_to_local(tilepos)) * tilesource.scale.x + Vector2(-dx/2,-dx/2) + tilesource.global_position
+					if (wheel_global_position - origin).length() > dx:
 						continue
 				skidmark_colour = tiledata.get_custom_data("skidmark_colour")
 			if tiledata.get_custom_data("has_particles"):
@@ -603,7 +603,7 @@ func _process(delta: float) -> void:
 					wheel_skidmarks[w].default_color = skidmark_colour
 					add_sibling(wheel_skidmarks[w],true)
 					wheel_skidmarks[w].z_index = 1
-				wheel_skidmarks[w].add_point(wheel_local_position - global_position + position)
+				wheel_skidmarks[w].add_point(wheel_global_position - global_position + position)
 			else:
 				wheel_skidmarks[w] = null
 			if particle_colour_1 != Color.TRANSPARENT:

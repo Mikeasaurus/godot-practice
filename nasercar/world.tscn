@@ -450,8 +450,6 @@ _spawnable_scenes = PackedStringArray("uid://c1p70okfvp84r", "uid://bt70ftdpif78
 spawn_path = NodePath("..")
 
 [node name="TrackSpawner" type="MultiplayerSpawner" parent="."]
-
-[node name="SkidmarkSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("uid://carfgs1mg40pn")
+spawn_path = NodePath("..")
 
 [connection signal="pressed" from="CanvasLayer/DoneButton" to="." method="_on_done_button_pressed"]
