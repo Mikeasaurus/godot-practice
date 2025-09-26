@@ -1,10 +1,14 @@
-[gd_scene load_steps=15 format=4 uid="uid://bon22hq3beg1y"]
+[gd_scene load_steps=19 format=4 uid="uid://bon22hq3beg1y"]
 
 [ext_resource type="PackedScene" uid="uid://j4ohs2agmh6j" path="res://tracks/track.tscn" id="1_7eep6"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://tiles/ground.png" id="2_ay74a"]
+[ext_resource type="Script" uid="uid://bvb2bfweiijh1" path="res://tracks/snowy.gd" id="2_qdul6"]
 [ext_resource type="Texture2D" uid="uid://chxeh0b48xusu" path="res://tiles/roads.png" id="3_bmdec"]
 [ext_resource type="PackedScene" uid="uid://cueu5a87cvopj" path="res://items/d_20.tscn" id="4_gtcsa"]
 [ext_resource type="Texture2D" uid="uid://c0yw7rvucrjqq" path="res://tiles/obstacles.png" id="5_0vyvq"]
+[ext_resource type="Texture2D" uid="uid://cs7pb6o3sxji5" path="res://effects/snow1.png" id="6_ui082"]
+[ext_resource type="Texture2D" uid="uid://b48h77v7pkycc" path="res://effects/snow2.png" id="8_phhwq"]
+[ext_resource type="Texture2D" uid="uid://bov2f6idop7o3" path="res://effects/snow3.png" id="9_3reir"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bmdec"]
 texture = ExtResource("2_ay74a")
@@ -280,6 +284,7 @@ _data = {
 point_count = 26
 
 [node name="Snowy" instance=ExtResource("1_7eep6")]
+script = ExtResource("2_qdul6")
 laps = 3
 
 [node name="Ground" type="TileMapLayer" parent="TilesBelowCars" index="0"]
@@ -312,3 +317,84 @@ tile_set = SubResource("TileSet_qdul6")
 [node name="TrackPath" parent="." index="3"]
 position = Vector2(0, -1)
 curve = SubResource("Curve2D_0vyvq")
+
+[node name="Snow" type="CanvasLayer" parent="." index="5"]
+
+[node name="Group1" type="Node2D" parent="Snow" index="0"]
+modulate = Color(1, 1, 1, 0.333333)
+
+[node name="UpperLeft" type="Sprite2D" parent="Snow/Group1" index="0"]
+texture_filter = 1
+scale = Vector2(10, 10)
+texture = ExtResource("6_ui082")
+
+[node name="UpperRight" type="Sprite2D" parent="Snow/Group1" index="1"]
+texture_filter = 1
+position = Vector2(1920, 0)
+scale = Vector2(10, 10)
+texture = ExtResource("6_ui082")
+
+[node name="LowerLeft" type="Sprite2D" parent="Snow/Group1" index="2"]
+texture_filter = 1
+position = Vector2(0, 1080)
+scale = Vector2(10, 10)
+texture = ExtResource("6_ui082")
+
+[node name="LowerRight" type="Sprite2D" parent="Snow/Group1" index="3"]
+texture_filter = 1
+position = Vector2(1920, 1080)
+scale = Vector2(10, 10)
+texture = ExtResource("6_ui082")
+
+[node name="Group2" type="Node2D" parent="Snow" index="1"]
+modulate = Color(1, 1, 1, 0.333333)
+
+[node name="UpperLeft" type="Sprite2D" parent="Snow/Group2" index="0"]
+texture_filter = 1
+scale = Vector2(8, 8)
+texture = ExtResource("8_phhwq")
+
+[node name="UpperRight" type="Sprite2D" parent="Snow/Group2" index="1"]
+texture_filter = 1
+position = Vector2(1920, 0)
+scale = Vector2(8, 8)
+texture = ExtResource("8_phhwq")
+
+[node name="LowerLeft" type="Sprite2D" parent="Snow/Group2" index="2"]
+texture_filter = 1
+position = Vector2(0, 1080)
+scale = Vector2(8, 8)
+texture = ExtResource("8_phhwq")
+
+[node name="LowerRight" type="Sprite2D" parent="Snow/Group2" index="3"]
+texture_filter = 1
+position = Vector2(1920, 1080)
+scale = Vector2(8, 8)
+texture = ExtResource("8_phhwq")
+
+[node name="Group3" type="Node2D" parent="Snow" index="2"]
+modulate = Color(1, 1, 1, 0.333333)
+
+[node name="UpperLeft" type="Sprite2D" parent="Snow/Group3" index="0"]
+texture_filter = 1
+scale = Vector2(6, 6)
+texture = ExtResource("9_3reir")
+
+[node name="UpperRight" type="Sprite2D" parent="Snow/Group3" index="1"]
+texture_filter = 1
+position = Vector2(1920, 0)
+scale = Vector2(6, 6)
+texture = ExtResource("9_3reir")
+
+[node name="LowerLeft" type="Sprite2D" parent="Snow/Group3" index="2"]
+texture_filter = 1
+position = Vector2(0, 1080)
+scale = Vector2(6, 6)
+texture = ExtResource("9_3reir")
+
+[node name="LowerRight" type="Sprite2D" parent="Snow/Group3" index="3"]
+texture_filter = 1
+position = Vector2(1920, 1080)
+scale = Vector2(6, 6)
+texture = ExtResource("9_3reir")
+
