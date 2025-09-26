@@ -278,6 +278,8 @@ func _process(delta: float) -> void:
 	if $Nameplate.visible:
 		$Nameplate.rotation = $Arrow.rotation
 		$Nameplate.global_position = global_position + Vector2(-$Nameplate.size.x/2,-110)
+	# And ice break effect.
+	$Iced/CPUParticles2D.global_rotation = 0
 
 	#######################################################
 	# Handle touch controls.
@@ -713,6 +715,11 @@ func _kersplash (liquid_type: int) -> void:
 			sound = $LavaSplash/SplashSound
 			particles = $LavaSplash/Particles
 			dt = 0.6
+		2:
+			splash = $IcyWaterSplash
+			sound = $IcyWaterSplash/SplashSound
+			particles = $IcyWaterSplash/Particles
+			dt = 0.3
 	# Only run this once when sinking, not on every tick.
 	if _splashing: return
 	_splashing = true
@@ -748,6 +755,15 @@ func _kersplash (liquid_type: int) -> void:
 	else:
 		for m in modulated_stuff:
 			m.modulate = Color.WHITE
+	# Delay on car movement for special effect (such as frozen?)
+	# No car motion during this (unlike smoulder), so don't need to put this
+	# in the more complicated "effects" logic.
+	if liquid_type == 2:
+		$Iced/Ice.show()
+		await get_tree().create_timer(1.0).timeout
+		$Iced/Ice.hide()
+		$Iced/CPUParticles2D.emitting = true
+		$Iced/ShatterSound.play()
 	# Make car mobile again.
 	freeze = false
 	# Reset stuck detection timer to avoid triggereing "un-stuck" maneuver.
@@ -775,6 +791,11 @@ func _ripples (liquid_type: int) -> void:
 			ripple_light = $LavaSplash/Ripple/Light
 			ripple_dark = $LavaSplash/Ripple/Dark
 			dt = 0.6
+		2:
+			ripple = $IcyWaterSplash/Ripple
+			ripple_light = $IcyWaterSplash/Ripple/Light
+			ripple_dark = $IcyWaterSplash/Ripple/Dark
+			dt = 0.3
 	ripple.show()
 	var dr: float = 0.20
 	var tween: Tween = create_tween()
@@ -801,6 +822,7 @@ func _move_to_road () -> void:
 	freeze = true # Rigid bodies don't like being relocated when they're undergoing physics.
 	# Temporarily hide other effects like slimed hood.
 	$Slimed.hide()
+	$Iced.hide()
 	var tween: Tween = create_tween()
 	tween.set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "global_position", _pathfollow.global_position, 1.0)
@@ -809,6 +831,7 @@ func _move_to_road () -> void:
 	freeze = false
 	# Restore other effects.
 	$Slimed.show()
+	$Iced.show()
 
 func get_slimed (delay: float, full_slime_duration: float, end: float) -> void:
 	# Wait a bit for Mango to spit the slime (same timing as screen slime).

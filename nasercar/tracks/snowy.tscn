@@ -87,6 +87,7 @@ texture_region_size = Vector2i(64, 64)
 1:8/0/custom_data_2 = Color(0, 0.172549, 0.678431, 1)
 1:8/0/custom_data_3 = Color(0.25098, 0.360784, 0.678431, 1)
 1:8/0/custom_data_8 = true
+1:8/0/custom_data_9 = 2
 
 [sub_resource type="TileSet" id="TileSet_gtcsa"]
 tile_size = Vector2i(64, 64)
@@ -305,26 +306,9 @@ tile_set = SubResource("TileSet_ui082")
 z_index = 2
 texture_filter = 1
 scale = Vector2(8, 8)
-tile_map_data = PackedByteArray("AAD+//n/AAAFAAAAAAD///T/AAAFAAAAAAD///H/AAAFAAAAAAADAPL/AAAFAAAAAAADAPX/AAAFAAAAAAADAPv/AAAFAAAAAAACAPj/AAAFAAAAAAD+/+3/AAAFAAAAAAADAOz/AAAFAAAAAAAAAOj/AAAFAAAAAAACAOj/AAAFAAAAAAANAOn/AAAEAAAAAAAWAOz/AAAEAAAAAAAgAOn/AAAEAAAAAAAOAND/AAACAAEAAAAOANH/AAACAAEAAAAOANT/AAACAAEAAAAOANX/AAACAAEAAAD5/9D/AAACAAEAAAD5/9H/AAACAAEAAAD5/9T/AAACAAEAAAD5/9X/AAACAAEAAADn/9n/AAAFAAAAAADn/9z/AAAFAAAAAADp/9f/AAAFAAAAAADp/9n/AAAFAAAAAADt/97/AAAFAAAAAADt/9n/AAAFAAAAAADr/9X/AAAFAAAAAADw/9b/AAAFAAAAAADx/9z/AAAFAAAAAADs/9v/AAAFAAAAAADs/9b/AAAFAAAAAADr/9v/AAAFAAAAAADs/93/AAAFAAAAAADn/9X/AAAFAAAAAADt/9T/AAAFAAAAAADq/93/AAAFAAAAAADp//T/AAAEAAAAAADu//T/AAAEAAAAAADv//j/AAAEAAAAAADs//X/AAAEAAAAAADt//n/AAAEAAAAAADo//n/AAAEAAAAAADn//v/AAAEAAAAAADu//v/AAAEAAAAAADr//3/AAAEAAAAAADp////AAAEAAAAAADs/wAAAAAEAAAAAADu//7/AAAEAAAAAADn//7/AAAEAAAAAADt/wYAAAACAAEAAADt/wsAAAACAAEAAADt/wcAAAACAAEAAADt/woAAAACAAEAAAD+//z/AAAFAAAAAAD/////AAAFAAAAAAACAP3/AAAFAAAAAAADAAAAAAAFAAAAAAD//wMAAAAFAAAAAAD//wcAAAAFAAAAAAACAAQAAAAFAAAAAAADAAgAAAAFAAAAAAA=")
+tile_map_data = PackedByteArray("AAD+//n/AAAFAAAAAAD///T/AAAFAAAAAAD///H/AAAFAAAAAAADAPL/AAAFAAAAAAADAPX/AAAFAAAAAAADAPv/AAAFAAAAAAACAPj/AAAFAAAAAAD+/+3/AAAFAAAAAAADAOz/AAAFAAAAAAAAAOj/AAAFAAAAAAACAOj/AAAFAAAAAAANAOn/AAAEAAAAAAAWAOz/AAAEAAAAAAAgAOn/AAAEAAAAAAAOAND/AAACAAEAAAAOANH/AAACAAEAAAAOANT/AAACAAEAAAAOANX/AAACAAEAAAD5/9D/AAACAAEAAAD5/9H/AAACAAEAAAD5/9T/AAACAAEAAAD5/9X/AAACAAEAAADn/9n/AAAFAAAAAADn/9z/AAAFAAAAAADp/9f/AAAFAAAAAADp/9n/AAAFAAAAAADt/97/AAAFAAAAAADt/9n/AAAFAAAAAADr/9X/AAAFAAAAAADw/9b/AAAFAAAAAADx/9z/AAAFAAAAAADs/9v/AAAFAAAAAADs/9b/AAAFAAAAAADr/9v/AAAFAAAAAADs/93/AAAFAAAAAADn/9X/AAAFAAAAAADt/9T/AAAFAAAAAADq/93/AAAFAAAAAADp//T/AAAEAAAAAADu//T/AAAEAAAAAADv//j/AAAEAAAAAADs//X/AAAEAAAAAADt//n/AAAEAAAAAADo//n/AAAEAAAAAADn//v/AAAEAAAAAADu//v/AAAEAAAAAADr//3/AAAEAAAAAADp////AAAEAAAAAADs/wAAAAAEAAAAAADu//7/AAAEAAAAAADn//7/AAAEAAAAAADt/wYAAAACAAEAAADt/wsAAAACAAEAAADt/wcAAAACAAEAAADt/woAAAACAAEAAAD+//z/AAAFAAAAAAD/////AAAFAAAAAAACAP3/AAAEAAAAAAADAAAAAAAFAAAAAAD//wMAAAAFAAAAAAD//wcAAAAFAAAAAAACAAQAAAAFAAAAAAADAAgAAAAFAAAAAAA=")
 tile_set = SubResource("TileSet_qdul6")
 
 [node name="TrackPath" parent="." index="3"]
 position = Vector2(0, -1)
 curve = SubResource("Curve2D_0vyvq")
-
-[connection signal="body_entered" from="TilesAboveCars/Items/D20" to="TilesAboveCars/Items/D20" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57446" to="TilesAboveCars/Items/@Area2D@57446" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57447" to="TilesAboveCars/Items/@Area2D@57447" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57448" to="TilesAboveCars/Items/@Area2D@57448" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57449" to="TilesAboveCars/Items/@Area2D@57449" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57450" to="TilesAboveCars/Items/@Area2D@57450" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57451" to="TilesAboveCars/Items/@Area2D@57451" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57452" to="TilesAboveCars/Items/@Area2D@57452" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57453" to="TilesAboveCars/Items/@Area2D@57453" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57454" to="TilesAboveCars/Items/@Area2D@57454" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57455" to="TilesAboveCars/Items/@Area2D@57455" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57456" to="TilesAboveCars/Items/@Area2D@57456" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57457" to="TilesAboveCars/Items/@Area2D@57457" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57458" to="TilesAboveCars/Items/@Area2D@57458" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57459" to="TilesAboveCars/Items/@Area2D@57459" method="_on_body_entered"]
-[connection signal="body_entered" from="TilesAboveCars/Items/@Area2D@57460" to="TilesAboveCars/Items/@Area2D@57460" method="_on_body_entered"]

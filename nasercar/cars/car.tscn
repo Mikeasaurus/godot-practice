@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://xkg3ucnitsra"]
+[gd_scene load_steps=45 format=3 uid="uid://xkg3ucnitsra"]
 
 [ext_resource type="PackedScene" uid="uid://dux0gd0slf1l5" path="res://cars/wheel.tscn" id="1_41m3k"]
 [ext_resource type="Script" uid="uid://coq2gttv7f4qw" path="res://cars/car.gd" id="1_88aey"]
@@ -11,8 +11,10 @@
 [ext_resource type="AudioStream" uid="uid://cwa27fwp1fu21" path="res://audio/128690__be-steele__metal-rub-10.mp3" id="7_6nyvj"]
 [ext_resource type="AudioStream" uid="uid://04tvpxlw4ukb" path="res://audio/320185__robinhood76__05966-water-surfacing-splashes.wav" id="7_xb7e0"]
 [ext_resource type="AudioStream" uid="uid://ck8qxnm7h80pv" path="res://audio/495118__nebulasnails__wet-splat-1.mp3" id="9_x1whg"]
+[ext_resource type="Texture2D" uid="uid://dma2jdn00negl" path="res://cars/iced.png" id="11_5ldgu"]
 [ext_resource type="AudioStream" uid="uid://88hgpp0mmg15" path="res://audio/348645__redafs__slurping-sipping-and-gulp-4.mp3" id="11_myl1q"]
 [ext_resource type="AudioStream" uid="uid://cgnsq3fqkf7fo" path="res://audio/167563__benboncan__jet_whoosh.wav" id="12_petsi"]
+[ext_resource type="AudioStream" uid="uid://cin7d6iutcrbn" path="res://audio/203373__c_rogers__glass-shattering_03.ogg" id="12_u1opb"]
 [ext_resource type="Script" uid="uid://dx8rc3wylygum" path="res://internal/race_synchronizer.gd" id="14_diguy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4ldm1"]
@@ -22,6 +24,9 @@ height = 116.0
 [sub_resource type="Gradient" id="Gradient_hwaf6"]
 offsets = PackedFloat32Array(0, 0.5, 1)
 colors = PackedColorArray(0.686275, 0.862745, 0.243137, 0.8, 0.686275, 0.862745, 0.243137, 0.8, 0.686275, 0.862745, 0.243137, 0)
+
+[sub_resource type="Gradient" id="Gradient_u1opb"]
+colors = PackedColorArray(0.309804, 0.737255, 0.847059, 0.6, 0.309804, 0.737255, 0.847059, 0)
 
 [sub_resource type="Gradient" id="Gradient_tagwm"]
 offsets = PackedFloat32Array(0, 0.25, 0.5, 0.75, 1)
@@ -41,6 +46,30 @@ colors = PackedColorArray(0.705882, 0.878431, 1, 0, 0.705882, 0.878431, 1, 0, 0.
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_pfulr"]
 gradient = SubResource("Gradient_vum66")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_d4qvj"]
+offsets = PackedFloat32Array(0, 0.25, 0.5, 0.75, 1)
+colors = PackedColorArray(0.207843, 0.67451, 1, 0, 0, 0.117647, 0.490196, 0, 0.000607891, 0.115844, 0.490201, 1, 0, 0.117647, 0.490196, 0, 0.207843, 0.67451, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_u1opb"]
+gradient = SubResource("Gradient_d4qvj")
+width = 32
+height = 32
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_rtkmi"]
+offsets = PackedFloat32Array(0, 0.25, 0.5, 0.75, 1)
+colors = PackedColorArray(0.705882, 0.878431, 1, 0, 0.25098, 0.360784, 0.678431, 0, 0.25098, 0.360784, 0.678431, 1, 0.25098, 0.360784, 0.678431, 0, 0.705882, 0.878431, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_d4qvj"]
+gradient = SubResource("Gradient_rtkmi")
 width = 32
 height = 32
 fill = 1
@@ -362,6 +391,24 @@ properties/37/replication_mode = 2
 properties/38/path = NodePath("Camera2D:zoom")
 properties/38/spawn = true
 properties/38/replication_mode = 2
+properties/39/path = NodePath("Iced/Ice:visible")
+properties/39/spawn = true
+properties/39/replication_mode = 2
+properties/40/path = NodePath("Iced/ShatterSound:playing")
+properties/40/spawn = true
+properties/40/replication_mode = 2
+properties/41/path = NodePath("Iced/CPUParticles2D:emitting")
+properties/41/spawn = true
+properties/41/replication_mode = 2
+properties/42/path = NodePath("IcyWaterSplash:rotation")
+properties/42/spawn = true
+properties/42/replication_mode = 2
+properties/43/path = NodePath("IcyWaterSplash/Particles:emitting")
+properties/43/spawn = true
+properties/43/replication_mode = 2
+properties/44/path = NodePath("IcyWaterSplash/SplashSound:playing")
+properties/44/spawn = true
+properties/44/replication_mode = 2
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0
@@ -459,6 +506,33 @@ scale_amount_max = 8.0
 color = Color(0.686275, 0.862745, 0.243137, 0.8)
 color_ramp = SubResource("Gradient_hwaf6")
 
+[node name="Iced" type="Node2D" parent="."]
+
+[node name="Ice" type="Sprite2D" parent="Iced"]
+visible = false
+texture_filter = 1
+scale = Vector2(2, 2)
+texture = ExtResource("11_5ldgu")
+
+[node name="ShatterSound" type="AudioStreamPlayer2D" parent="Iced"]
+stream = ExtResource("12_u1opb")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="Iced"]
+emitting = false
+amount = 50
+one_shot = true
+explosiveness = 1.0
+lifetime_randomness = 0.5
+emission_shape = 3
+emission_rect_extents = Vector2(45, 60)
+direction = Vector2(0, -1)
+spread = 60.0
+initial_velocity_min = 500.0
+initial_velocity_max = 500.0
+scale_amount_min = 20.0
+scale_amount_max = 20.0
+color_ramp = SubResource("Gradient_u1opb")
+
 [node name="WaterSplash" type="Node2D" parent="."]
 
 [node name="Particles" type="CPUParticles2D" parent="WaterSplash"]
@@ -511,6 +585,61 @@ scale = Vector2(8, 8)
 texture = SubResource("GradientTexture2D_pfulr")
 
 [node name="SplashSound" type="AudioStreamPlayer2D" parent="WaterSplash"]
+stream = ExtResource("7_xb7e0")
+volume_db = 8.0
+
+[node name="IcyWaterSplash" type="Node2D" parent="."]
+
+[node name="Particles" type="CPUParticles2D" parent="IcyWaterSplash"]
+emitting = false
+amount = 500
+lifetime = 1.2
+emission_shape = 1
+emission_sphere_radius = 50.0
+direction = Vector2(0, -1)
+spread = 30.0
+initial_velocity_min = 500.0
+initial_velocity_max = 750.0
+scale_amount_min = 10.0
+scale_amount_max = 10.0
+color = Color(0.25098, 0.360784, 0.678431, 1)
+
+[node name="Ripple" type="Node2D" parent="IcyWaterSplash"]
+visible = false
+
+[node name="Dark" type="TextureRect" parent="IcyWaterSplash/Ripple"]
+texture_filter = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -124.0
+offset_top = -124.0
+offset_right = -92.0
+offset_bottom = -92.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(8, 8)
+texture = SubResource("GradientTexture2D_u1opb")
+
+[node name="Light" type="TextureRect" parent="IcyWaterSplash/Ripple"]
+texture_filter = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -132.0
+offset_top = -132.0
+offset_right = -100.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(8, 8)
+texture = SubResource("GradientTexture2D_d4qvj")
+
+[node name="SplashSound" type="AudioStreamPlayer2D" parent="IcyWaterSplash"]
 stream = ExtResource("7_xb7e0")
 volume_db = 8.0
 
