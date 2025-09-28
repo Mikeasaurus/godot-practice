@@ -5,6 +5,12 @@ class_name Track
 ## Number of laps for the track.
 @export var laps: int = 1
 
+## Description of the track.
+@export_multiline var description: String
+
+## Thumbnail for track
+@export var thumbnail_image: CompressedTexture2D
+
 # Finalize some setup, such as item block interactions.
 # Only called on the server instance, or for local game.
 func setup (participants: Dictionary) -> void:

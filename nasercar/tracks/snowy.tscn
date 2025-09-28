@@ -1,9 +1,10 @@
-[gd_scene load_steps=19 format=4 uid="uid://bon22hq3beg1y"]
+[gd_scene load_steps=20 format=4 uid="uid://bon22hq3beg1y"]
 
 [ext_resource type="PackedScene" uid="uid://j4ohs2agmh6j" path="res://tracks/track.tscn" id="1_7eep6"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://tiles/ground.png" id="2_ay74a"]
 [ext_resource type="Script" uid="uid://bvb2bfweiijh1" path="res://tracks/snowy.gd" id="2_qdul6"]
 [ext_resource type="Texture2D" uid="uid://chxeh0b48xusu" path="res://tiles/roads.png" id="3_bmdec"]
+[ext_resource type="Texture2D" uid="uid://8d2a3gshpegv" path="res://tracks/snowy.png" id="3_oik7a"]
 [ext_resource type="PackedScene" uid="uid://cueu5a87cvopj" path="res://items/d_20.tscn" id="4_gtcsa"]
 [ext_resource type="Texture2D" uid="uid://c0yw7rvucrjqq" path="res://tiles/obstacles.png" id="5_0vyvq"]
 [ext_resource type="Texture2D" uid="uid://cs7pb6o3sxji5" path="res://effects/snow1.png" id="6_ui082"]
@@ -284,8 +285,11 @@ _data = {
 point_count = 26
 
 [node name="Snowy" instance=ExtResource("1_7eep6")]
+editor_description = ""
 script = ExtResource("2_qdul6")
 laps = 3
+description = "A winter wonderland."
+thumbnail_image = ExtResource("3_oik7a")
 
 [node name="Ground" type="TileMapLayer" parent="TilesBelowCars" index="0"]
 texture_filter = 1
@@ -397,4 +401,3 @@ texture_filter = 1
 position = Vector2(1920, 1080)
 scale = Vector2(6, 6)
 texture = ExtResource("9_3reir")
-

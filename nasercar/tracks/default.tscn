@@ -1,6 +1,7 @@
-[gd_scene load_steps=15 format=4 uid="uid://b88w887cn5uwe"]
+[gd_scene load_steps=16 format=4 uid="uid://b88w887cn5uwe"]
 
 [ext_resource type="PackedScene" uid="uid://j4ohs2agmh6j" path="res://tracks/track.tscn" id="1_w0p70"]
+[ext_resource type="Texture2D" uid="uid://mdsntknikkdj" path="res://tracks/default.png" id="2_kk6dp"]
 [ext_resource type="Texture2D" uid="uid://c5rk51wrsacr8" path="res://tiles/ground.png" id="2_t82tq"]
 [ext_resource type="Texture2D" uid="uid://chxeh0b48xusu" path="res://tiles/roads.png" id="3_kk6dp"]
 [ext_resource type="PackedScene" uid="uid://cueu5a87cvopj" path="res://items/d_20.tscn" id="4_0dwkn"]
@@ -257,7 +258,9 @@ _data = {
 point_count = 70
 
 [node name="Default" instance=ExtResource("1_w0p70")]
-editor_description = "The original track that was published in the GVH fanzine."
+editor_description = ""
+description = "The original track from when the project was first published in the GVH fanzine."
+thumbnail_image = ExtResource("2_kk6dp")
 
 [node name="Ground" type="TileMapLayer" parent="TilesBelowCars" index="0"]
 texture_filter = 1
