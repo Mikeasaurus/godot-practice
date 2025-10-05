@@ -2,10 +2,6 @@ extends Control
 
 @onready var _naomi := $CarSelection/MarginContainer/CenterContainer/VBoxContainer/GridContainer/Naomi
 
-# List of all race instances running / being created.
-# (for server side).
-# Key is host player id, values are dictionaries of participants.
-var _races: Dictionary = {}
 # Table of currently running races.
 # (also for server side).
 # Key is race number, values are the nodes containing the races.
@@ -18,19 +14,17 @@ func _ready() -> void:
 	$NaserCar.make_local_cpu()
 	_reset_car()
 	$CarTimer.start()
-	MenuHandler.done_submenus.connect(_reset_and_start_timer)
-	$CarSelection.singleplayer_race.connect(start_race)
 	# Need to unlock Naomi kart.
 	_naomi.hide()
 	# If this is configured as a headless server, then set up the connection.
 	if DisplayServer.get_name() == "headless":
 		_make_server()
-	# Error messages from other screens, when returning.
-	$MultiplayerCarSelection.error_message.connect(_error_message)
 	# Handles cases where the player needs to disconnect from the server.
 	# (going back to single-player mode).
+	"""
 	$Multiplayer.leave_server.connect(_leave_server)
 	$MultiplayerCarSelection.leave_server.connect(_leave_server)
+	"""
 	# Spawn a race in multiplayer context.
 	$MultiplayerSpawner.spawn_function = _spawn_multiplayer_race
 
@@ -54,11 +48,6 @@ func _make_server () -> void:
 	# Turn off the Naser car for server instance, otherwise it gets synchronized to all the players and
 	# they see an extra car floating around the screen!
 	_reset_car()
-	# Propogate multiplayer race info to car selection menu.
-	$MultiplayerCarSelection._races = _races
-	$MultiplayerCarSelection.refresh_race.connect(_refresh_race)
-	# Signals for starting the race.
-	$MultiplayerCarSelection.multiplayer_race.connect(_start_multiplayer_race)
 
 func _reset_car() -> void:
 	$NaserCar.set_deferred("global_position",Vector2(-53,-75))
@@ -73,11 +62,36 @@ func _reset_and_start_timer() -> void:
 
 func _on_help_pressed() -> void:
 	_reset_car()
-	MenuHandler.activate_menu($Help)
+	$Help.run()
+	_reset_and_start_timer()
 
 func _on_single_player_pressed() -> void:
+	# Turn off Naser car.
 	_reset_car()
-	MenuHandler.activate_menu($CarSelection)
+	$NaserCar.hide()
+	$NaserCar.process_mode = Node.PROCESS_MODE_DISABLED
+	#TODO: track selection.
+	var track: Track = load("res://tracks/default.tscn").instantiate()
+	# Select a car.
+	var participants: Dictionary = await $CarSelection.run()
+	if len(participants) > 0:
+		# Update participants for track.
+		# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
+		track.call_deferred('setup',participants)
+		# Load up the race track.
+		var race: World = load("res://world.tscn").instantiate()
+		add_child(race)
+		race.set_track(track)
+		race.setup_race(participants)
+		var place: int = await race.quit
+		race.queue_free()
+		if place == 1 and not _naomi.visible:
+			await $Naomi.run()
+			_naomi.show()
+	# Turn on Naser car.
+	_reset_and_start_timer()
+	$NaserCar.show()
+	$NaserCar.process_mode = Node.PROCESS_MODE_INHERIT
 
 # When multiplayer is clicked, need to start a connection to the server.
 func _on_multiplayer_pressed() -> void:
@@ -161,46 +175,7 @@ func _spawn_multiplayer_race (data: Array) -> Node:
 	race.name = str(player_ids[0])
 	return race
 
-func start_race (player_car: Car) -> void:
-	# Set up the player car based on the car type chosen.
-	# For single-player games, player id is just 1.
-	var participants: Dictionary = {1:["Player",player_car.display_name]}
-	# Load up the race track.
-	var race: World = load("res://world.tscn").instantiate()
-	add_child(race)
-	var track: Track = load("res://tracks/default.tscn").instantiate()
-	# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
-	track.call_deferred('setup',participants)
-	race.set_track(track)
-	race.setup_race(participants)
-	# Turn off Naser car visual.
-	# Do this after a bit of a delay, because there's a call to _reset_and_start_timer around the same
-	# time as this (from MenuHandler) that would cause the Naser car to start on its own.
-	#
-	$NaserCar.call_deferred("hide")
-	await get_tree().create_timer(0.1).timeout
-	MenuHandler.done_submenus.disconnect(_reset_and_start_timer)
-	$NaserCar.call_deferred("hide")
-	_reset_car()
-	#
-	# Let the race finish, and get the player's final place in the race.
-	var place: int
-	place = await race.quit
-	if place == 1 and not _naomi.visible:
-		$Naomi.process_mode = Node.PROCESS_MODE_INHERIT
-		$NaserCar.call_deferred("hide")
-		MenuHandler.activate_menu($Naomi)
-		await get_tree().create_timer(0.1).timeout
-		$NaserCar.call_deferred("hide")
-		_reset_car()
-		_naomi.show()
-	else:
-		call_deferred("_reset_and_start_timer")
-	race.queue_free()
-	# Restore Naser car.
-	MenuHandler.done_submenus.connect(_reset_and_start_timer)
-	_reset_and_start_timer()
-
+"""
 # This is called once the player selects a multiplayer race to join.
 # This is called from peer instance.  Need to coordinate with the server.
 func _on_multiplayer_join_race(race_id: int, handle: String) -> void:
@@ -243,3 +218,4 @@ func _error_message (msg: String) -> void:
 func _leave_server () -> void:
 	if multiplayer.get_unique_id() != 1:
 		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+"""

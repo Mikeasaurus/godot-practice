@@ -105,14 +105,6 @@ func _ready() -> void:
 		stylebox.thickness = 3
 		hsep.add_theme_stylebox_override("separator", stylebox)
 		places_vbox.add_child(hsep)
-	# Set up a pause screen for single player games.
-	if multiplayer.get_unique_id() == 1:
-		MenuHandler.pause.connect(_pause_screen)
-		MenuHandler.done_submenus.connect(_unpause_screen)
-		$ScreenEffects/PauseMenu/MarginContainer/CenterContainer/VBoxContainer/QuitButton.pressed.connect(_leave_race)
-	# Hook up server signals.
-	if multiplayer.get_unique_id() == 1:
-		multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
 
 # Call this during race creation.
 func set_track (track: Track) -> void:
@@ -126,6 +118,15 @@ func setup_race (participants: Dictionary) -> void:
 	if multiplayer.get_unique_id() != 1:
 		print ("Attempted to call setup_race on a passive peer.")
 		return
+
+	# Set up a pause screen for single player games.
+	if multiplayer.get_unique_id() == 1:
+		MenuHandler.pause.connect(_pause_screen)
+		MenuHandler.done_submenus.connect(_unpause_screen)
+		$ScreenEffects/PauseMenu/MarginContainer/CenterContainer/VBoxContainer/QuitButton.pressed.connect(_leave_race)
+	# Hook up server signals.
+	if multiplayer.get_unique_id() == 1:
+		multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
 
 	# Match each player to their car scene in the race.
 	# participants variable gets updated from [player_name,car_name] to instances of car objects.
