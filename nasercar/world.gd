@@ -119,11 +119,6 @@ func setup_race (participants: Dictionary) -> void:
 		print ("Attempted to call setup_race on a passive peer.")
 		return
 
-	# Set up a pause screen for single player games.
-	if multiplayer.get_unique_id() == 1:
-		MenuHandler.pause.connect(_pause_screen)
-		MenuHandler.done_submenus.connect(_unpause_screen)
-		$ScreenEffects/PauseMenu/MarginContainer/CenterContainer/VBoxContainer/QuitButton.pressed.connect(_leave_race)
 	# Hook up server signals.
 	if multiplayer.get_unique_id() == 1:
 		multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
@@ -281,17 +276,22 @@ func _itemblock (car: Car) -> void:
 	if car not in _current_items:
 		_get_item(car)
 
-# Client side input capture for using an item.
+var _paused: bool = false
 func _input(event: InputEvent) -> void:
+	if multiplayer.get_unique_id() == 1 and event.is_action_pressed("menu_toggle"):
+		# Check if already paused (or in process of unpausing).
+		if _paused: return
+		_paused = true
+		get_tree().paused = true
+		var quit: bool = await $ScreenEffects/PauseMenu.run()
+		if quit:
+			_leave_race(false)
+		else:
+			get_tree().paused = false
+			set_deferred('_paused',false)
+	# Client side input capture for using an item.
 	if event.is_action_pressed("use_item"):
 		_use_item.rpc_id(1)
-
-func _pause_screen() -> void:
-	if _leaving_race: return  # Don't pause if race is being terminated.
-	get_tree().paused = true
-	MenuHandler.activate_menu($ScreenEffects/PauseMenu)
-func _unpause_screen() -> void:
-	get_tree().paused = false
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
@@ -592,8 +592,8 @@ func _leave_race(completed: bool = false) -> void:
 	# Check if already leaving race.
 	if _leaving_race: return
 	_leaving_race = true
-	# Make sure we're unpaused.
-	MenuHandler.deactivate_menu()
+	# Make sure game is unpaused, or this doesn't run properly?
+	get_tree().paused = false
 	var tween: Tween = create_tween()
 	tween.tween_property(self,"modulate",Color.BLACK,1.0)
 	# Why do I need to modulate stats if I'm already modulating the whole scene???
