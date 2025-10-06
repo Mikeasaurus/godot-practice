@@ -82,8 +82,7 @@ func _on_single_player_pressed() -> void:
 		var race: World = load("res://world.tscn").instantiate()
 		add_child(race)
 		race.set_track(track)
-		race.setup_race(participants)
-		var place: int = await race.quit
+		var place: int = await race.run(participants)
 		race.queue_free()
 		if place == 1 and not _naomi.visible:
 			await $Naomi.run()

@@ -1,8 +1,8 @@
 extends Node2D
 class_name World
 
-# Signal that gets emitted when the game is finished and the player wishes to exit.
-signal quit (place: int)
+# Internal signal that gets emitted when the game is finished and the player wishes to exit.
+signal _done (place: int)
 
 # List of particpants for the race.
 # Filled in by the parent scene.
@@ -113,10 +113,18 @@ func set_track (track: Track) -> void:
 	add_child(track)
 
 # Called to do final setup of race, and start it.
-func setup_race (participants: Dictionary) -> void:
+func run (participants: Dictionary) -> int:
+	_start_race(participants)
+	# Wait until race is finished, and return the final place.
+	# Place will be -1 for unfinished race?
+	var place: int = await _done
+	return place
+
+# Starts the race (countdown, then activate cars).
+func _start_race (participants: Dictionary) -> void:
 
 	if multiplayer.get_unique_id() != 1:
-		print ("Attempted to call setup_race on a passive peer.")
+		print ("Attempted to call World.run on a passive peer.")
 		return
 
 	# Hook up server signals.
@@ -235,6 +243,8 @@ func setup_race (participants: Dictionary) -> void:
 	place_tween.set_ease(Tween.EASE_IN)
 	place_tween.tween_property($CanvasLayer/Place, "modulate", Color.WHITE, 1.0)
 	await place_tween.finished
+
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	# Update the places of all the cars.
@@ -604,10 +614,10 @@ func _leave_race(completed: bool = false) -> void:
 	# For completed single-player games, return the player's place.
 	var my_id: int = multiplayer.get_unique_id()
 	if completed and my_id == 1:
-		quit.emit(_place[my_id])
+		_done.emit(_place[my_id])
 	# For incomplete single-player games, don't have a place to return.
 	elif not completed and my_id == 1:
-		quit.emit(-1)
+		_done.emit(-1)
 	# For multiplayer games, leave the server and clean up the screen.
 	elif my_id != 1:
 		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
@@ -617,4 +627,4 @@ func _leave_race(completed: bool = false) -> void:
 func _player_disconnected (player_id: int) -> void:
 	self.participants.erase(player_id)
 	if len(self.participants) == 0:
-		quit.emit(-1)  # Tell the parent scene that this race is completely finished.
+		_done.emit(-1)
