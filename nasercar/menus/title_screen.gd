@@ -12,8 +12,7 @@ func _ready() -> void:
 	var notracks: Array[TileMapLayer] = []
 	$NaserCar.add_to_track($Path2D,notracks)
 	$NaserCar.make_local_cpu()
-	_reset_car()
-	$CarTimer.start()
+	_reset_and_start_timer()
 	# Need to unlock Naomi kart.
 	_naomi.hide()
 	# If this is configured as a headless server, then set up the connection.
@@ -61,15 +60,16 @@ func _reset_and_start_timer() -> void:
 	$CarTimer.start()
 
 func _on_help_pressed() -> void:
-	_reset_car()
-	$Help.run()
-	_reset_and_start_timer()
+	# Hide menu
+	$MarginContainer.hide()
+	# Start help menu
+	await $Help.run()
+	# Show the main menu again.
+	$MarginContainer.show()
 
 func _on_single_player_pressed() -> void:
-	# Turn off Naser car.
-	_reset_car()
-	$NaserCar.hide()
-	$NaserCar.process_mode = Node.PROCESS_MODE_DISABLED
+	# Hide menu
+	$MarginContainer.hide()
 	#TODO: track selection.
 	var track: Track = load("res://tracks/default.tscn").instantiate()
 	# Select a car.
@@ -82,15 +82,14 @@ func _on_single_player_pressed() -> void:
 		var race: World = load("res://world.tscn").instantiate()
 		add_child(race)
 		race.set_track(track)
+		# Start race and wait for it to end.
 		var place: int = await race.run(participants)
 		race.queue_free()
 		if place == 1 and not _naomi.visible:
 			await $Naomi.run()
 			_naomi.show()
-	# Turn on Naser car.
-	_reset_and_start_timer()
-	$NaserCar.show()
-	$NaserCar.process_mode = Node.PROCESS_MODE_INHERIT
+	# Show the main menu again.
+	$MarginContainer.show()
 
 # When multiplayer is clicked, need to start a connection to the server.
 func _on_multiplayer_pressed() -> void:
@@ -218,3 +217,16 @@ func _leave_server () -> void:
 	if multiplayer.get_unique_id() != 1:
 		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 """
+
+
+func _on_margin_container_visibility_changed() -> void:
+	# When main menu is visible, make Naser car visible and active on the screen.
+	if $MarginContainer.visible:
+		$NaserCar.process_mode = Node.PROCESS_MODE_INHERIT
+		# Defer call to make it work when screen first becomes visible (wait for CarTimer to be scene).
+		call_deferred('_reset_and_start_timer')
+	# Turn off Naser car when main menu becomes hidden.
+	else:
+		_reset_car()
+		$NaserCar.hide()
+		$NaserCar.set_deferred('process_mode',Node.PROCESS_MODE_DISABLED)

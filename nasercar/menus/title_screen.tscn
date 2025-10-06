@@ -188,6 +188,7 @@ layout_mode = 1
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 spawn_path = NodePath("..")
 
+[connection signal="visibility_changed" from="MarginContainer" to="." method="_on_margin_container_visibility_changed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/SinglePlayer" to="." method="_on_single_player_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Multiplayer" to="." method="_on_multiplayer_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Help" to="." method="_on_help_pressed"]
