@@ -2,18 +2,21 @@ extends Control
 
 @onready var _handle: LineEdit = $MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/Handle
 
-signal leave_server
+# Internal signal sent when the user is finished interacting with this menu.
+signal _done (race_id: int, handle: String)
 
-# Signal to send when a session is ready to be joined.
-signal join_race (race_id: int, handle: String)
+func run() -> Array:
+	show()
+	var info: Array = await _done
+	hide()
+	return info
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	$RaceEntrySpawner.spawn_function = _spawn_race_entry
 
 func _on_back_button_pressed() -> void:
-	leave_server.emit()
-	MenuHandler.deactivate_menu()
+	_done.emit(-1,"")
 
 # Player wants to start their own multiplayer session.
 func _on_new_button_pressed() -> void:
@@ -23,7 +26,7 @@ func _on_new_button_pressed() -> void:
 	$NameWarning.hide()
 	_create_new_race.rpc_id(1,_handle.text)
 	MenuHandler.deactivate_menu()
-	join_race.emit(multiplayer.get_unique_id(),_handle.text)
+	_done.emit(multiplayer.get_unique_id(),_handle.text)
 @rpc("any_peer","reliable")
 func _create_new_race (handle: String) -> void:
 	var id: int = multiplayer.get_remote_sender_id()
@@ -40,8 +43,7 @@ func _spawn_race_entry (id: int):
 			$NameWarning.show()
 			return
 		$NameWarning.hide()
-		MenuHandler.deactivate_menu()
-		join_race.emit(id,_handle.text)
+		_done.emit(id,_handle.text)
 	)
 	entry.name = str(id)
 	return entry

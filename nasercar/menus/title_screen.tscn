@@ -176,16 +176,15 @@ layout_mode = 1
 visible = false
 layout_mode = 1
 
-[node name="MultiplayerCarSelection" parent="." instance=ExtResource("8_82lv5")]
-visible = false
-layout_mode = 1
-
 [node name="Naomi" parent="." instance=ExtResource("9_lriup")]
 process_mode = 4
 visible = false
 layout_mode = 1
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+[node name="RaceSpawner" type="MultiplayerSpawner" parent="."]
+spawn_path = NodePath("..")
+
+[node name="CarSelectionMenuSpawner" type="MultiplayerSpawner" parent="."]
 spawn_path = NodePath("..")
 
 [connection signal="visibility_changed" from="MarginContainer" to="." method="_on_margin_container_visibility_changed"]
@@ -193,4 +192,3 @@ spawn_path = NodePath("..")
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Multiplayer" to="." method="_on_multiplayer_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/Help" to="." method="_on_help_pressed"]
 [connection signal="timeout" from="CarTimer" to="." method="_on_car_timer_timeout"]
-[connection signal="join_race" from="Multiplayer" to="." method="_on_multiplayer_join_race"]

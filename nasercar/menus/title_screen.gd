@@ -1,6 +1,7 @@
 extends Control
 
-@onready var _naomi := $CarSelection/MarginContainer/CenterContainer/VBoxContainer/GridContainer/Naomi
+## Cars that start off as locked in single player game.
+@export var locked_cars: Array[String] = ["Naomi"]
 
 # Table of currently running races.
 # (also for server side).
@@ -13,8 +14,6 @@ func _ready() -> void:
 	$NaserCar.add_to_track($Path2D,notracks)
 	$NaserCar.make_local_cpu()
 	_reset_and_start_timer()
-	# Need to unlock Naomi kart.
-	_naomi.hide()
 	# If this is configured as a headless server, then set up the connection.
 	if DisplayServer.get_name() == "headless":
 		_make_server()
@@ -25,7 +24,8 @@ func _ready() -> void:
 	$MultiplayerCarSelection.leave_server.connect(_leave_server)
 	"""
 	# Spawn a race in multiplayer context.
-	$MultiplayerSpawner.spawn_function = _spawn_multiplayer_race
+	$CarSelectionMenuSpawner.spawn_function = _spawn_car_selection_menu
+	$RaceSpawner.spawn_function = _spawn_multiplayer_race
 
 # Multiplayer server setup.
 func _make_server () -> void:
@@ -67,13 +67,25 @@ func _on_help_pressed() -> void:
 	# Show the main menu again.
 	$MarginContainer.show()
 
-func _on_single_player_pressed() -> void:
+func new_game () -> void:
 	# Hide menu
 	$MarginContainer.hide()
 	#TODO: track selection.
 	var track: Track = load("res://tracks/default.tscn").instantiate()
+	var selection: CarSelection
+	# Join a multiplayer race.
+	if multiplayer.get_unique_id() != 1:
+		var info: Array = await $Multiplayer.run()
+		var race_id: int = info[0]
+		var handle: String = info[1]
+		# Check if player cancelled joining a race.
+		if race_id == -1:
+			$MarginContainer.show()
+			return
+		selection = await _request_car_selection_menu (race_id)
 	# Select a car.
-	var participants: Dictionary = await $CarSelection.run()
+	var participants: Dictionary = await selection.run(locked_cars)
+	selection.queue_free()
 	if len(participants) > 0:
 		# Update participants for track.
 		# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
@@ -85,17 +97,20 @@ func _on_single_player_pressed() -> void:
 		# Start race and wait for it to end.
 		var place: int = await race.run(participants)
 		race.queue_free()
-		if place == 1 and not _naomi.visible:
+		if multiplayer.get_unique_id() == 1 and place == 1 and "Naomi" in locked_cars:
 			await $Naomi.run()
-			_naomi.show()
+			locked_cars.erase("Naomi")
 	# Show the main menu again.
 	$MarginContainer.show()
+
+func _on_single_player_pressed() -> void:
+	new_game()
 
 # When multiplayer is clicked, need to start a connection to the server.
 func _on_multiplayer_pressed() -> void:
 	multiplayer.multiplayer_peer = null
-	if not multiplayer.connected_to_server.is_connected(_launch_multiplayer_menu):
-		multiplayer.connected_to_server.connect(_launch_multiplayer_menu)
+	if not multiplayer.connected_to_server.is_connected(_open_multiplayer_menu):
+		multiplayer.connected_to_server.connect(_open_multiplayer_menu)
 	var peer := WebSocketMultiplayerPeer.new()
 	if "--local" in OS.get_cmdline_user_args():
 		peer.create_client("ws://localhost:1157")
@@ -103,9 +118,11 @@ func _on_multiplayer_pressed() -> void:
 		peer.create_client("wss://nasercar.mikeasaurus.ca:1157")
 	multiplayer.multiplayer_peer = peer
 # This is called once the server process is established.
-func _launch_multiplayer_menu() -> void:
-	_reset_car()
-	MenuHandler.activate_menu($Multiplayer)
+func _open_multiplayer_menu() -> void:
+	await new_game()
+	if multiplayer.multiplayer_peer.get_connection_status() == multiplayer.multiplayer_peer.CONNECTION_CONNECTED:
+		multiplayer.multiplayer_peer.close()
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
 func _on_car_timer_timeout() -> void:
 	$NaserCar.freeze = false
@@ -172,6 +189,31 @@ func _spawn_multiplayer_race (data: Array) -> Node:
 	# Use the id of the host player (first entry).
 	race.name = str(player_ids[0])
 	return race
+
+# Get reference to car selection menu.
+func _request_car_selection_menu (race_id:int) -> Node:
+	_server_request_car_selection_menu.rpc_id(1,race_id)
+	await _car_selection_menu_ready
+	var menu_name: String = 'car_selection_'+str(race_id)
+	return get_node(menu_name)
+@rpc("any_peer","call_local","reliable")
+func _server_request_car_selection_menu (race_id: int) -> void:
+	var menu_name: String = 'car_selection_'+str(race_id)
+	if not has_node(menu_name):
+		$CarSelectionMenuSpawner.spawn(race_id)
+	_client_receive_car_selection_menu.rpc_id(multiplayer.get_remote_sender_id())
+@rpc("authority","call_local","reliable")
+func _client_receive_car_selection_menu () -> void:
+	_car_selection_menu_ready.emit()
+signal _car_selection_menu_ready
+
+# Spawn a menu for selecting cars within a multiplayer race.
+func _spawn_car_selection_menu (race_id: int) -> Node:
+	var menu: CarSelection = preload("res://menus/car_selection.tscn").instantiate()
+	menu.name = 'car_selection_'+str(race_id)
+	# Invisible by default (until explicitly made visible by peer).
+	menu.visible = false
+	return menu
 
 """
 # This is called once the player selects a multiplayer race to join.

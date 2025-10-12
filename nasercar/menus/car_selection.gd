@@ -1,5 +1,7 @@
 extends Control
 
+class_name CarSelection
+
 var selection: CarSelectionPanel = null
 
 # This is copied from the title screen, on server instance.
@@ -33,7 +35,12 @@ signal _leave_server
 
 # This is called by the parent menu to wait for a car to be selected.
 # Returns the participants for the race.
-func run () -> Dictionary:
+func run (locked_cars: Array[String]) -> Dictionary:
+	for panel: CarSelectionPanel in $MarginContainer/CenterContainer/VBoxContainer/GridContainer.get_children():
+		if panel.car.display_name in locked_cars:
+			panel.hide()
+		else:
+			panel.show()
 	show()
 	var status: bool = await _done
 	hide()
