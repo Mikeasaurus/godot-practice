@@ -73,16 +73,19 @@ func new_game () -> void:
 	#TODO: track selection.
 	var track: Track = load("res://tracks/default.tscn").instantiate()
 	var selection: CarSelection
+	var race_id: int
 	# Join a multiplayer race.
 	if multiplayer.get_unique_id() != 1:
 		var info: Array = await $Multiplayer.run()
-		var race_id: int = info[0]
+		race_id = info[0]
 		var handle: String = info[1]
 		# Check if player cancelled joining a race.
 		if race_id == -1:
 			$MarginContainer.show()
 			return
-		selection = await _request_car_selection_menu (race_id)
+	else:
+		race_id = 1
+	selection = await _request_car_selection_menu (race_id)
 	# Select a car.
 	var participants: Dictionary = await selection.run(locked_cars)
 	selection.queue_free()
@@ -193,8 +196,12 @@ func _spawn_multiplayer_race (data: Array) -> Node:
 # Get reference to car selection menu.
 func _request_car_selection_menu (race_id:int) -> Node:
 	_server_request_car_selection_menu.rpc_id(1,race_id)
-	await _car_selection_menu_ready
 	var menu_name: String = 'car_selection_'+str(race_id)
+	# Quick and dirty way to handle case where rpc call was instantaneous (i.e. local).
+	if not has_node(menu_name):
+		# If not immediately available, then wait for it.
+		# Assuming there's no race condition between these two lines!
+		await _car_selection_menu_ready
 	return get_node(menu_name)
 @rpc("any_peer","call_local","reliable")
 func _server_request_car_selection_menu (race_id: int) -> void:
