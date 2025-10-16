@@ -70,9 +70,6 @@ func _on_help_pressed() -> void:
 func new_game () -> void:
 	# Hide menu
 	$MarginContainer.hide()
-	#TODO: track selection.
-	var track: Track = load("res://tracks/default.tscn").instantiate()
-	var selection: CarSelection
 	var race_id: int
 	# Join a multiplayer race.
 	if multiplayer.get_unique_id() != 1:
@@ -85,10 +82,16 @@ func new_game () -> void:
 			return
 	else:
 		race_id = 1
-	selection = await _request_car_selection_menu (race_id)
+	# If this player is starting the race, then they decide the track to use.
+	#TODO: track selection.
+	var track: Track = load("res://tracks/default.tscn").instantiate()
+	var selection_menu: CarSelection
+	# Now that a track is chosen, launch the car selection menu.
+	# Also, add this to the list of available races.
+	#TODO
+	selection_menu = await _request_car_selection_menu (race_id, track)
 	# Select a car.
-	var participants: Dictionary = await selection.run(locked_cars)
-	selection.queue_free()
+	var participants: Dictionary = await selection_menu.run()
 	if len(participants) > 0:
 		# Update participants for track.
 		# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
@@ -194,8 +197,8 @@ func _spawn_multiplayer_race (data: Array) -> Node:
 	return race
 
 # Get reference to car selection menu.
-func _request_car_selection_menu (race_id:int) -> Node:
-	_server_request_car_selection_menu.rpc_id(1,race_id)
+func _request_car_selection_menu (race_id: int, track: Track) -> Node:
+	_server_request_car_selection_menu.rpc_id(1,race_id,track)
 	var menu_name: String = 'car_selection_'+str(race_id)
 	# Quick and dirty way to handle case where rpc call was instantaneous (i.e. local).
 	if not has_node(menu_name):
@@ -204,10 +207,17 @@ func _request_car_selection_menu (race_id:int) -> Node:
 		await _car_selection_menu_ready
 	return get_node(menu_name)
 @rpc("any_peer","call_local","reliable")
-func _server_request_car_selection_menu (race_id: int) -> void:
+func _server_request_car_selection_menu (race_id: int, track: Track) -> void:
 	var menu_name: String = 'car_selection_'+str(race_id)
+	var selection: CarSelection
 	if not has_node(menu_name):
-		$CarSelectionMenuSpawner.spawn(race_id)
+		selection = $CarSelectionMenuSpawner.spawn(race_id)
+		# If this is a single player game, then respect the locked cars list.
+		if multiplayer.get_remote_sender_id() == 1:
+			selection.setup(race_id, track, locked_cars)
+		else:
+			selection.setup(race_id, track, [])
+	# Tell client that the menu is available.
 	_client_receive_car_selection_menu.rpc_id(multiplayer.get_remote_sender_id())
 @rpc("authority","call_local","reliable")
 func _client_receive_car_selection_menu () -> void:
@@ -218,6 +228,10 @@ signal _car_selection_menu_ready
 func _spawn_car_selection_menu (race_id: int) -> Node:
 	var menu: CarSelection = preload("res://menus/car_selection.tscn").instantiate()
 	menu.name = 'car_selection_'+str(race_id)
+	# Car selection menu needs to know which player is creating the race.
+	# (the race id corresponds to their player id).
+	# The creator has control over starting / cancelling the race.
+	menu.race_id = race_id
 	# Invisible by default (until explicitly made visible by peer).
 	menu.visible = false
 	return menu
