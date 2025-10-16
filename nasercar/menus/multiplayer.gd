@@ -2,6 +2,9 @@ extends Control
 
 @onready var _handle: LineEdit = $MarginContainer/CenterContainer/VBoxContainer/HBoxContainer2/Handle
 
+# Keep track of all the races currently being set up.
+var available_races: Dictionary = {}
+
 # Internal signal sent when the user is finished interacting with this menu.
 signal _done (race_id: int, handle: String)
 
@@ -24,15 +27,29 @@ func _on_new_button_pressed() -> void:
 		$NameWarning.show()
 		return
 	$NameWarning.hide()
-	_create_new_race.rpc_id(1,_handle.text)
-	MenuHandler.deactivate_menu()
 	_done.emit(multiplayer.get_unique_id(),_handle.text)
-@rpc("any_peer","reliable")
-func _create_new_race (handle: String) -> void:
-	var id: int = multiplayer.get_remote_sender_id()
-	var entry = $RaceEntrySpawner.spawn(id)
-	entry.get_node("VBoxContainer/Host").text = "%s is starting a new race"%handle
-	$MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer/NoRacesLabel.hide()
+
+# This function is called to refresh the list of races.
+func update_race (race_id: int, participants: Dictionary) -> void:
+	# If this is a new race, then add it to the list.
+	if race_id not in available_races:
+		available_races[race_id] = $RaceEntrySpawner.spawn(race_id)
+		var handle: String = "Someone"
+		# Get race host.
+		if race_id in participants: handle = participants[race_id][0]
+		available_races[race_id].get_node("VBoxContainer/Host").text = "%s is starting a new race"%handle
+	var entry: Node = available_races[race_id]
+	# Update number of participants.
+	entry.get_node("VBoxContainer/NumPlayers").text = "%d player(s) joined so far"%len(participants)
+	# If an empty list of participants was given, then the race is not available to join anymore.
+	if len(participants) == 0:
+		available_races.erase(race_id)
+		entry.queue_free()
+	# If no races available, then show a message.
+	if len(available_races) == 0:
+		$MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer/NoRacesLabel.show()
+	else:
+		$MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer/NoRacesLabel.hide()
 
 # Called when a new line is added to the list of available races.
 # Where is race id going to be stored?
@@ -47,10 +64,3 @@ func _spawn_race_entry (id: int):
 	)
 	entry.name = str(id)
 	return entry
-
-# Print the information message when list of current races becomes empty.
-func _on_v_box_container_child_exiting_tree(_node: Node) -> void:
-	var vbox: VBoxContainer = $MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer
-	if len(vbox.get_children()) == 2:  # 2 = the (hidden) label, and the last race in the list being removed.
-		vbox.get_node("NoRacesLabel").show()
-	pass # Replace with function body.
