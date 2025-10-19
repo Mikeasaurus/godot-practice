@@ -71,7 +71,6 @@ func _maybe_cleanup (_status: Dictionary) -> void:
 func _cleanup () -> void:
 	# Check id again (should already be correct, but just in case someone tries something weird).
 	if multiplayer.get_remote_sender_id() == race_id:
-		print ("FREEING ", self)
 		queue_free()
 
 func _panel_selected (panel: CarSelectionPanel) -> void:

@@ -17,15 +17,9 @@ func _ready() -> void:
 	# If this is configured as a headless server, then set up the connection.
 	if DisplayServer.get_name() == "headless":
 		_make_server()
-	# Handles cases where the player needs to disconnect from the server.
-	# (going back to single-player mode).
-	"""
-	$Multiplayer.leave_server.connect(_leave_server)
-	$MultiplayerCarSelection.leave_server.connect(_leave_server)
-	"""
 	# Spawn a race in multiplayer context.
 	$CarSelectionMenuSpawner.spawn_function = _spawn_car_selection_menu
-	$RaceSpawner.spawn_function = _spawn_multiplayer_race
+	$RaceSpawner.spawn_function = _spawn_race
 
 # Multiplayer server setup.
 func _make_server () -> void:
@@ -86,10 +80,10 @@ func new_game () -> void:
 		handle = "Player"
 	# If this player is starting the race, then they decide the track to use.
 	#TODO: track selection.
-	var track: Track = load("res://tracks/default.tscn").instantiate()
+	var track_name: String = "default"
 	var selection_menu: CarSelection
 	# Now that a track is chosen, launch the car selection menu.
-	selection_menu = await _request_car_selection_menu (race_id, "default")
+	selection_menu = await _request_car_selection_menu (race_id, track_name)
 
 	# Select a car.
 	var participants: Dictionary = await selection_menu.run(handle)
@@ -105,17 +99,12 @@ func new_game () -> void:
 		tween.tween_interval(3.0)
 		tween.tween_property(e,"modulate",Color.hex(0xffffff00),3.0)
 
+	# Set up and run the race.
 	if len(participants) > 0:
-		# Update participants for track.
-		# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
-		track.call_deferred('setup',participants)
-		# Load up the race track.
-		var race: World = load("res://world.tscn").instantiate()
-		add_child(race)
-		race.set_track(track)
+		var race: World = await _request_race (race_id, track_name, participants)
 		# Start race and wait for it to end.
 		var place: int = await race.run(participants)
-		race.queue_free()
+		# Check if a character was unlocked.
 		if multiplayer.get_unique_id() == 1 and place == 1 and "Naomi" in locked_cars:
 			await $Naomi.run()
 			locked_cars.erase("Naomi")
@@ -146,68 +135,6 @@ func _open_multiplayer_menu() -> void:
 func _on_car_timer_timeout() -> void:
 	$NaserCar.freeze = false
 	$NaserCar.go()
-
-# Called within server (from kart selection screen back to main screen) to indicate
-# a race is ready to start.
-func _start_multiplayer_race(race_id: int, participants: Dictionary) -> void:
-	# Construct a list of all race participants, starting with the host.
-	var player_ids: Array[int] = [race_id]
-	for player_id in participants.keys():
-		if player_id not in player_ids:
-			player_ids.append(player_id)
-	# Find a free index for the race.
-	# Starting at index 1 instead of 0, to always start in an offset.
-	# (avoids visual glitches where things spawn starting at the origin).
-	var index: int = 1
-	while index in _running_races:
-		index += 1
-	var race: World = $MultiplayerSpawner.spawn([index,player_ids,"res://tracks/default.tscn"])
-	var player_names: Array[String] = []
-	for player_id in participants.keys():
-		player_names.append(participants[player_id][0])
-	print ("Starting multiplayer race ", race_id, " at index ", index, " with players ", "," .join(player_names), ".")
-	_running_races[index] = race
-	# Configure the race with the given participants.
-	if multiplayer.get_unique_id() == 1:  # Why do I need to check this???
-		race.setup_race(participants)
-		# Free the race object once all players have left the game.
-		await race.quit
-		print ("Finished multiplayer race ", race_id)
-		_running_races.erase(index)
-		race.queue_free()
-
-# This is called to create a multiplayer race among all peers.
-# "data" is the race_id, and dictionary containing all players / karts for the race.
-func _spawn_multiplayer_race (data: Array) -> Node:
-	var race: Node
-	var index: int = data[0]
-	var player_ids: Array[int] = data[1]
-	var track_scene_path: String = data[2]
-	# For the server and participating peers, this will be the fully constructed race.
-	var player_id: int = multiplayer.get_unique_id()
-	if player_id == 1 or player_id in player_ids:
-		race = load("res://world.tscn").instantiate()
-		# Each race is offset so that they don't overlap in the coordinate space.
-		# So that rigid bodies from different races don't collide with each other... haha.
-		race.global_position.x = 100000*index
-		var track: Track = load(track_scene_path).instantiate()
-		# Set up participants for track (for synchronization of peers).
-		# Don't need the specific cars, just the player ids.
-		var participants: Dictionary = {}
-		for id in player_ids:
-			participants[id] = null
-		# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
-		track.call_deferred('setup',participants)
-		race.set_track(track)
-	# For other peers, just put a simple dummy object here.
-	else:
-		race = Node.new()
-		#race = load("res://world.tscn").instantiate()
-		#race.process_mode = Node.PROCESS_MODE_DISABLED
-	# Set a consistent name for this race across all peers.
-	# Use the id of the host player (first entry).
-	race.name = str(player_ids[0])
-	return race
 
 # Get reference to car selection menu.
 func _request_car_selection_menu (race_id: int, track: String) -> Node:
@@ -254,6 +181,82 @@ func _spawn_car_selection_menu (race_id: int) -> Node:
 	menu.visible = false
 	return menu
 
+# Get a reference to a race.
+# Create it if it doesn't exist yet.
+func _request_race (race_id: int, track_name: String, participants: Dictionary) -> World:
+	_server_request_race.rpc_id(1,race_id, track_name, participants)
+	var race_name: String = "race_"+str(race_id)
+	if not has_node(race_name):
+		await _race_ready
+	return get_node(race_name)
+@rpc("any_peer","call_local","reliable")
+func _server_request_race (race_id: int, track_name: String, participants: Dictionary) -> void:
+	var race_name: String = "race_"+str(race_id)
+	if not has_node(race_name):
+		# Construct a list of all race participants, starting with the host.
+		var player_ids: Array[int] = [race_id]
+		for player_id in participants.keys():
+			if player_id not in player_ids:
+				player_ids.append(player_id)
+		# Find a free index for the race.
+		# Starting at index 1 instead of 0, to always start in an offset.
+		# (avoids visual glitches where things spawn starting at the origin).
+		var index: int = 1
+		while index in _running_races:
+			index += 1
+		# Spawn the race
+		var race: World = $RaceSpawner.spawn([index,race_id,player_ids,"res://tracks/%s.tscn"%track_name])
+		var player_names: Array[String] = []
+		for player_id in participants.keys():
+			player_names.append(participants[player_id][0])
+		print ("Starting race ", race_id, " at index ", index, " with players ", "," .join(player_names), ".")
+		_running_races[index] = race
+		# Free the race object once all players have left the game.
+		race.tree_exited.connect(func () -> void:
+			print ("Finished race ", race_id)
+			_running_races.erase(index)
+		)
+		# Run from server side as well (which will control the race).
+		race.run(participants)
+	# Tell client that the race is available.
+	_client_receive_race.rpc_id(multiplayer.get_remote_sender_id())
+@rpc("authority","call_local","reliable")
+func _client_receive_race () -> void:
+	_race_ready.emit()
+signal _race_ready
+
+# This is called to create a multiplayer race among all peers.
+# "data" is the race_id, and dictionary containing all players / karts for the race.
+func _spawn_race (data: Array) -> Node:
+	var race: Node
+	var index: int = data[0]
+	var race_id: int = data[1]
+	var player_ids: Array[int] = data[2]
+	var track_scene_path: String = data[3]
+	# For the server and participating peers, this will be the fully constructed race.
+	var player_id: int = multiplayer.get_unique_id()
+	if player_id == 1 or player_id in player_ids:
+		race = load("res://world.tscn").instantiate()
+		# Each race is offset so that they don't overlap in the coordinate space.
+		# So that rigid bodies from different races don't collide with each other... haha.
+		race.global_position.x = 100000*index
+		var track: Track = load(track_scene_path).instantiate()
+		# Set up participants for track (for synchronization of peers).
+		# Don't need the specific cars, just the player ids.
+		var participants: Dictionary = {}
+		for id in player_ids:
+			participants[id] = null
+		# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
+		track.call_deferred('setup',participants)
+		race.set_track(track)
+	# For other peers, just put a simple dummy object here.
+	else:
+		race = Node.new()
+		#race = load("res://world.tscn").instantiate()
+		#race.process_mode = Node.PROCESS_MODE_DISABLED
+	# Set a consistent name for this race across all peers.
+	race.name = "race_"+str(race_id)
+	return race
 
 
 func _on_margin_container_visibility_changed() -> void:

@@ -114,7 +114,9 @@ func set_track (track: Track) -> void:
 
 # Called to do final setup of race, and start it.
 func run (participants: Dictionary) -> int:
-	_start_race(participants)
+	# If this is the host, then start the race.
+	if multiplayer.get_unique_id() == 1:
+		_start_race(participants)
 	# Wait until race is finished, and return the final place.
 	# Place will be -1 for unfinished race?
 	var place: int = await _done
@@ -618,13 +620,15 @@ func _leave_race(completed: bool = false) -> void:
 	# For incomplete single-player games, don't have a place to return.
 	elif not completed and my_id == 1:
 		_done.emit(-1)
-	# For multiplayer games, leave the server and clean up the screen.
+	# For multiplayer games, just return without the place.
+	# (the place is stored in the server context, not available here).
+	# It could be communicated, if needed for some reason.
 	elif my_id != 1:
-		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
-		queue_free()
+		_done.emit(-1)
 
 # Handle peer disconnections.
+# Clean up the race after all players have left.
 func _player_disconnected (player_id: int) -> void:
 	self.participants.erase(player_id)
 	if len(self.participants) == 0:
-		_done.emit(-1)
+		queue_free()
