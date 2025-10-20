@@ -11,7 +11,7 @@ signal _done (race_id: int, handle: String)
 func run() -> Array:
 	show()
 	var info: Array = await _done
-	hide()
+	#hide()  # Will be re-hidden from context of main menu, to avoid a brief period of no menus visible while waiting for next menu to be shown.
 	return info
 
 # Called when the node enters the scene tree for the first time.

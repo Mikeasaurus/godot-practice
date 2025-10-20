@@ -625,6 +625,10 @@ func _leave_race(completed: bool = false) -> void:
 	# It could be communicated, if needed for some reason.
 	elif my_id != 1:
 		_done.emit(-1)
+	# For single player games, clean up the race.
+	# Multiplayer games get cleaned up after all players disconnected from server (see below).
+	if my_id == 1:
+		queue_free()
 
 # Handle peer disconnections.
 # Clean up the race after all players have left.

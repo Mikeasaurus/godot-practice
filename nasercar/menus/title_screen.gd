@@ -73,6 +73,7 @@ func new_game () -> void:
 		handle = info[1]
 		# Check if player cancelled joining a race.
 		if race_id == -1:
+			$Multiplayer.hide()
 			$MarginContainer.show()
 			return
 	else:
@@ -84,6 +85,8 @@ func new_game () -> void:
 	var selection_menu: CarSelection
 	# Now that a track is chosen, launch the car selection menu.
 	selection_menu = await _request_car_selection_menu (race_id, track_name)
+	# Hide the previous multiplayer menu after this selection menu is available.
+	$Multiplayer.hide()
 
 	# Select a car.
 	var participants: Dictionary = await selection_menu.run(handle)
@@ -217,9 +220,17 @@ func _server_request_race (race_id: int, track_name: String, participants: Dicti
 			_running_races.erase(index)
 		)
 		# Run from server side as well (which will control the race).
-		race.run(participants)
+		if multiplayer.multiplayer_peer is not OfflineMultiplayerPeer:
+			race.run(participants)
 	# Tell client that the race is available.
 	_client_receive_race.rpc_id(multiplayer.get_remote_sender_id())
+	# Clean up the car selection menu (now that the race can be displayed).
+	# If this was cleaned up too early, then there's be a brief period where nothing is
+	# on the screen except a blank grey space.
+	await get_tree().create_timer(5.0).timeout
+	var selection_menu: CarSelection = get_node('car_selection_'+str(race_id))
+	if selection_menu != null:
+		selection_menu.queue_free()
 @rpc("authority","call_local","reliable")
 func _client_receive_race () -> void:
 	_race_ready.emit()

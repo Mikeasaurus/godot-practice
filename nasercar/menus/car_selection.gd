@@ -28,7 +28,7 @@ func run (handle: String) -> Dictionary:
 	own_handle = handle
 	show()
 	var status: Dictionary = await _done
-	hide()
+	# NOTE: Will be freed once race is available, to avoid a brief period of no menus visible while waiting for next screen to be shown.
 	return status
 
 # Initialize the menu (from server / local instance).
@@ -60,18 +60,6 @@ func _ready() -> void:
 	# Server side setup.
 	if multiplayer.get_unique_id() == 1:
 		multiplayer.peer_disconnected.connect(_player_bailed)
-	# Make sure this menu gets cleaned up after it's finished.
-	_done.connect(_maybe_cleanup)
-
-func _maybe_cleanup (_status: Dictionary) -> void:
-	# Clean up controlled by the client who was starting this race.
-	if multiplayer.get_unique_id() == race_id:
-		_cleanup.rpc_id(1)
-@rpc("any_peer","call_local","reliable")
-func _cleanup () -> void:
-	# Check id again (should already be correct, but just in case someone tries something weird).
-	if multiplayer.get_remote_sender_id() == race_id:
-		queue_free()
 
 func _panel_selected (panel: CarSelectionPanel) -> void:
 	var panel_index: int = panel2index(panel)
