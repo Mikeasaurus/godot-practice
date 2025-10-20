@@ -1,11 +1,8 @@
 extends Control
 
-@onready var _naomi := $CarSelection/MarginContainer/CenterContainer/VBoxContainer/GridContainer/Naomi
+## Cars that start off as locked in single player game.
+@export var locked_cars: Array[String] = ["Naomi"]
 
-# List of all race instances running / being created.
-# (for server side).
-# Key is host player id, values are dictionaries of participants.
-var _races: Dictionary = {}
 # Table of currently running races.
 # (also for server side).
 # Key is race number, values are the nodes containing the races.
@@ -16,23 +13,13 @@ func _ready() -> void:
 	var notracks: Array[TileMapLayer] = []
 	$NaserCar.add_to_track($Path2D,notracks)
 	$NaserCar.make_local_cpu()
-	_reset_car()
-	$CarTimer.start()
-	MenuHandler.done_submenus.connect(_reset_and_start_timer)
-	$CarSelection.singleplayer_race.connect(start_race)
-	# Need to unlock Naomi kart.
-	_naomi.hide()
+	_reset_and_start_timer()
 	# If this is configured as a headless server, then set up the connection.
 	if DisplayServer.get_name() == "headless":
 		_make_server()
-	# Error messages from other screens, when returning.
-	$MultiplayerCarSelection.error_message.connect(_error_message)
-	# Handles cases where the player needs to disconnect from the server.
-	# (going back to single-player mode).
-	$Multiplayer.leave_server.connect(_leave_server)
-	$MultiplayerCarSelection.leave_server.connect(_leave_server)
 	# Spawn a race in multiplayer context.
-	$MultiplayerSpawner.spawn_function = _spawn_multiplayer_race
+	$CarSelectionMenuSpawner.spawn_function = _spawn_car_selection_menu
+	$RaceSpawner.spawn_function = _spawn_race
 
 # Multiplayer server setup.
 func _make_server () -> void:
@@ -54,11 +41,6 @@ func _make_server () -> void:
 	# Turn off the Naser car for server instance, otherwise it gets synchronized to all the players and
 	# they see an extra car floating around the screen!
 	_reset_car()
-	# Propogate multiplayer race info to car selection menu.
-	$MultiplayerCarSelection._races = _races
-	$MultiplayerCarSelection.refresh_race.connect(_refresh_race)
-	# Signals for starting the race.
-	$MultiplayerCarSelection.multiplayer_race.connect(_start_multiplayer_race)
 
 func _reset_car() -> void:
 	$NaserCar.set_deferred("global_position",Vector2(-53,-75))
@@ -72,18 +54,74 @@ func _reset_and_start_timer() -> void:
 	$CarTimer.start()
 
 func _on_help_pressed() -> void:
-	_reset_car()
-	MenuHandler.activate_menu($Help)
+	# Hide menu
+	$MarginContainer.hide()
+	# Start help menu
+	await $Help.run()
+	# Show the main menu again.
+	$MarginContainer.show()
+
+func new_game () -> void:
+	# Hide menu
+	$MarginContainer.hide()
+	var race_id: int
+	var handle: String
+	# Join a multiplayer race.
+	if multiplayer.get_unique_id() != 1:
+		var info: Array = await $Multiplayer.run()
+		race_id = info[0]
+		handle = info[1]
+		# Check if player cancelled joining a race.
+		if race_id == -1:
+			$Multiplayer.hide()
+			$MarginContainer.show()
+			return
+	else:
+		race_id = 1
+		handle = "Player"
+	# If this player is starting the race, then they decide the track to use.
+	#TODO: track selection.
+	var track_name: String = "default"
+	var selection_menu: CarSelection
+	# Now that a track is chosen, launch the car selection menu.
+	selection_menu = await _request_car_selection_menu (race_id, track_name)
+	# Hide the previous multiplayer menu after this selection menu is available.
+	$Multiplayer.hide()
+
+	# Select a car.
+	var participants: Dictionary = await selection_menu.run(handle)
+
+	# Check for error codes.
+	if -1 in participants:
+		var msg: String = participants[-1]
+		participants.erase(-1)
+		var e: Label = $MarginContainer/CenterContainer/VBoxContainer/ErrorMessage
+		e.modulate = Color.WHITE
+		e.text = msg
+		var tween: Tween = create_tween()
+		tween.tween_interval(3.0)
+		tween.tween_property(e,"modulate",Color.hex(0xffffff00),3.0)
+
+	# Set up and run the race.
+	if len(participants) > 0:
+		var race: World = await _request_race (race_id, track_name, participants)
+		# Start race and wait for it to end.
+		var place: int = await race.run(participants)
+		# Check if a character was unlocked.
+		if multiplayer.get_unique_id() == 1 and place == 1 and "Naomi" in locked_cars:
+			await $Naomi.run()
+			locked_cars.erase("Naomi")
+	# Show the main menu again.
+	$MarginContainer.show()
 
 func _on_single_player_pressed() -> void:
-	_reset_car()
-	MenuHandler.activate_menu($CarSelection)
+	new_game()
 
 # When multiplayer is clicked, need to start a connection to the server.
 func _on_multiplayer_pressed() -> void:
 	multiplayer.multiplayer_peer = null
-	if not multiplayer.connected_to_server.is_connected(_launch_multiplayer_menu):
-		multiplayer.connected_to_server.connect(_launch_multiplayer_menu)
+	if not multiplayer.connected_to_server.is_connected(_open_multiplayer_menu):
+		multiplayer.connected_to_server.connect(_open_multiplayer_menu)
 	var peer := WebSocketMultiplayerPeer.new()
 	if "--local" in OS.get_cmdline_user_args():
 		peer.create_client("ws://localhost:1157")
@@ -91,50 +129,121 @@ func _on_multiplayer_pressed() -> void:
 		peer.create_client("wss://nasercar.mikeasaurus.ca:1157")
 	multiplayer.multiplayer_peer = peer
 # This is called once the server process is established.
-func _launch_multiplayer_menu() -> void:
-	_reset_car()
-	MenuHandler.activate_menu($Multiplayer)
+func _open_multiplayer_menu() -> void:
+	await new_game()
+	if multiplayer.multiplayer_peer.get_connection_status() == multiplayer.multiplayer_peer.CONNECTION_CONNECTED:
+		multiplayer.multiplayer_peer.close()
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 
 func _on_car_timer_timeout() -> void:
 	$NaserCar.freeze = false
 	$NaserCar.go()
 
-# Called within server (from kart selection screen back to main screen) to indicate
-# a race is ready to start.
-func _start_multiplayer_race(race_id: int, participants: Dictionary) -> void:
-	# Construct a list of all race participants, starting with the host.
-	var player_ids: Array[int] = [race_id]
-	for player_id in participants.keys():
-		if player_id not in player_ids:
-			player_ids.append(player_id)
-	# Find a free index for the race.
-	# Starting at index 1 instead of 0, to always start in an offset.
-	# (avoids visual glitches where things spawn starting at the origin).
-	var index: int = 1
-	while index in _running_races:
-		index += 1
-	var race: World = $MultiplayerSpawner.spawn([index,player_ids,"res://tracks/default.tscn"])
-	var player_names: Array[String] = []
-	for player_id in participants.keys():
-		player_names.append(participants[player_id][0])
-	print ("Starting multiplayer race ", race_id, " at index ", index, " with players ", "," .join(player_names), ".")
-	_running_races[index] = race
-	# Configure the race with the given participants.
-	if multiplayer.get_unique_id() == 1:  # Why do I need to check this???
-		race.setup_race(participants)
+# Get reference to car selection menu.
+func _request_car_selection_menu (race_id: int, track: String) -> Node:
+	_server_request_car_selection_menu.rpc_id(1,race_id,track)
+	var menu_name: String = 'car_selection_'+str(race_id)
+	# Quick and dirty way to handle case where rpc call was instantaneous (i.e. local).
+	if not has_node(menu_name):
+		# If not immediately available, then wait for it.
+		# Assuming there's no race condition between these two lines!
+		await _car_selection_menu_ready
+	return get_node(menu_name)
+@rpc("any_peer","call_local","reliable")
+func _server_request_car_selection_menu (race_id: int, track: String) -> void:
+	var menu_name: String = 'car_selection_'+str(race_id)
+	var selection: CarSelection
+	if not has_node(menu_name):
+		selection = $CarSelectionMenuSpawner.spawn(race_id)
+		# If this is a single player game, then respect the locked cars list.
+		if multiplayer.get_remote_sender_id() == 1:
+			selection.setup(race_id, track, locked_cars)
+		else:
+			selection.setup(race_id, track, [])
+		# Connect a signal that lets the list of participants be updated on the multiplayer menu list.
+		#selection.participants_updated.connect($Multiplayer.update_race.bind([race_id]))
+		selection.participants_updated.connect(func (participants: Dictionary) -> void:
+			$Multiplayer.update_race(race_id, participants)
+		)
+	# Tell client that the menu is available.
+	_client_receive_car_selection_menu.rpc_id(multiplayer.get_remote_sender_id())
+@rpc("authority","call_local","reliable")
+func _client_receive_car_selection_menu () -> void:
+	_car_selection_menu_ready.emit()
+signal _car_selection_menu_ready
+
+# Spawn a menu for selecting cars within a multiplayer race.
+func _spawn_car_selection_menu (race_id: int) -> Node:
+	var menu: CarSelection = preload("res://menus/car_selection.tscn").instantiate()
+	menu.name = 'car_selection_'+str(race_id)
+	# Car selection menu needs to know which player is creating the race.
+	# (the race id corresponds to their player id).
+	# The creator has control over starting / cancelling the race.
+	menu.race_id = race_id
+	# Invisible by default (until explicitly made visible by peer).
+	menu.visible = false
+	return menu
+
+# Get a reference to a race.
+# Create it if it doesn't exist yet.
+func _request_race (race_id: int, track_name: String, participants: Dictionary) -> World:
+	_server_request_race.rpc_id(1,race_id, track_name, participants)
+	var race_name: String = "race_"+str(race_id)
+	if not has_node(race_name):
+		await _race_ready
+	return get_node(race_name)
+@rpc("any_peer","call_local","reliable")
+func _server_request_race (race_id: int, track_name: String, participants: Dictionary) -> void:
+	var race_name: String = "race_"+str(race_id)
+	if not has_node(race_name):
+		# Construct a list of all race participants, starting with the host.
+		var player_ids: Array[int] = [race_id]
+		for player_id in participants.keys():
+			if player_id not in player_ids:
+				player_ids.append(player_id)
+		# Find a free index for the race.
+		# Starting at index 1 instead of 0, to always start in an offset.
+		# (avoids visual glitches where things spawn starting at the origin).
+		var index: int = 1
+		while index in _running_races:
+			index += 1
+		# Spawn the race
+		var race: World = $RaceSpawner.spawn([index,race_id,player_ids,"res://tracks/%s.tscn"%track_name])
+		var player_names: Array[String] = []
+		for player_id in participants.keys():
+			player_names.append(participants[player_id][0])
+		print ("Starting race ", race_id, " at index ", index, " with players ", "," .join(player_names), ".")
+		_running_races[index] = race
 		# Free the race object once all players have left the game.
-		await race.quit
-		print ("Finished multiplayer race ", race_id)
-		_running_races.erase(index)
-		race.queue_free()
+		race.tree_exited.connect(func () -> void:
+			print ("Finished race ", race_id)
+			_running_races.erase(index)
+		)
+		# Run from server side as well (which will control the race).
+		if multiplayer.multiplayer_peer is not OfflineMultiplayerPeer:
+			race.run(participants)
+	# Tell client that the race is available.
+	_client_receive_race.rpc_id(multiplayer.get_remote_sender_id())
+	# Clean up the car selection menu (now that the race can be displayed).
+	# If this was cleaned up too early, then there's be a brief period where nothing is
+	# on the screen except a blank grey space.
+	await get_tree().create_timer(5.0).timeout
+	var selection_menu: CarSelection = get_node('car_selection_'+str(race_id))
+	if selection_menu != null:
+		selection_menu.queue_free()
+@rpc("authority","call_local","reliable")
+func _client_receive_race () -> void:
+	_race_ready.emit()
+signal _race_ready
 
 # This is called to create a multiplayer race among all peers.
 # "data" is the race_id, and dictionary containing all players / karts for the race.
-func _spawn_multiplayer_race (data: Array) -> Node:
+func _spawn_race (data: Array) -> Node:
 	var race: Node
 	var index: int = data[0]
-	var player_ids: Array[int] = data[1]
-	var track_scene_path: String = data[2]
+	var race_id: int = data[1]
+	var player_ids: Array[int] = data[2]
+	var track_scene_path: String = data[3]
 	# For the server and participating peers, this will be the fully constructed race.
 	var player_id: int = multiplayer.get_unique_id()
 	if player_id == 1 or player_id in player_ids:
@@ -157,89 +266,18 @@ func _spawn_multiplayer_race (data: Array) -> Node:
 		#race = load("res://world.tscn").instantiate()
 		#race.process_mode = Node.PROCESS_MODE_DISABLED
 	# Set a consistent name for this race across all peers.
-	# Use the id of the host player (first entry).
-	race.name = str(player_ids[0])
+	race.name = "race_"+str(race_id)
 	return race
 
-func start_race (player_car: Car) -> void:
-	# Set up the player car based on the car type chosen.
-	# For single-player games, player id is just 1.
-	var participants: Dictionary = {1:["Player",player_car.display_name]}
-	# Load up the race track.
-	var race: World = load("res://world.tscn").instantiate()
-	add_child(race)
-	var track: Track = load("res://tracks/default.tscn").instantiate()
-	# Need to defer call to this, otehrwise the itemblocks don't show up as children and don't get set up?
-	track.call_deferred('setup',participants)
-	race.set_track(track)
-	race.setup_race(participants)
-	# Turn off Naser car visual.
-	# Do this after a bit of a delay, because there's a call to _reset_and_start_timer around the same
-	# time as this (from MenuHandler) that would cause the Naser car to start on its own.
-	#
-	$NaserCar.call_deferred("hide")
-	await get_tree().create_timer(0.1).timeout
-	MenuHandler.done_submenus.disconnect(_reset_and_start_timer)
-	$NaserCar.call_deferred("hide")
-	_reset_car()
-	#
-	# Let the race finish, and get the player's final place in the race.
-	var place: int
-	place = await race.quit
-	if place == 1 and not _naomi.visible:
-		$Naomi.process_mode = Node.PROCESS_MODE_INHERIT
-		$NaserCar.call_deferred("hide")
-		MenuHandler.activate_menu($Naomi)
-		await get_tree().create_timer(0.1).timeout
-		$NaserCar.call_deferred("hide")
+
+func _on_margin_container_visibility_changed() -> void:
+	# When main menu is visible, make Naser car visible and active on the screen.
+	if $MarginContainer.visible:
+		$NaserCar.process_mode = Node.PROCESS_MODE_INHERIT
+		# Defer call to make it work when screen first becomes visible (wait for CarTimer to be scene).
+		call_deferred('_reset_and_start_timer')
+	# Turn off Naser car when main menu becomes hidden.
+	else:
 		_reset_car()
-		_naomi.show()
-	else:
-		call_deferred("_reset_and_start_timer")
-	race.queue_free()
-	# Restore Naser car.
-	MenuHandler.done_submenus.connect(_reset_and_start_timer)
-	_reset_and_start_timer()
-
-# This is called once the player selects a multiplayer race to join.
-# This is called from peer instance.  Need to coordinate with the server.
-func _on_multiplayer_join_race(race_id: int, handle: String) -> void:
-	_peer_joining_race.rpc_id(1, race_id, handle)
-	# Open car selection menu with multiplayer context.
-	_reset_car()
-	MenuHandler.activate_menu($MultiplayerCarSelection)
-# Server side - bookkeeping for current races.
-@rpc("any_peer","reliable")
-func _peer_joining_race(race_id: int, handle: String) -> void:
-	# Get id of the peer that's joining.
-	var id: int = multiplayer.get_remote_sender_id()
-	# If this race doesn't exist yet, then create it.
-	if race_id not in _races:
-		_races[race_id] = {}
-	# No kart selected, so just a handle for now.
-	_races[race_id][id] = [handle,""]
-	_refresh_race (race_id)
-# Called when the race stats should be updated.
-# Called from server to itself.
-func _refresh_race (race_id) -> void:
-	# Update count for the race.
-	var race_list: VBoxContainer = $Multiplayer/MarginContainer/CenterContainer/VBoxContainer/ScrollContainer/VBoxContainer
-	# Update info on the race.
-	if race_id in _races:
-		race_list.get_node(str(race_id)).get_node("VBoxContainer/NumPlayers").text = "%d player(s) joined so far"%len(_races[race_id])
-	# Or clear it out if it no longer exists.
-	else:
-		race_list.get_node(str(race_id)).queue_free()
-# Briefly displays an error message at the top of the screen.
-func _error_message (msg: String) -> void:
-	var e: Label = $MarginContainer/CenterContainer/VBoxContainer/ErrorMessage
-	e.modulate = Color.WHITE
-	e.text = msg
-	var tween: Tween = create_tween()
-	tween.tween_interval(3.0)
-	tween.tween_property(e,"modulate",Color.hex(0xffffff00),3.0)
-
-# Disconnect from any multiplayer instance.
-func _leave_server () -> void:
-	if multiplayer.get_unique_id() != 1:
-		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+		$NaserCar.hide()
+		$NaserCar.set_deferred('process_mode',Node.PROCESS_MODE_DISABLED)

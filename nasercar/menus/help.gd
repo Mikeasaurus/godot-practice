@@ -1,5 +1,6 @@
 extends Control
 
-
-func _on_back_pressed() -> void:
-	MenuHandler.deactivate_menu()
+func run () -> void:
+	show()
+	await $MarginContainer/CenterContainer/VBoxContainer/BackButton.pressed
+	hide()

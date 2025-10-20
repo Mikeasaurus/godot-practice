@@ -1,8 +1,8 @@
 extends Node2D
 class_name World
 
-# Signal that gets emitted when the game is finished and the player wishes to exit.
-signal quit (place: int)
+# Internal signal that gets emitted when the game is finished and the player wishes to exit.
+signal _done (place: int)
 
 # List of particpants for the race.
 # Filled in by the parent scene.
@@ -105,14 +105,6 @@ func _ready() -> void:
 		stylebox.thickness = 3
 		hsep.add_theme_stylebox_override("separator", stylebox)
 		places_vbox.add_child(hsep)
-	# Set up a pause screen for single player games.
-	if multiplayer.get_unique_id() == 1:
-		MenuHandler.pause.connect(_pause_screen)
-		MenuHandler.done_submenus.connect(_unpause_screen)
-		$ScreenEffects/PauseMenu/MarginContainer/CenterContainer/VBoxContainer/QuitButton.pressed.connect(_leave_race)
-	# Hook up server signals.
-	if multiplayer.get_unique_id() == 1:
-		multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
 
 # Call this during race creation.
 func set_track (track: Track) -> void:
@@ -121,11 +113,25 @@ func set_track (track: Track) -> void:
 	add_child(track)
 
 # Called to do final setup of race, and start it.
-func setup_race (participants: Dictionary) -> void:
+func run (participants: Dictionary) -> int:
+	# If this is the host, then start the race.
+	if multiplayer.get_unique_id() == 1:
+		_start_race(participants)
+	# Wait until race is finished, and return the final place.
+	# Place will be -1 for unfinished race?
+	var place: int = await _done
+	return place
+
+# Starts the race (countdown, then activate cars).
+func _start_race (participants: Dictionary) -> void:
 
 	if multiplayer.get_unique_id() != 1:
-		print ("Attempted to call setup_race on a passive peer.")
+		print ("Attempted to call World.run on a passive peer.")
 		return
+
+	# Hook up server signals.
+	if multiplayer.get_unique_id() == 1:
+		multiplayer.multiplayer_peer.peer_disconnected.connect(_player_disconnected)
 
 	# Match each player to their car scene in the race.
 	# participants variable gets updated from [player_name,car_name] to instances of car objects.
@@ -239,6 +245,8 @@ func setup_race (participants: Dictionary) -> void:
 	place_tween.set_ease(Tween.EASE_IN)
 	place_tween.tween_property($CanvasLayer/Place, "modulate", Color.WHITE, 1.0)
 	await place_tween.finished
+
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	# Update the places of all the cars.
@@ -280,17 +288,22 @@ func _itemblock (car: Car) -> void:
 	if car not in _current_items:
 		_get_item(car)
 
-# Client side input capture for using an item.
+var _paused: bool = false
 func _input(event: InputEvent) -> void:
+	if multiplayer.get_unique_id() == 1 and event.is_action_pressed("menu_toggle"):
+		# Check if already paused (or in process of unpausing).
+		if _paused: return
+		_paused = true
+		get_tree().paused = true
+		var quit: bool = await $ScreenEffects/PauseMenu.run()
+		if quit:
+			_leave_race(false)
+		else:
+			get_tree().paused = false
+			set_deferred('_paused',false)
+	# Client side input capture for using an item.
 	if event.is_action_pressed("use_item"):
 		_use_item.rpc_id(1)
-
-func _pause_screen() -> void:
-	if _leaving_race: return  # Don't pause if race is being terminated.
-	get_tree().paused = true
-	MenuHandler.activate_menu($ScreenEffects/PauseMenu)
-func _unpause_screen() -> void:
-	get_tree().paused = false
 
 func _get_item(car: Car) -> void:
 	# First, select an item.
@@ -591,8 +604,8 @@ func _leave_race(completed: bool = false) -> void:
 	# Check if already leaving race.
 	if _leaving_race: return
 	_leaving_race = true
-	# Make sure we're unpaused.
-	MenuHandler.deactivate_menu()
+	# Make sure game is unpaused, or this doesn't run properly?
+	get_tree().paused = false
 	var tween: Tween = create_tween()
 	tween.tween_property(self,"modulate",Color.BLACK,1.0)
 	# Why do I need to modulate stats if I'm already modulating the whole scene???
@@ -603,17 +616,23 @@ func _leave_race(completed: bool = false) -> void:
 	# For completed single-player games, return the player's place.
 	var my_id: int = multiplayer.get_unique_id()
 	if completed and my_id == 1:
-		quit.emit(_place[my_id])
+		_done.emit(_place[my_id])
 	# For incomplete single-player games, don't have a place to return.
 	elif not completed and my_id == 1:
-		quit.emit(-1)
-	# For multiplayer games, leave the server and clean up the screen.
+		_done.emit(-1)
+	# For multiplayer games, just return without the place.
+	# (the place is stored in the server context, not available here).
+	# It could be communicated, if needed for some reason.
 	elif my_id != 1:
-		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+		_done.emit(-1)
+	# For single player games, clean up the race.
+	# Multiplayer games get cleaned up after all players disconnected from server (see below).
+	if my_id == 1:
 		queue_free()
 
 # Handle peer disconnections.
+# Clean up the race after all players have left.
 func _player_disconnected (player_id: int) -> void:
 	self.participants.erase(player_id)
 	if len(self.participants) == 0:
-		quit.emit(-1)  # Tell the parent scene that this race is completely finished.
+		queue_free()

@@ -1,5 +1,13 @@
 extends Control
 
+signal _done
+
+func run() -> void:
+	show()
+	process_mode = Node.PROCESS_MODE_INHERIT
+	await _done
+	process_mode = PROCESS_MODE_DISABLED
+	hide()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -17,8 +25,7 @@ func _input(event: InputEvent) -> void:
 		var tween: Tween = create_tween()
 		tween.tween_property(self,"modulate",Color.BLACK,1.0)
 		await tween.finished
-		MenuHandler.deactivate_menu()
-		process_mode = PROCESS_MODE_DISABLED
+		_done.emit()
 
 func _on_visibility_changed() -> void:
 	if not visible: return

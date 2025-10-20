@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://culfs1hcaohhm"]
+[gd_scene load_steps=14 format=3 uid="uid://culfs1hcaohhm"]
 
 [ext_resource type="Texture2D" uid="uid://dhkns5jdsokx5" path="res://items/beetle.png" id="1_fs3b4"]
 [ext_resource type="Script" uid="uid://cbgj37s6j3g2q" path="res://menus/help.gd" id="1_hpd5p"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://qri1ymcgcnnj" path="res://items/meteor.png" id="5_g2o11"]
 [ext_resource type="Texture2D" uid="uid://dj2ehw53ucubn" path="res://menus/spacebar.png" id="5_um2h5"]
 [ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="6_shoa8"]
+[ext_resource type="PackedScene" uid="uid://yq4nt46yrohd" path="res://menus/back_button.tscn" id="12_kmtil"]
 
 [node name="Help" type="Control"]
 layout_mode = 3
@@ -354,12 +355,8 @@ glass-shattering_03.ogg by C_Rogers
 License: Creative Commons 0"
 fit_content = true
 
-[node name="Back" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer"]
+[node name="BackButton" parent="MarginContainer/CenterContainer/VBoxContainer" instance=ExtResource("12_kmtil")]
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 64
-text = "     Back     "
 
 [node name="FullScreenToggle" parent="." instance=ExtResource("6_shoa8")]
-
-[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/Back" to="." method="_on_back_pressed"]

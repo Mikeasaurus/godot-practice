@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://0dummt6q0fyv"]
+[gd_scene load_steps=21 format=3 uid="uid://0dummt6q0fyv"]
 
 [ext_resource type="Script" uid="uid://dkggvt4e0rr2g" path="res://menus/car_selection.gd" id="1_4n2t3"]
 [ext_resource type="PackedScene" uid="uid://v25n41i6nk2g" path="res://menus/car_selection_panel.tscn" id="1_k8wlo"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://d254t8huvudx6" path="res://cars/stella_car.tscn" id="7_umfb0"]
 [ext_resource type="PackedScene" uid="uid://bvoj5fwm75u8v" path="res://cars/naomi_car.tscn" id="8_1csdl"]
 [ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="11_1wam5"]
+[ext_resource type="PackedScene" uid="uid://yq4nt46yrohd" path="res://menus/back_button.tscn" id="11_smolx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pvpv1"]
 resource_local_to_scene = true
@@ -169,10 +170,8 @@ layout_mode = 2
 theme_override_constants/separation = 100
 alignment = 1
 
-[node name="BackButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="BackButton" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer" instance=ExtResource("11_smolx")]
 layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "     Back     "
 
 [node name="RaceButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
