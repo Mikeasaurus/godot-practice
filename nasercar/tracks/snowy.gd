@@ -30,8 +30,8 @@ func _process(delta: float) -> void:
 		# Wrap snow around.
 		# Could probably do something more robust with tiling?
 		# But this works for now.
-		if pos.x < -960: pos.x += 1920
-		if pos.x > 960: pos.x -= 1920
-		if pos.y < -540: pos.y += 1080
-		if pos.y > 540: pos.y -= 1080
+		while pos.x < -960: pos.x += 1920
+		while pos.x > 960: pos.x -= 1920
+		while pos.y < -540: pos.y += 1080
+		while pos.y > 540: pos.y -= 1080
 		_snow[i].position = pos
