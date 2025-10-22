@@ -30,7 +30,7 @@ func _on_new_button_pressed() -> void:
 	_done.emit(multiplayer.get_unique_id(),_handle.text)
 
 # This function is called to refresh the list of races.
-func update_race (race_id: int, participants: Dictionary) -> void:
+func update_race (race_id: int, track_name: String, participants: Dictionary) -> void:
 	# If this is a new race, then add it to the list.
 	if race_id not in available_races:
 		available_races[race_id] = $RaceEntrySpawner.spawn(race_id)
@@ -40,7 +40,7 @@ func update_race (race_id: int, participants: Dictionary) -> void:
 		available_races[race_id].get_node("VBoxContainer/Host").text = "%s is starting a new race"%handle
 	var entry: Node = available_races[race_id]
 	# Update number of participants.
-	entry.get_node("VBoxContainer/NumPlayers").text = "%d player(s) joined so far"%len(participants)
+	entry.get_node("VBoxContainer/NumPlayers").text = "Track: \"%s\"   %d player(s) joined so far"%[track_name, len(participants)]
 	# If an empty list of participants was given, then the race is not available to join anymore.
 	if len(participants) == 0:
 		available_races.erase(race_id)

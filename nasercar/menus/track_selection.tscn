@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://d4fjxuie6wstg"]
+[gd_scene load_steps=4 format=3 uid="uid://d4fjxuie6wstg"]
 
 [ext_resource type="Script" uid="uid://5kel4rk4hw3x" path="res://menus/track_selection.gd" id="1_x5ber"]
+[ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="2_bie1k"]
+[ext_resource type="PackedScene" uid="uid://yq4nt46yrohd" path="res://menus/back_button.tscn" id="2_x5ber"]
 
 [node name="TrackSelection" type="Control"]
 layout_mode = 3
@@ -37,7 +39,7 @@ text = "Choose a track"
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 600)
+custom_minimum_size = Vector2(732, 600)
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
@@ -50,12 +52,15 @@ theme_override_constants/separation = 20
 layout_mode = 2
 theme_override_constants/separation = 100
 
-[node name="BackButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="BackButton" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_x5ber")]
 layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "   Back   "
 
 [node name="ContinueButton" type="Button" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = " Continue "
+
+[node name="FullScreenToggle" parent="." instance=ExtResource("2_bie1k")]
+
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]

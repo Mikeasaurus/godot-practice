@@ -66,7 +66,7 @@ func new_game () -> void:
 	$MarginContainer.hide()
 	var race_id: int
 	var handle: String
-	# Join a multiplayer race.
+	# Join a multiplayer race?
 	if multiplayer.get_unique_id() != 1:
 		var info: Array = await $Multiplayer.run()
 		race_id = info[0]
@@ -80,13 +80,22 @@ func new_game () -> void:
 		race_id = 1
 		handle = "Player"
 	# If this player is starting the race, then they decide the track to use.
-	#TODO: track selection.
-	var track_name: String = "default"
+	var track_name: String
+	if race_id == multiplayer.get_unique_id():
+		track_name = await $TrackSelection.run()
+		if track_name == "":
+			$Multiplayer.hide()
+			$TrackSelection.hide()
+			$MarginContainer.show()
+			return
+	else:
+		track_name = ""  # Track name not needed by other peers.
 	var selection_menu: CarSelection
 	# Now that a track is chosen, launch the car selection menu.
 	selection_menu = await _request_car_selection_menu (race_id, track_name)
 	# Hide the previous multiplayer menu after this selection menu is available.
 	$Multiplayer.hide()
+	$TrackSelection.hide()
 
 	# Select a car.
 	var participants: Dictionary = await selection_menu.run(handle)
@@ -163,7 +172,7 @@ func _server_request_car_selection_menu (race_id: int, track: String) -> void:
 		# Connect a signal that lets the list of participants be updated on the multiplayer menu list.
 		#selection.participants_updated.connect($Multiplayer.update_race.bind([race_id]))
 		selection.participants_updated.connect(func (participants: Dictionary) -> void:
-			$Multiplayer.update_race(race_id, participants)
+			$Multiplayer.update_race(race_id, track, participants)
 		)
 	# Tell client that the menu is available.
 	_client_receive_car_selection_menu.rpc_id(multiplayer.get_remote_sender_id())
