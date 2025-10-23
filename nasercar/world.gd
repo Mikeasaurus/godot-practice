@@ -539,7 +539,10 @@ func _lap_completed (car: Car, lap: int) -> void:
 @rpc("authority","reliable","call_local")
 func _lap_announce (lap: int):
 	var t: Label = $CanvasLayer/LapFinished
-	t.text = "Lap %d"%lap
+	if lap < track.laps:
+		t.text = "Lap %d"%lap
+	else:
+		t.text = "Final Lap"
 	t.global_position = Vector2(-t.size.x*t.scale.x,0)
 	t.show()
 	var tween: Tween = create_tween()
