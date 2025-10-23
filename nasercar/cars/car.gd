@@ -733,7 +733,7 @@ func _kersplash (liquid_type: int) -> void:
 	_ripples.rpc(liquid_type)
 	var tween: Tween = create_tween()
 	var dr: float = 0.20
-	var modulated_stuff: Array = [$Body, $Wheels/FrontLeft/Sprite2D, $Wheels/FrontRight/Sprite2D, $Wheels/RearLeft/Sprite2D, $Wheels/RearRight/Sprite2D]
+	var modulated_stuff: Array = [$Body, $Wheels/FrontLeft/Sprite2D, $Wheels/FrontRight/Sprite2D, $Wheels/RearLeft/Sprite2D, $Wheels/RearRight/Sprite2D, $Slimed, $Coffee]
 	for m in modulated_stuff:
 		tween.parallel().tween_property(m, "modulate", Color.hex(0x00000000), dt)
 	# Start playing splashing sound as well.

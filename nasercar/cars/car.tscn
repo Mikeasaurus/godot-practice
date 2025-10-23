@@ -409,6 +409,12 @@ properties/43/replication_mode = 2
 properties/44/path = NodePath("IcyWaterSplash/SplashSound:playing")
 properties/44/spawn = true
 properties/44/replication_mode = 2
+properties/45/path = NodePath("Slimed:modulate")
+properties/45/spawn = true
+properties/45/replication_mode = 2
+properties/46/path = NodePath("Coffee:modulate")
+properties/46/spawn = true
+properties/46/replication_mode = 2
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0
