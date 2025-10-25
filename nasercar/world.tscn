@@ -1,6 +1,7 @@
-[gd_scene load_steps=25 format=3 uid="uid://b4tklj1nsft7a"]
+[gd_scene load_steps=26 format=3 uid="uid://b4tklj1nsft7a"]
 
 [ext_resource type="Script" uid="uid://biv1bchek2mp7" path="res://world.gd" id="1_5oo6t"]
+[ext_resource type="PackedScene" uid="uid://cws2bh67ogk0f" path="res://tracks/map_overlay.tscn" id="2_26xuy"]
 [ext_resource type="AudioStream" uid="uid://xnlgqle1fo4l" path="res://audio/20440__agfx__beep-pager.wav" id="10_leqvv"]
 [ext_resource type="AudioStream" uid="uid://dgii4vaux02bg" path="res://audio/196236__alienxxx__long-beep_011.wav" id="11_l7rta"]
 [ext_resource type="Texture2D" uid="uid://cfhya08sd73lc" path="res://items/mangoslime.png" id="16_4ogqs"]
@@ -321,6 +322,8 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_font_sizes/font_size = 48
 text = "     Done     "
+
+[node name="MapOverlay" parent="." instance=ExtResource("2_26xuy")]
 
 [node name="Beep1" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("10_leqvv")

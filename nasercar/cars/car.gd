@@ -4,6 +4,13 @@ class_name Car
 ## What name to use for display on screen.
 @export var display_name: String = "???"
 
+## Picture of character for car selection.
+## Multiple images can be added for an animated effect.
+@export var headshot: Array[CompressedTexture2D]
+
+## Thumbnail image for map overlay.
+@export var tinypic: CompressedTexture2D
+
 ## Top speed of car (pixels/second)
 @export var max_speed: float = 1500.0
 

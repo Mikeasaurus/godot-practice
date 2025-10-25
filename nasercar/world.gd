@@ -111,6 +111,8 @@ func set_track (track: Track) -> void:
 	# Store a reference to the track, and place it in the visible area.
 	self.track = track
 	add_child(track)
+	# Set up map overlay.
+	$MapOverlay.set_track(track)
 
 # Called to do final setup of race, and start it.
 func run (participants: Dictionary) -> int:
