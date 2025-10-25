@@ -52,7 +52,7 @@ func set_track (track: Track) -> void:
 	# Add finish line.
 	var finish_line: Sprite2D = Sprite2D.new()
 	finish_line.texture = load("res://race-interface/finishline-icon.png")
-	finish_line.position = line1.points[0]
+	finish_line.position = line1.points[-1]
 	add_child(finish_line)
 
 	# Render the tiny icons for the participants.
