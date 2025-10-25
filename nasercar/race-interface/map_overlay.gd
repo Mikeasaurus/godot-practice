@@ -51,7 +51,7 @@ func set_track (track: Track) -> void:
 
 	# Add finish line.
 	var finish_line: Sprite2D = Sprite2D.new()
-	finish_line.texture = load("res://tracks/finishline-icon.png")
+	finish_line.texture = load("res://race-interface/finishline-icon.png")
 	finish_line.position = line1.points[0]
 	add_child(finish_line)
 
