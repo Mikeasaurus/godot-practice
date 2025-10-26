@@ -120,6 +120,10 @@ func new_game () -> void:
 		if multiplayer.get_unique_id() == 1 and place == 1 and "Naomi" in locked_cars:
 			await $Naomi.run()
 			locked_cars.erase("Naomi")
+	# If a race wasn't run (e.g. user cancelled at car selection), then need to free
+	# the car selection menu here.  It won't be cleaned up by the _request_race logic in this case.
+	else:
+		selection_menu.queue_free()
 	# Show the main menu again.
 	$MarginContainer.show()
 
