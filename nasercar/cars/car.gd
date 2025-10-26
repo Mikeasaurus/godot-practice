@@ -402,6 +402,9 @@ func _process(delta: float) -> void:
 				$LostArrow/Fade.play("fade_in")
 		elif distance_to_path < 500 and $LostArrow.visible:
 			$LostArrow/Fade.play("fade_out")
+	# If not a player anymore (e.g. just finished race), make sure arrow is hidden.
+	if type != CarType.PLAYER and $LostArrow.visible:
+		$LostArrow.hide()
 
 	#######################################################
 	# Wheel-turning for player or override of regular CPU steering
