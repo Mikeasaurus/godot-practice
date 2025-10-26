@@ -113,9 +113,9 @@ func _touchpad_press (touch_position: Vector2) -> void:
 		_turning_left = false
 	if w.dot(t) >= 0:
 		_accelerating = true
-		_braking = false
+		_reversing = false
 	else:
-		_braking = true
+		_reversing = true
 		_accelerating = false
 #
 @rpc("any_peer","reliable","call_local")
