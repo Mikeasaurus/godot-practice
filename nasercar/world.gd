@@ -614,8 +614,11 @@ func _leave_race(completed: bool = false) -> void:
 	var tween: Tween = create_tween()
 	tween.tween_property(self,"modulate",Color.BLACK,1.0)
 	# Why do I need to modulate stats if I'm already modulating the whole scene???
+	# I think it's because they're in their own CanvasLayer, so don't get affected by parent modulation?
 	tween.parallel().tween_property($CanvasLayer/Stats,"modulate",Color.BLACK,1.0)
 	tween.parallel().tween_property($CanvasLayer/LapFinished,"modulate",Color.BLACK,1.0)
+	for c in $MapOverlay.get_children():
+		tween.parallel().tween_property(c,"modulate",Color.BLACK,1.0)
 	await tween.finished
 	_leaving_race = false
 	# For completed single-player games, return the player's place.
