@@ -89,3 +89,8 @@ func spin (icon: Sprite2D) -> void:
 	await tween.finished
 	icon.rotation = 0
 	_spinning[icon] = false
+
+# Move the specified car to the front of the display.
+func move_to_front (car: Car) -> void:
+	var icon: Sprite2D = _icons[car]
+	icon.z_index += 1

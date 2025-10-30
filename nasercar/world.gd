@@ -116,6 +116,14 @@ func set_track (track: Track) -> void:
 
 # Called to do final setup of race, and start it.
 func run (participants: Dictionary) -> int:
+	# Now that we know the participants, can find out which car is the current player's car.
+	# Move the map icon for that car to the front of visibility.
+	var id: int = multiplayer.get_unique_id()
+	if id in participants:
+		var carname: String = participants[id][1]
+		for c in _cars():
+			if c.display_name == carname:
+				$MapOverlay.move_to_front(c)
 	# If this is the host, then start the race.
 	if multiplayer.get_unique_id() == 1:
 		_start_race(participants)
