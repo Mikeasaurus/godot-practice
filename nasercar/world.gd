@@ -111,9 +111,19 @@ func set_track (track: Track) -> void:
 	# Store a reference to the track, and place it in the visible area.
 	self.track = track
 	add_child(track)
+	# Set up map overlay.
+	$MapOverlay.set_track(track)
 
 # Called to do final setup of race, and start it.
 func run (participants: Dictionary) -> int:
+	# Now that we know the participants, can find out which car is the current player's car.
+	# Move the map icon for that car to the front of visibility.
+	var id: int = multiplayer.get_unique_id()
+	if id in participants:
+		var carname: String = participants[id][1]
+		for c in _cars():
+			if c.display_name == carname:
+				$MapOverlay.move_to_front(c)
 	# If this is the host, then start the race.
 	if multiplayer.get_unique_id() == 1:
 		_start_race(participants)
@@ -612,8 +622,11 @@ func _leave_race(completed: bool = false) -> void:
 	var tween: Tween = create_tween()
 	tween.tween_property(self,"modulate",Color.BLACK,1.0)
 	# Why do I need to modulate stats if I'm already modulating the whole scene???
+	# I think it's because they're in their own CanvasLayer, so don't get affected by parent modulation?
 	tween.parallel().tween_property($CanvasLayer/Stats,"modulate",Color.BLACK,1.0)
 	tween.parallel().tween_property($CanvasLayer/LapFinished,"modulate",Color.BLACK,1.0)
+	for c in $MapOverlay.get_children():
+		tween.parallel().tween_property(c,"modulate",Color.BLACK,1.0)
 	await tween.finished
 	_leaving_race = false
 	# For completed single-player games, return the player's place.

@@ -4,6 +4,13 @@ class_name Car
 ## What name to use for display on screen.
 @export var display_name: String = "???"
 
+## Picture of character for car selection.
+## Multiple images can be added for an animated effect.
+@export var headshot: Array[CompressedTexture2D]
+
+## Thumbnail image for map overlay.
+@export var tinypic: CompressedTexture2D
+
 ## Top speed of car (pixels/second)
 @export var max_speed: float = 1500.0
 
@@ -36,6 +43,10 @@ var _current_lap: int
 # Remember previous progress along the track, to help detect when a lap is completed
 # (when the PathFollow2D progress loops around).
 var _last_progress: float
+
+## Emit signal when this car gets in trouble (bonked by beetle, sinking in water, etc.)
+## Can be used for applying visual effects to other elements of the game.
+signal AHHH
 
 ## Effects currently applied to the car
 enum EffectType {SLIMED,NAILPOLISHED,CAFFEINATED,SMOULDERING}
@@ -726,6 +737,7 @@ func _kersplash (liquid_type: int) -> void:
 	# Only run this once when sinking, not on every tick.
 	if _splashing: return
 	_splashing = true
+	scream()
 	# Stop car from moving any further during this sequence.
 	freeze = true
 	# Car not moveable (turns off other skidding / particle effects from friction).
@@ -887,6 +899,7 @@ func space_rock () -> void:
 	await tween.finished
 	shadow.hide()
 	meteor_impact.emit()
+	scream()
 
 func smoulder () -> void:
 	effects[EffectType.SMOULDERING] = Time.get_ticks_msec()
@@ -909,3 +922,9 @@ func _get_unstuck () -> void:
 	# Otherwise, this routine will get tried again after a brief time.
 	_is_stuck = false
 	_getting_unstuck = false
+
+func scream() -> void:
+	_scream.rpc()
+@rpc("authority","call_local","reliable")
+func _scream() -> void:
+	AHHH.emit()
