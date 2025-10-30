@@ -62,6 +62,8 @@ func _on_body_entered(body: Node2D) -> void:
 			body.apply_impulse(dv)
 		if "apply_torque_impulse" in body:
 			body.apply_torque_impulse(20000)
+		if "scream" in body:
+			body.scream()
 		body._crash_effect()
 		active = false
 		target = $FlyAway

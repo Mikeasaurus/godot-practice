@@ -62,6 +62,9 @@ func set_track (track: Track) -> void:
 			pic.texture = load(car.tinypic.load_path)
 			add_child(pic)
 			_icons[car] = pic
+			car.AHHH.connect(func () -> void:
+				spin(pic)
+			)
 
 	# Initial positioning of icons.
 	_update_icons()
@@ -74,3 +77,15 @@ func _update_icons () -> void:
 # Update icon positions as game progresses.
 func _process(_delta: float) -> void:
 	_update_icons()
+
+# Apply a rotation effect to an icon (e.g. when the car gets hit).
+var _spinning: Dictionary[Sprite2D,bool] = {}
+func spin (icon: Sprite2D) -> void:
+	# Ignore if already spinning.
+	if _spinning.get(icon,false) == true: return
+	_spinning[icon] = true
+	var tween: Tween = create_tween()
+	tween.tween_property(icon, "rotation_degrees", 360, 0.5)
+	await tween.finished
+	icon.rotation = 0
+	_spinning[icon] = false
