@@ -756,10 +756,10 @@ func _kersplash (liquid_type: int) -> void:
 	await tween.finished
 	# Near end of inward convergence of water, show spray of water particles.
 	particles.emitting = true
-	await get_tree().create_timer(dt*dr*2).timeout
+	await get_tree().create_timer(dt*dr*2, false).timeout
 	particles.emitting = false
 	# Cut off sound before second splash in the .wav file.
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(1.0, false).timeout
 	sound.stop()
 	# Move car back onto the road.
 	await _move_to_road ()
@@ -775,7 +775,7 @@ func _kersplash (liquid_type: int) -> void:
 	# in the more complicated "effects" logic.
 	if liquid_type == 2:
 		$Iced/Ice.show()
-		await get_tree().create_timer(1.0).timeout
+		await get_tree().create_timer(1.0, false).timeout
 		$Iced/Ice.hide()
 		$Iced/CPUParticles2D.emitting = true
 		$Iced/ShatterSound.play()
@@ -850,7 +850,7 @@ func _move_to_road () -> void:
 
 func get_slimed (delay: float, full_slime_duration: float, end: float) -> void:
 	# Wait a bit for Mango to spit the slime (same timing as screen slime).
-	await get_tree().create_timer(delay).timeout
+	await get_tree().create_timer(delay, false).timeout
 	var slime: Sprite2D = $Slimed/Slime
 	slime.modulate = Color.hex(0xffffffcc)
 	slime.show()
@@ -911,11 +911,11 @@ func _get_unstuck () -> void:
 	# Try backing up in one direction.
 	cpu_steer_direction = CPU_Steer_Direction.LEFT
 	cpu_movement = CPU_Movement.BACKWARD
-	await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(0.5, false).timeout
 	# Now try going forward after turning wheel in other direction.
 	cpu_steer_direction = CPU_Steer_Direction.RIGHT
 	cpu_movement = CPU_Movement.FORWARD
-	await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(0.5, false).timeout
 	# Hopefully that was enough to get unstuck?
 	cpu_steer_direction = CPU_Steer_Direction.PATH
 	# Reset the "stuck" state and see if that worked.

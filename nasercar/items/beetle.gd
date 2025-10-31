@@ -17,7 +17,7 @@ func set_target (car: Node2D) -> void:
 	$BuzzSound.play(1.0)
 	# Wait a bit before becoming active
 	# (so we don't hit the car that just launched us).
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(1.0, false).timeout
 	active = true
 	# Need to start animation via RPC, because it's not clear what property
 	# to put into a MultiplayerSynchronizer to achieve the same effect.
@@ -31,7 +31,7 @@ func buzz_off () -> void:
 	global_rotation = velocity.angle() - PI/2
 	set_target($FlyAway)
 	# Remove from scene after some fixed amount of time.
-	await get_tree().create_timer(10.0).timeout
+	await get_tree().create_timer(10.0, false).timeout
 	queue_free()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

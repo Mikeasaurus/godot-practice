@@ -233,13 +233,13 @@ func _start_race (participants: Dictionary) -> void:
 	$CanvasLayer/GoLabel.show()
 	$CanvasLayer/GoLabel.text = "3"
 	$Beep1.play()
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(1.0, false).timeout
 	$CanvasLayer/GoLabel.text = "2"
 	$Beep1.play()
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(1.0, false).timeout
 	$CanvasLayer/GoLabel.text = "1"
 	$Beep1.play()
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(1.0, false).timeout
 	$CanvasLayer/GoLabel.text = "GO!!!"
 	$Beep2.play()
 	for car in _cars():
@@ -250,7 +250,7 @@ func _start_race (participants: Dictionary) -> void:
 	go.parallel().tween_property($CanvasLayer/GoLabel,"scale",Vector2(2,2),1.0)
 	go.parallel().tween_property($CanvasLayer/GoLabel,"position", Vector2($CanvasLayer/GoLabel.position.x*0.5,1),1.0)
 	# Show place after the cars have starting racing a bit.
-	await get_tree().create_timer(3.0).timeout
+	await get_tree().create_timer(3.0, false).timeout
 	var place_tween: Tween = create_tween()
 	place_tween.set_ease(Tween.EASE_IN)
 	place_tween.tween_property($CanvasLayer/Place, "modulate", Color.WHITE, 1.0)
@@ -370,11 +370,11 @@ func _get_item(car: Car) -> void:
 	if car.type == car.CarType.PLAYER:
 		_item_selection_visual.rpc_id(_get_player_id(car), item)
 	else:
-		await get_tree().create_timer(2.0).timeout
+		await get_tree().create_timer(2.0, false).timeout
 	_current_items[car] = item
 	# CPUs use items automatically after some random amount of time.
 	if car.type == car.CarType.CPU:
-		await get_tree().create_timer(randf()*5).timeout
+		await get_tree().create_timer(randf()*5, false).timeout
 		_use_item(car)
 
 # Called from server to client, to update visual for item selection.
@@ -392,7 +392,7 @@ func _item_selection_visual (item: ItemType) -> void:
 	await tween.finished
 	# Players with touchscreen automatically use items after a short amount of time.
 	if DisplayServer.is_touchscreen_available():
-		await get_tree().create_timer(1.0).timeout
+		await get_tree().create_timer(1.0, false).timeout
 		_use_item.rpc_id(1)
 
 # Called from client to server, to indicate the item should be used.
@@ -416,7 +416,7 @@ func _use_item(car: Car = null) -> void:
 			if c.type == c.CarType.PLAYER:
 				_slime_screen.rpc_id(_get_player_id(c))
 		# Allow slime item to be obtained again after slime has faded.
-		await get_tree().create_timer(7.1).timeout
+		await get_tree().create_timer(7.1, false).timeout
 		_sliming = false
 	if item == ItemType.BEETLE:
 		# Target the car in front.
@@ -459,11 +459,11 @@ func _slime_screen() -> void:
 	mangotween.tween_interval(0.2)
 	mangotween.set_ease(Tween.EASE_OUT)
 	mangotween.tween_property(mango, "offset", Vector2(0,0), 0.3)
-	await get_tree().create_timer(0.7).timeout
+	await get_tree().create_timer(0.7, false).timeout
 	mango.animation = "mouth_open"
 	$ScreenEffects/MangoSlime/CPUParticles2D.emitting = true
 	$ScreenEffects/MangoSlime/HorkSound.play()
-	await get_tree().create_timer(0.4).timeout
+	await get_tree().create_timer(0.4, false).timeout
 	$ScreenEffects/MangoSlime/SplatSound.play()
 	var slime: AnimatedSprite2D = $ScreenEffects/MangoSlime/Slime
 	slime.show()
@@ -535,7 +535,7 @@ func _big_badaboom (car: Car) -> void:
 	await tween.finished
 	_meteor = false
 	boom.queue_free()
-	await get_tree().create_timer(10.0).timeout
+	await get_tree().create_timer(10.0, false).timeout
 	crater.queue_free()
 
 # Called when a car has just completed a lap.
