@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://dscelbyqu4ok3"]
+[gd_scene load_steps=3 format=3 uid="uid://dscelbyqu4ok3"]
 
 [ext_resource type="Script" uid="uid://ylxoadrl8lek" path="res://menus/pause_menu.gd" id="1_s0u37"]
+[ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="2_p1qj3"]
 
 [node name="PauseMenu" type="Control"]
 process_mode = 2
@@ -40,5 +41,7 @@ text = "PAUSED"
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Quit Game"
+
+[node name="FullScreenToggle" parent="." instance=ExtResource("2_p1qj3")]
 
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
