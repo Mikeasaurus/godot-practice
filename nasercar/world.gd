@@ -617,9 +617,9 @@ func _leave_race(completed: bool = false) -> void:
 	# Check if already leaving race.
 	if _leaving_race: return
 	_leaving_race = true
-	# Make sure game is unpaused, or this doesn't run properly?
-	get_tree().paused = false
 	var tween: Tween = create_tween()
+	# Allow this fadeout tween to run even though the scene is probably paused right now.
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(self,"modulate",Color.BLACK,1.0)
 	# Why do I need to modulate stats if I'm already modulating the whole scene???
 	# I think it's because they're in their own CanvasLayer, so don't get affected by parent modulation?
@@ -628,6 +628,8 @@ func _leave_race(completed: bool = false) -> void:
 	for c in $MapOverlay.get_children():
 		tween.parallel().tween_property(c,"modulate",Color.BLACK,1.0)
 	await tween.finished
+	# Unpause the tree so the main menu and other elements will function properly once we leave the race.
+	get_tree().paused = false
 	_leaving_race = false
 	# For completed single-player games, return the player's place.
 	var my_id: int = multiplayer.get_unique_id()
