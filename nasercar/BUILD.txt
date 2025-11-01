@@ -11,7 +11,7 @@ E.g., something like this in the Head Include section:
 
 <meta property="og:title" content="Nasercar">
 <meta property="og:description" content="GVH kart racing game.">
-<meta property="og:image" content="https://mikeasaurus.github.io/nasercar/preview.png" >
+<meta property="og:image" content="https://mikeasaurus.github.io/nasercar/preview2.png" >
 <meta http-equiv="Cache-Control" content="no-cache">
 
 Need to manually copy the "preview.png" file to the web server.
