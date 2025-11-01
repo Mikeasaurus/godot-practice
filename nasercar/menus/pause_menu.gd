@@ -2,6 +2,13 @@ extends Control
 
 signal _done (quit:bool)
 
+func _ready() -> void:
+	# For multiplayer games, change the pause menu a bit (not actually paused,
+	# and not "quitting" the game, just leaving it.
+	if multiplayer.get_unique_id() != 1:
+		$MarginContainer/CenterContainer/VBoxContainer/Label.hide()
+		$MarginContainer/CenterContainer/VBoxContainer/QuitButton.text = "Leave Race"
+
 func run () -> bool:
 	show()
 	var quit: bool = await _done

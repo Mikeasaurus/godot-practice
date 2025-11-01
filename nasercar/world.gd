@@ -159,7 +159,7 @@ func _start_race (participants: Dictionary) -> void:
 					car.display_name = car.display_name + " (Player)"
 				else:
 					car.display_name = player_name
-				car._show_nameplate.rpc(player_name)
+					car.show_nameplate(player_name)
 
 	# Move the playable car(s) to the front.
 	var positions: Array[Vector2] = []
@@ -300,11 +300,13 @@ func _itemblock (car: Car) -> void:
 
 var _paused: bool = false
 func _input(event: InputEvent) -> void:
-	if multiplayer.get_unique_id() == 1 and event.is_action_pressed("menu_toggle"):
+	if event.is_action_pressed("menu_toggle"):
 		# Check if already paused (or in process of unpausing).
 		if _paused: return
 		_paused = true
-		get_tree().paused = true
+		# Only truly pause for single-player games.
+		if multiplayer.get_unique_id() == 1:
+			get_tree().paused = true
 		var quit: bool = await $ScreenEffects/PauseMenu.run()
 		if quit:
 			_leave_race(false)
@@ -651,6 +653,9 @@ func _leave_race(completed: bool = false) -> void:
 # Handle peer disconnections.
 # Clean up the race after all players have left.
 func _player_disconnected (player_id: int) -> void:
+	var car: Car = self.participants[player_id]
+	car.hide_nameplate()
+	car.autopilot()
 	self.participants.erase(player_id)
 	if len(self.participants) == 0:
 		queue_free()

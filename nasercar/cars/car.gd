@@ -195,10 +195,11 @@ func _ready() -> void:
 	z_index = 2
 
 # Called to show a nameplace on the car.
-@rpc("authority","reliable")
-func _show_nameplate (text: String) -> void:
+func show_nameplate (text: String) -> void:
 	$Nameplate.show()
 	$Nameplate.text = text
+func hide_nameplate () -> void:
+	$Nameplate.hide()
 
 # Add track information (world tiles, path from start to finish of race).
 func add_to_track (track_path: Path2D, tilesets: Array[TileMapLayer]) -> void:

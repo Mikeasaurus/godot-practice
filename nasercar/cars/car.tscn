@@ -415,6 +415,12 @@ properties/45/replication_mode = 2
 properties/46/path = NodePath("Coffee:modulate")
 properties/46/spawn = true
 properties/46/replication_mode = 2
+properties/47/path = NodePath("Nameplate:text")
+properties/47/spawn = true
+properties/47/replication_mode = 2
+properties/48/path = NodePath("Nameplate:visible")
+properties/48/spawn = true
+properties/48/replication_mode = 2
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0
