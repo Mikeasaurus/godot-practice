@@ -85,6 +85,8 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "  Create New Race  "
 
+[node name="ClickSound" type="AudioStreamPlayer" parent="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+
 [node name="FullScreenToggle" parent="." instance=ExtResource("2_mr17g")]
 
 [node name="RaceEntrySpawner" type="MultiplayerSpawner" parent="."]
@@ -111,3 +113,4 @@ horizontal_alignment = 1
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/NewButton" to="." method="_on_new_button_pressed"]
+[connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/NewButton" to="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/ClickSound" method="play"]

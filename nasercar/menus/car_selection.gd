@@ -80,6 +80,7 @@ func _panel_selected (panel: CarSelectionPanel) -> void:
 var _fadeout_time: float = 1.0
 @rpc("authority","reliable")
 func _fadeout() -> void:
+	$StartEngineSound.play()
 	var tween: Tween = create_tween()
 	tween.tween_property(self,"modulate",Color.BLACK,_fadeout_time)
 	await tween.finished

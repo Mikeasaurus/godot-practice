@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://0dummt6q0fyv"]
+[gd_scene load_steps=22 format=3 uid="uid://0dummt6q0fyv"]
 
 [ext_resource type="Script" uid="uid://dkggvt4e0rr2g" path="res://menus/car_selection.gd" id="1_4n2t3"]
 [ext_resource type="PackedScene" uid="uid://v25n41i6nk2g" path="res://menus/car_selection_panel.tscn" id="1_k8wlo"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://bvoj5fwm75u8v" path="res://cars/naomi_car.tscn" id="8_1csdl"]
 [ext_resource type="PackedScene" uid="uid://ed7idg0lghbn" path="res://menus/full_screen_toggle.tscn" id="11_1wam5"]
 [ext_resource type="PackedScene" uid="uid://yq4nt46yrohd" path="res://menus/back_button.tscn" id="11_smolx"]
+[ext_resource type="AudioStream" uid="uid://cstdfowewsv0g" path="res://audio/253614__xtrgamr__honda-cr-v-start.wav" id="13_s6hmk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pvpv1"]
 resource_local_to_scene = true
@@ -185,6 +186,10 @@ theme_override_font_sizes/font_size = 36
 horizontal_alignment = 1
 
 [node name="FullScreenToggle" parent="." instance=ExtResource("11_1wam5")]
+
+[node name="StartEngineSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("13_s6hmk")
+volume_db = 10.0
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="pressed" from="MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
