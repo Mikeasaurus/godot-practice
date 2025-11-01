@@ -5,7 +5,12 @@ signal _done (quit:bool)
 func run () -> bool:
 	show()
 	var quit: bool = await _done
-	hide()
+	# If unpausing (and continuing game), hide the pause menu.
+	if not quit:
+		hide()
+	# Otherwise, hide the elements but keep the fade-out.
+	else:
+		$MarginContainer/CenterContainer/VBoxContainer.hide()
 	return quit
 
 func _input(event: InputEvent) -> void:
