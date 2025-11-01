@@ -208,6 +208,11 @@ func _request_race (race_id: int, track_name: String, participants: Dictionary) 
 @rpc("any_peer","call_local","reliable")
 func _server_request_race (race_id: int, track_name: String, participants: Dictionary) -> void:
 	var race_name: String = "race_"+str(race_id)
+	# If this wasn't called by the host, and the host hasn't requested the race object yet, then
+	# wait until it's ready.
+	if track_name == "" and not has_node(race_name):
+		print ("Waiting for host to initiate race")
+		await _race_ready
 	if not has_node(race_name):
 		# Construct a list of all race participants, starting with the host.
 		var player_ids: Array[int] = [race_id]
@@ -237,6 +242,8 @@ func _server_request_race (race_id: int, track_name: String, participants: Dicti
 			race.run(participants)
 	# Tell client that the race is available.
 	_client_receive_race.rpc_id(multiplayer.get_remote_sender_id())
+	# Send the ready signal within this server too, in case we're waiting for the host to initialize the race.
+	_race_ready.emit()
 	# Clean up the car selection menu (now that the race can be displayed).
 	# If this was cleaned up too early, then there's be a brief period where nothing is
 	# on the screen except a blank grey space.
