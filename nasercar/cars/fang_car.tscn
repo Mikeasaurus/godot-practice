@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://bimruttii2nbg"]
+[gd_scene load_steps=5 format=3 uid="uid://bimruttii2nbg"]
 
 [ext_resource type="PackedScene" uid="uid://xkg3ucnitsra" path="res://cars/car.tscn" id="1_fuodk"]
 [ext_resource type="Texture2D" uid="uid://cfby6xhp8wjuw" path="res://cars/fangcar.png" id="2_ayufj"]
 [ext_resource type="Texture2D" uid="uid://dd38uq2i5hwhl" path="res://cars/fang-tiny.png" id="2_cwebq"]
+[ext_resource type="AudioStream" uid="uid://b08rqp4cxtnj0" path="res://audio/571322__maciejadach__horn.wav" id="4_nmrj5"]
 
 [node name="FangCar" instance=ExtResource("1_fuodk")]
 display_name = "Fang"
@@ -10,3 +11,6 @@ tinypic = ExtResource("2_cwebq")
 
 [node name="Body" parent="." index="2"]
 texture = ExtResource("2_ayufj")
+
+[node name="HornSound" parent="." index="6"]
+stream = ExtResource("4_nmrj5")

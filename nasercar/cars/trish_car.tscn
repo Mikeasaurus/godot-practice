@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://t281m7hks87i"]
+[gd_scene load_steps=5 format=3 uid="uid://t281m7hks87i"]
 
 [ext_resource type="PackedScene" uid="uid://xkg3ucnitsra" path="res://cars/car.tscn" id="1_1ud34"]
 [ext_resource type="Texture2D" uid="uid://yksgjstsh2fs" path="res://cars/trish-tiny.png" id="2_3dtc5"]
 [ext_resource type="Texture2D" uid="uid://xa1mdus3a5qh" path="res://cars/trishcar.png" id="2_4ygip"]
+[ext_resource type="AudioStream" uid="uid://b027xumbuuxxx" path="res://audio/432641__digpro120__car-horn.mp3" id="4_um8oh"]
 
 [node name="TrishCar" instance=ExtResource("1_1ud34")]
 display_name = "Trish"
@@ -10,3 +11,6 @@ tinypic = ExtResource("2_3dtc5")
 
 [node name="Body" parent="." index="2"]
 texture = ExtResource("2_4ygip")
+
+[node name="HornSound" parent="." index="6"]
+stream = ExtResource("4_um8oh")

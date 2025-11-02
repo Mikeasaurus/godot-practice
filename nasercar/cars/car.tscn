@@ -421,6 +421,9 @@ properties/47/replication_mode = 2
 properties/48/path = NodePath("Nameplate:visible")
 properties/48/spawn = true
 properties/48/replication_mode = 2
+properties/49/path = NodePath("HornSound:playing")
+properties/49/spawn = true
+properties/49/replication_mode = 2
 
 [node name="Car" type="RigidBody2D"]
 gravity_scale = 0.0
@@ -464,6 +467,8 @@ pitch_scale = 0.5
 [node name="CrashSoundTimer" type="Timer" parent="."]
 wait_time = 0.5
 one_shot = true
+
+[node name="HornSound" type="AudioStreamPlayer2D" parent="."]
 
 [node name="TireSquealSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("5_n08ew")

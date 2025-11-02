@@ -702,6 +702,9 @@ func _on_body_entered(_body: Node) -> void:
 	if _crashing: return  # Only play sound once during a crashing period.
 	_crash_effect()
 	_crashing = true
+	# If CPU car is hitting another car from behind, then it honks its horn :3
+	if type == CarType.CPU and _body is Car and _pathfollow.progress < _body._pathfollow.progress and not $HornSound.playing:
+		$HornSound.play()
 
 func _crash_effect(stun_duration: float = 1.0) -> void:
 	$CrashSound.play()

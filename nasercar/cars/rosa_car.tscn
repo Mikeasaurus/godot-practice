@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dsew28lh05yyv"]
+[gd_scene load_steps=5 format=3 uid="uid://dsew28lh05yyv"]
 
 [ext_resource type="PackedScene" uid="uid://xkg3ucnitsra" path="res://cars/car.tscn" id="1_nowth"]
 [ext_resource type="Texture2D" uid="uid://d3ffe0w08xacs" path="res://cars/rosacar.png" id="2_53cs7"]
 [ext_resource type="Texture2D" uid="uid://ibhfeh6dv0qq" path="res://cars/rosa-tiny.png" id="2_x4aul"]
+[ext_resource type="AudioStream" uid="uid://c8fs5vhup63p8" path="res://audio/571348__99021905683__car-horn-honking.wav" id="4_r3ynl"]
 
 [node name="RosaCar" instance=ExtResource("1_nowth")]
 display_name = "Rosa"
@@ -10,3 +11,6 @@ tinypic = ExtResource("2_x4aul")
 
 [node name="Body" parent="." index="2"]
 texture = ExtResource("2_53cs7")
+
+[node name="HornSound" parent="." index="6"]
+stream = ExtResource("4_r3ynl")

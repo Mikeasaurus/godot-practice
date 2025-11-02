@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://bvoj5fwm75u8v"]
+[gd_scene load_steps=5 format=3 uid="uid://bvoj5fwm75u8v"]
 
 [ext_resource type="PackedScene" uid="uid://xkg3ucnitsra" path="res://cars/car.tscn" id="1_awwwh"]
 [ext_resource type="Texture2D" uid="uid://cq1jkn6quwyid" path="res://cars/naomicar.png" id="2_220w2"]
 [ext_resource type="Texture2D" uid="uid://bp7sgbpsn2r7f" path="res://cars/naomi-tiny.png" id="2_ho5rs"]
+[ext_resource type="AudioStream" uid="uid://dj3n1ix45bmtr" path="res://audio/436589__julien_matthey__jm_transport_ext_horn-01a-car_short_mini-countryman.wav" id="4_v20w0"]
 
 [node name="NaomiCar" instance=ExtResource("1_awwwh")]
 display_name = "Naomi"
@@ -10,3 +11,6 @@ tinypic = ExtResource("2_ho5rs")
 
 [node name="Body" parent="." index="2"]
 texture = ExtResource("2_220w2")
+
+[node name="HornSound" parent="." index="6"]
+stream = ExtResource("4_v20w0")
