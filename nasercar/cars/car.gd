@@ -368,19 +368,25 @@ func _process(delta: float) -> void:
 				_get_unstuck()
 		else:
 			_is_stuck = false
+
+	#######################################################
+	# Compute the progress of the car along the path.
+	#######################################################
+	if _pathfollow != null:
+		# Check if "progress" is needed for updating the path.
+		var distance_to_path: float = (global_position-_pathfollow.global_position).length()
+		# If next point along path is closer to player than previous point, then update to that point.
+		if distance_to_path < (global_position-_old_path_pos).length():
+			_old_path_pos = _pathfollow.global_position
+			_pathfollow.progress += 300
+
+
 	#######################################################
 	# Path-following for CPUs
 	#######################################################
-	if type == CarType.CPU and _pathfollow != null and cpu_steer_direction == CPU_Steer_Direction.PATH:
+	if type == CarType.CPU and cpu_steer_direction == CPU_Steer_Direction.PATH:
 		# Make sure our target point is far enough ahead.
 		var target_direction: Vector2 = _pathfollow.global_position - global_position
-		var dx: float = target_direction.length()
-		if dx < 10:
-			_old_path_pos = _pathfollow.global_position
-			_pathfollow.progress += 300
-		else:
-			_old_path_pos = _pathfollow.global_position
-			_pathfollow.progress += (300/dx) * linear_velocity.length() * delta
 		var angle: float = target_direction.angle() - global_rotation
 		for wheel in [$Wheels/FrontLeft, $Wheels/FrontRight]:
 			# Target angle of wheel (from wheel frame of reference).
@@ -397,16 +403,11 @@ func _process(delta: float) -> void:
 					wheel.rotation += dr
 
 	#######################################################
-	# Path-tracking for player
+	# Directional arrow for lost player
 	#######################################################
 	# (So player can be returned to road when something happens to their car).
-	if type == CarType.PLAYER and _pathfollow != null:
-		# Check if "progress" is needed for updating the path.
+	if type == CarType.PLAYER:
 		var distance_to_path: float = (global_position-_pathfollow.global_position).length()
-		# If next point along path is closer to player than previous point, then update to that point.
-		if distance_to_path < (global_position-_old_path_pos).length():
-			_old_path_pos = _pathfollow.global_position
-			_pathfollow.progress += 300
 		# Point to where player was last on the path, if they wandered too far.
 		$LostArrow.global_rotation = (_pathfollow.global_position-global_position).angle() + PI/2
 		if distance_to_path > 2000:
