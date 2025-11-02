@@ -12,5 +12,5 @@ tinypic = ExtResource("2_x4aul")
 [node name="Body" parent="." index="2"]
 texture = ExtResource("2_53cs7")
 
-[node name="HornSound" parent="." index="6"]
+[node name="HornSound" parent="." index="7"]
 stream = ExtResource("4_r3ynl")

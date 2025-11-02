@@ -704,7 +704,7 @@ func _on_body_entered(_body: Node) -> void:
 	_crash_effect()
 	_crashing = true
 	# If CPU car is hitting another car from behind, then it honks its horn :3
-	if type == CarType.CPU and _body is Car and _pathfollow.progress < _body._pathfollow.progress and not $HornSound.playing:
+	if type == CarType.CPU and _body is Car and progress() < _body.progress() and not $HornSound.playing:
 		$HornSound.play()
 
 func _crash_effect(stun_duration: float = 1.0) -> void:
