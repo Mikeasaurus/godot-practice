@@ -360,7 +360,11 @@ License: Attribution NonCommercial 4.0
 
 HONDA CR-V START.wav by xtrgamr
 [url]https://freesound.org/s/253614/[/url]
-License: Attribution 4.0"
+License: Attribution 4.0
+
+\"Coach\" Whistle.aiff by connersaw8
+[url]https://freesound.org/s/161662/[/url]s
+License: Creative Commons 0"
 fit_content = true
 
 [node name="BackButton" parent="MarginContainer/CenterContainer/VBoxContainer" instance=ExtResource("12_kmtil")]

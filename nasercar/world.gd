@@ -593,6 +593,7 @@ func _finished (car: Car) -> void:
 @rpc("authority","reliable","call_local")
 func _finished_announce() -> void:
 	$CanvasLayer/Place.hide()
+	$CanvasLayer/FinishSound.play()
 	var t: Label = $CanvasLayer/LapFinished
 	t.text = "FINISHED"
 	t.global_position = Vector2(-t.size.x*t.scale.x,0)
