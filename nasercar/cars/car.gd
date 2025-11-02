@@ -30,9 +30,9 @@ class_name Car
 @export var wheel_turn_speed: float = 120.0
 
 ## Emit signal when an item block is touched.
-# This signal gets connected and used from the parent context, so ignore the "unused" warning.
-@warning_ignore("unused_signal")
 signal itemblock
+func get_itemblock () -> void:
+	itemblock.emit()
 
 ## Emit signal when meteor impacts.
 signal meteor_impact
@@ -176,7 +176,6 @@ var _stuck_since: float
 var _getting_unstuck: bool = false
 
 ## The path to follow if this is a CPU.
-var path: Path2D = null
 var _pathfollow: PathFollow2D = null
 # For tracking player progress along path.
 var _old_path_pos: Vector2 = Vector2.ZERO

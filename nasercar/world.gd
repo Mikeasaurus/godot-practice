@@ -107,33 +107,33 @@ func _ready() -> void:
 		places_vbox.add_child(hsep)
 
 # Call this during race creation.
-func set_track (track: Track) -> void:
+func set_track (new_track: Track) -> void:
 	# Store a reference to the track, and place it in the visible area.
-	self.track = track
-	add_child(track)
+	self.track = new_track
+	add_child(new_track)
 	# Set up map overlay.
-	$MapOverlay.set_track(track)
+	$MapOverlay.set_track(new_track)
 
 # Called to do final setup of race, and start it.
-func run (participants: Dictionary) -> int:
+func run (participants_in: Dictionary) -> int:
 	# Now that we know the participants, can find out which car is the current player's car.
 	# Move the map icon for that car to the front of visibility.
 	var id: int = multiplayer.get_unique_id()
-	if id in participants:
-		var carname: String = participants[id][1]
+	if id in participants_in:
+		var carname: String = participants_in[id][1]
 		for c in _cars():
 			if c.display_name == carname:
 				$MapOverlay.move_to_front(c)
 	# If this is the host, then start the race.
 	if multiplayer.get_unique_id() == 1:
-		_start_race(participants)
+		_start_race(participants_in)
 	# Wait until race is finished, and return the final place.
 	# Place will be -1 for unfinished race?
 	var place: int = await _done
 	return place
 
 # Starts the race (countdown, then activate cars).
-func _start_race (participants: Dictionary) -> void:
+func _start_race (participants_in: Dictionary) -> void:
 
 	if multiplayer.get_unique_id() != 1:
 		print ("Attempted to call World.run on a passive peer.")
@@ -147,15 +147,15 @@ func _start_race (participants: Dictionary) -> void:
 	# participants variable gets updated from [player_name,car_name] to instances of car objects.
 	var cars: Array[Car] = _cars()
 	self.participants = {}
-	for player_id in participants.keys():
+	for player_id in participants_in.keys():
 		for car in cars:
-			var player_name: String = participants[player_id][0]
-			var car_name: String = participants[player_id][1]
+			var player_name: String = participants_in[player_id][0]
+			var car_name: String = participants_in[player_id][1]
 			if car.display_name == car_name:
 				self.participants[player_id] = car
 				# Update the names of player car(s)
 				# Use the handle for multiplayer, or (Player) for single player.
-				if 1 in participants:
+				if 1 in participants_in:
 					car.display_name = car.display_name + " (Player)"
 				else:
 					car.display_name = player_name

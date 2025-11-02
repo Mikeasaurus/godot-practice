@@ -18,8 +18,8 @@ func _on_body_entered(body: Node2D) -> void:
 	$ParticleTimer.start()
 	$RespawnTimer.start()
 	$ReactivateTimer.start()
-	if "itemblock" in body:
-		body.itemblock.emit()
+	if "get_itemblock" in body:
+		body.get_itemblock()
 	for peer in peers:
 		_item_taken_visual.rpc_id(peer)
 @rpc("authority","reliable","call_local")

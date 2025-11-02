@@ -12,15 +12,12 @@ func _process(delta: float) -> void:
 	# Update snow positions based on fall rate and camera motion.
 	var camera: Camera2D = get_viewport().get_camera_2d()
 	var camera_motion: Vector2
-	var camera_zoom: Vector2
 	if camera != null:
 		var camera_pos: Vector2 = camera.get_screen_center_position()
 		camera_motion = camera_pos - _previous_camera_pos
 		_previous_camera_pos = camera_pos
-		camera_zoom = camera.zoom
 	else:
 		camera_motion = Vector2.ZERO
-		camera_zoom = Vector2.ONE
 	for i in range(len(_snow)):
 		var pos: Vector2 = _snow[i].position
 		# Falling snow

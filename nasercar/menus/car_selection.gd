@@ -32,8 +32,8 @@ func run (handle: String) -> Dictionary:
 	return status
 
 # Initialize the menu (from server / local instance).
-func setup (race_id: int, track: String, locked_cars: Array[String]) -> void:
-	self.race_id = race_id
+func setup (new_race_id: int, track: String, locked_cars: Array[String]) -> void:
+	self.race_id = new_race_id
 	#TODO: get available cars from track info, and set up the panels accordingly.
 	for panel: CarSelectionPanel in $MarginContainer/CenterContainer/VBoxContainer/GridContainer.get_children():
 		if panel.car.display_name in locked_cars:
@@ -46,9 +46,9 @@ var car_names: Array[String]
 func index2name (panel_index: int) -> String:
 	if panel_index < 0: return ""
 	return car_names[panel_index]
-func name2index (name: String) -> int:
-	if name == "": return -1
-	return car_names.find(name)
+func name2index (carname: String) -> int:
+	if carname == "": return -1
+	return car_names.find(carname)
 func panel2index (panel: CarSelectionPanel) -> int:
 	return car_names.find(panel.car.display_name)
 

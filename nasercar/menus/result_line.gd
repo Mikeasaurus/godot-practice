@@ -8,7 +8,7 @@ func _ready() -> void:
 	#set_results(2, load("res://cars/naser_car.tscn").instantiate(), "Naser (CPU)", 64.0, Color.GREEN)
 
 @rpc("authority","reliable","call_local")
-func set_results (place: int, car_path: String, name: String, time: float, colour: Color = Color.WHITE) -> void:
+func set_results (place: int, car_path: String, racer_name: String, time: float, colour: Color = Color.WHITE) -> void:
 	if place > 0:
 		$Place.text = str(place)
 	$Place.modulate = colour
@@ -18,7 +18,7 @@ func set_results (place: int, car_path: String, name: String, time: float, colou
 		car.scale = Vector2(0.5,0.5)
 		car.position = Vector2(40,40)
 		car.process_mode = Node.PROCESS_MODE_DISABLED
-	$Name.text = name
+	$Name.text = racer_name
 	$Name.modulate = colour
 	if time > 0:
 		@warning_ignore("integer_division")

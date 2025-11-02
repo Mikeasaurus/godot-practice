@@ -1,7 +1,5 @@
 extends CanvasLayer
 
-@export var track: Track
-
 # Scale and offset for converting from track path coords to map overlay coords.
 var _scale: float
 var _offset: Vector2
