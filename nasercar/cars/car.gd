@@ -703,8 +703,13 @@ func _on_body_entered(_body: Node) -> void:
 	_crash_effect()
 	_crashing = true
 	# If CPU car is hitting another car from behind, then it honks its horn :3
-	if type == CarType.CPU and _body is Car and progress() < _body.progress() and not $HornSound.playing:
-		$HornSound.play()
+	if type == CarType.CPU and _body is Car and not $HornSound.playing:
+		# When it's 2 CPU cars colliding, the one behind does the honking.
+		if Vector2.from_angle(global_rotation+PI/2).dot(_body.position-self.position) > 0:
+			$HornSound.play()
+		# CPU car will always honk when it hits a player car.
+		elif _body.type == CarType.PLAYER:
+			$HornSound.play()
 
 func _crash_effect(stun_duration: float = 1.0) -> void:
 	$CrashSound.play()
