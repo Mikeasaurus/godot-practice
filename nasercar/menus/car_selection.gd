@@ -71,6 +71,7 @@ func _panel_selected (panel: CarSelectionPanel) -> void:
 		selection.unselect()
 	selection = panel
 	panel.select()
+	_update_headshot(panel)
 	participants[1] = ["Player", index2name(panel_index)]
 	if $MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled:
 		$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = false
@@ -181,6 +182,7 @@ func _update_panel (panel_index: int, is_taken: bool, player_id: int, handle: St
 		selection = panel
 		selection.select()
 		panel.overlay(handle)
+		_update_headshot(panel)
 	else:
 		panel.unselect()
 		panel.enable()
@@ -205,6 +207,7 @@ func _on_visibility_changed() -> void:
 		if selection != null:
 			selection.unselect()
 			selection = null
+		$Headshot.sprite_frames.clear("default")
 		# Enable "Back" button (may have been disabled in previous interaction with this scene).
 		$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/BackButton.disabled = false
 		if multiplayer.get_unique_id() != 1:
@@ -212,6 +215,17 @@ func _on_visibility_changed() -> void:
 			_sync_panels.rpc_id(1)
 			# No joining race until a car is selected.
 			$MarginContainer/CenterContainer/VBoxContainer/HBoxContainer/RaceButton.disabled = true
+
+# Update the headshot being displayed for the currently selected car.
+func _update_headshot (panel: CarSelectionPanel) -> void:
+	var car: Car = panel.car
+	$Label.text = car.display_name
+	var frames: SpriteFrames = $Headshot.sprite_frames
+	frames.clear("default")
+	for texture: Texture2D in car.headshot:
+		frames.add_frame("default",texture)
+	$Headshot.play()
+	$SelectionSound.play()
 
 # This is called if a player has disconnected from the server.
 func _player_bailed (player_id: int) -> void:
