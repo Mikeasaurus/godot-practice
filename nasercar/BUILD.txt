@@ -14,12 +14,11 @@ E.g., something like this in the Head Include section:
 <meta property="og:image" content="https://mikeasaurus.github.io/nasercar/preview2.png" >
 <meta http-equiv="Cache-Control" content="no-cache">
 
-Need to manually copy the "preview.png" file to the web server.
+Need to manually copy the "preview*.png" file to the web server.
 
 Also, enable virtual keyboard to help with mobile devices.  Mobile browsers
 don't react to Godot's text boxes with their native virtual keyboard, so
 Godot has to provide its own keyboard.
-
 
 Server:
 
