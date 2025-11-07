@@ -602,7 +602,7 @@ func _process(delta: float) -> void:
 			else:
 				wheel_sinking = false
 		# Special effects override the tile skidmarks and friction.
-		if EffectType.NAILPOLISHED in wheel_effects[w]:
+		if EffectType.NAILPOLISHED in wheel_effects[w] and not wheel_sinking:
 			skidmark_colour = wheel_effects[w][EffectType.NAILPOLISHED][0]
 			if w%2 == 1: friction = 0
 			else: friction = -0.3
